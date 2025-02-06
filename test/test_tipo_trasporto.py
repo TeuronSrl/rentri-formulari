@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.tipo_trasporto import TipoTrasporto
+from rentri_formulari.models.tipo_trasporto import TipoTrasporto  # noqa: E501
 
 class TestTipoTrasporto(unittest.TestCase):
     """TipoTrasporto unit test stubs"""

@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.dati_trasbordo_totale_model import DatiTrasbordoTotaleModel
+from rentri_formulari.models.dati_trasbordo_totale_model import DatiTrasbordoTotaleModel  # noqa: E501
 
 class TestDatiTrasbordoTotaleModel(unittest.TestCase):
     """DatiTrasbordoTotaleModel unit test stubs"""
@@ -28,12 +29,12 @@ class TestDatiTrasbordoTotaleModel(unittest.TestCase):
 
     def make_instance(self, include_optional) -> DatiTrasbordoTotaleModel:
         """Test DatiTrasbordoTotaleModel
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `DatiTrasbordoTotaleModel`
         """
-        model = DatiTrasbordoTotaleModel()
+        model = DatiTrasbordoTotaleModel()  # noqa: E501
         if include_optional:
             return DatiTrasbordoTotaleModel(
                 trasportatore = None,

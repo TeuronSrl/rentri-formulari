@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **esito** | [**EsitoEstraiDatiXfirModel**](EsitoEstraiDatiXfirModel.md) | Esito | [optional] 
@@ -21,7 +20,7 @@ json = "{}"
 # create an instance of EsitoEstrazioneDatiXfirModel from a JSON string
 esito_estrazione_dati_xfir_model_instance = EsitoEstrazioneDatiXfirModel.from_json(json)
 # print the JSON string representation of the object
-print(EsitoEstrazioneDatiXfirModel.to_json())
+print EsitoEstrazioneDatiXfirModel.to_json()
 
 # convert the object into a dict
 esito_estrazione_dati_xfir_model_dict = esito_estrazione_dati_xfir_model_instance.to_dict()

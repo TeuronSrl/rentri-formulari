@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.tipo_analisi_classificazione import TipoAnalisiClassificazione
+from rentri_formulari.models.tipo_analisi_classificazione import TipoAnalisiClassificazione  # noqa: E501
 
 class TestTipoAnalisiClassificazione(unittest.TestCase):
     """TipoAnalisiClassificazione unit test stubs"""

@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.stati_trasmissione_dati import StatiTrasmissioneDati
+from rentri_formulari.models.stati_trasmissione_dati import StatiTrasmissioneDati  # noqa: E501
 
 class TestStatiTrasmissioneDati(unittest.TestCase):
     """StatiTrasmissioneDati unit test stubs"""

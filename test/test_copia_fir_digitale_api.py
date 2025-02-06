@@ -15,7 +15,7 @@
 
 import unittest
 
-from rentri_formulari.api.copia_fir_digitale_api import CopiaFIRDigitaleApi
+from rentri_formulari.api.copia_fir_digitale_api import CopiaFIRDigitaleApi  # noqa: E501
 
 
 class TestCopiaFIRDigitaleApi(unittest.TestCase):
@@ -25,82 +25,82 @@ class TestCopiaFIRDigitaleApi(unittest.TestCase):
         self.api = CopiaFIRDigitaleApi()
 
     def tearDown(self) -> None:
-        pass
+        self.api.api_client.close()
 
     def test_copia_digitale_caricamento_num_iscr_sito_get(self) -> None:
         """Test case for copia_digitale_caricamento_num_iscr_sito_get
 
-        Copie FIR digitali disponibili
+        Copie FIR digitali disponibili  # noqa: E501
         """
         pass
 
     def test_copia_digitale_caricamento_num_iscr_sito_identificativo_delete(self) -> None:
         """Test case for copia_digitale_caricamento_num_iscr_sito_identificativo_delete
 
-        Cancella copia FIR digitale
+        Cancella copia FIR digitale  # noqa: E501
         """
         pass
 
     def test_copia_digitale_caricamento_num_iscr_sito_identificativo_documento_get(self) -> None:
         """Test case for copia_digitale_caricamento_num_iscr_sito_identificativo_documento_get
 
-        Documento copia FIR digitale
+        Documento copia FIR digitale  # noqa: E501
         """
         pass
 
     def test_copia_digitale_caricamento_num_iscr_sito_identificativo_get(self) -> None:
         """Test case for copia_digitale_caricamento_num_iscr_sito_identificativo_get
 
-        Dettaglio copia FIR digitale
+        Dettaglio copia FIR digitale  # noqa: E501
         """
         pass
 
     def test_copia_digitale_caricamento_numero_fir_post(self) -> None:
         """Test case for copia_digitale_caricamento_numero_fir_post
 
-        🔁[ASYNC] Carica copia digitale xFIR
+        🔁[ASYNC] Carica copia digitale xFIR  # noqa: E501
         """
         pass
 
     def test_copia_digitale_conferma_identificativo_soggetto_get(self) -> None:
         """Test case for copia_digitale_conferma_identificativo_soggetto_get
 
-        Copie FIR digitali disponibili
+        Copie FIR digitali disponibili  # noqa: E501
         """
         pass
 
     def test_copia_digitale_conferma_identificativo_soggetto_identificativo_documento_get(self) -> None:
         """Test case for copia_digitale_conferma_identificativo_soggetto_identificativo_documento_get
 
-        Documento copia FIR digitale disponibile
+        Documento copia FIR digitale disponibile  # noqa: E501
         """
         pass
 
     def test_copia_digitale_conferma_identificativo_soggetto_identificativo_get(self) -> None:
         """Test case for copia_digitale_conferma_identificativo_soggetto_identificativo_get
 
-        Dettaglio copia digitale FIR disponibile
+        Dettaglio copia digitale FIR disponibile  # noqa: E501
         """
         pass
 
     def test_copia_digitale_conferma_num_iscr_sito_identificativo_put(self) -> None:
         """Test case for copia_digitale_conferma_num_iscr_sito_identificativo_put
 
-        Conferma copia FIR digitale disponibile
+        Conferma copia FIR digitale disponibile  # noqa: E501
         """
         pass
 
     def test_copia_digitale_transazione_id_result_get(self) -> None:
         """Test case for copia_digitale_transazione_id_result_get
 
-        ⚠️[DEPRECATO] - utilizzare /{transazioneId}/result - Esito transazione
+        ⚠️[DEPRECATO] - utilizzare /{transazioneId}/result - Esito transazione  # noqa: E501
         """
         pass
 
     def test_copia_digitale_transazione_id_status_get(self) -> None:
         """Test case for copia_digitale_transazione_id_status_get
 
-        ⚠️[DEPRECATO] - utilizzare /{transazioneId}/status - Stato transazione
+        ⚠️[DEPRECATO] - utilizzare /{transazioneId}/status - Stato transazione  # noqa: E501
         """
         pass
 

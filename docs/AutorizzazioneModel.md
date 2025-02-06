@@ -3,7 +3,6 @@
 Autorizzazione
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **numero** | **str** | Numero di autorizzazione | [optional] 
@@ -19,7 +18,7 @@ json = "{}"
 # create an instance of AutorizzazioneModel from a JSON string
 autorizzazione_model_instance = AutorizzazioneModel.from_json(json)
 # print the JSON string representation of the object
-print(AutorizzazioneModel.to_json())
+print AutorizzazioneModel.to_json()
 
 # convert the object into a dict
 autorizzazione_model_dict = autorizzazione_model_instance.to_dict()

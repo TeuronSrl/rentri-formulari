@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **data_firma** | **datetime** |  | [optional] 
@@ -23,7 +22,7 @@ json = "{}"
 # create an instance of ControlloFirmeResult from a JSON string
 controllo_firme_result_instance = ControlloFirmeResult.from_json(json)
 # print the JSON string representation of the object
-print(ControlloFirmeResult.to_json())
+print ControlloFirmeResult.to_json()
 
 # convert the object into a dict
 controllo_firme_result_dict = controllo_firme_result_instance.to_dict()

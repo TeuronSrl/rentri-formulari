@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **numero_fir_origine** | **str** | Numero FIR del formulario che ha subito il trasbordo parziale da cui prende origine il nuovo formulario | 
@@ -19,7 +18,7 @@ json = "{}"
 # create an instance of DatiTrasbordoParzialeOrigineModel from a JSON string
 dati_trasbordo_parziale_origine_model_instance = DatiTrasbordoParzialeOrigineModel.from_json(json)
 # print the JSON string representation of the object
-print(DatiTrasbordoParzialeOrigineModel.to_json())
+print DatiTrasbordoParzialeOrigineModel.to_json()
 
 # convert the object into a dict
 dati_trasbordo_parziale_origine_model_dict = dati_trasbordo_parziale_origine_model_instance.to_dict()

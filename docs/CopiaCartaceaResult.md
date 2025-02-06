@@ -3,7 +3,6 @@
 Dati della copia del FIR cartaceo
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **identificativo** | **str** | Identificativo univco della copia del FIR cartaceo caricata | [optional] 
@@ -30,7 +29,7 @@ json = "{}"
 # create an instance of CopiaCartaceaResult from a JSON string
 copia_cartacea_result_instance = CopiaCartaceaResult.from_json(json)
 # print the JSON string representation of the object
-print(CopiaCartaceaResult.to_json())
+print CopiaCartaceaResult.to_json()
 
 # convert the object into a dict
 copia_cartacea_result_dict = copia_cartacea_result_instance.to_dict()

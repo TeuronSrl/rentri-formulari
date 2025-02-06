@@ -18,77 +18,60 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field
-from typing import Any, ClassVar, Dict, List, Optional
-from typing_extensions import Annotated
-from typing import Optional, Set
-from typing_extensions import Self
+
+from typing import Optional
+from pydantic import BaseModel, Field, constr
 
 class DatiProduttoreOriginarioModel(BaseModel):
     """
     DatiProduttoreOriginarioModel
-    """ # noqa: E501
-    nazione_id: Optional[Annotated[str, Field(strict=True, max_length=2)]] = Field(default=None, description="Codice ISO 3166-1 alpha-2 della nazione, in caso di \"IT\" è possibile omettere.  Vengono accettati solo codici previsti dallo standard ISO 3166-1 alpha-2.  Vedi API di codifica: <i>GET /codifiche/v1.0/nazioni</i>")
-    denominazione: Annotated[str, Field(min_length=1, strict=True)] = Field(description="Denominazione del soggetto")
-    codice_fiscale: Annotated[str, Field(min_length=5, strict=True, max_length=20)] = Field(description="Codice fiscale del soggetto. In base alla nazione (\"nazione_id\") verranno effettuate le seguenti validazioni: - IT: validazioni formale per codice fiscale personale (16 caratteri) o formato partita IVA (11 cifre decimali) - UE: da 5 a 20 caratteri con successiva validazione formale specifica per il paese UE - Extra UE: da 5 a 20 caratteri")
-    __properties: ClassVar[List[str]] = ["nazione_id", "denominazione", "codice_fiscale"]
+    """
+    nazione_id: Optional[constr(strict=True, max_length=2)] = Field(default=None, description="Codice ISO 3166-1 alpha-2 della nazione, in caso di \"IT\" è possibile omettere.  Vengono accettati solo codici previsti dallo standard ISO 3166-1 alpha-2.  Vedi API di codifica: <i>GET /codifiche/v1.0/nazioni</i>")
+    denominazione: constr(strict=True, min_length=1) = Field(default=..., description="Denominazione del soggetto")
+    codice_fiscale: constr(strict=True, max_length=20, min_length=5) = Field(default=..., description="Codice fiscale del soggetto. In base alla nazione (\"nazione_id\") verranno effettuate le seguenti validazioni: - IT: validazioni formale per codice fiscale personale (16 caratteri) o formato partita IVA (11 cifre decimali) - UE: da 5 a 20 caratteri con successiva validazione formale specifica per il paese UE - Extra UE: da 5 a 20 caratteri")
+    __properties = ["nazione_id", "denominazione", "codice_fiscale"]
 
-    model_config = ConfigDict(
-        populate_by_name=True,
-        validate_assignment=True,
-        protected_namespaces=(),
-    )
-
+    class Config:
+        """Pydantic configuration"""
+        allow_population_by_field_name = True
+        validate_assignment = True
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""
-        return pprint.pformat(self.model_dump(by_alias=True))
+        return pprint.pformat(self.dict(by_alias=True))
 
     def to_json(self) -> str:
         """Returns the JSON representation of the model using alias"""
-        # TODO: pydantic v2: use .model_dump_json(by_alias=True, exclude_unset=True) instead
         return json.dumps(self.to_dict())
 
     @classmethod
-    def from_json(cls, json_str: str) -> Optional[Self]:
+    def from_json(cls, json_str: str) -> DatiProduttoreOriginarioModel:
         """Create an instance of DatiProduttoreOriginarioModel from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
-    def to_dict(self) -> Dict[str, Any]:
-        """Return the dictionary representation of the model using alias.
-
-        This has the following differences from calling pydantic's
-        `self.model_dump(by_alias=True)`:
-
-        * `None` is only added to the output dict for nullable fields that
-          were set at model initialization. Other fields with value `None`
-          are ignored.
-        """
-        excluded_fields: Set[str] = set([
-        ])
-
-        _dict = self.model_dump(
-            by_alias=True,
-            exclude=excluded_fields,
-            exclude_none=True,
-        )
+    def to_dict(self):
+        """Returns the dictionary representation of the model using alias"""
+        _dict = self.dict(by_alias=True,
+                          exclude={
+                          },
+                          exclude_none=True)
         # set to None if nazione_id (nullable) is None
-        # and model_fields_set contains the field
-        if self.nazione_id is None and "nazione_id" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.nazione_id is None and "nazione_id" in self.__fields_set__:
             _dict['nazione_id'] = None
 
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
+    def from_dict(cls, obj: dict) -> DatiProduttoreOriginarioModel:
         """Create an instance of DatiProduttoreOriginarioModel from a dict"""
         if obj is None:
             return None
 
         if not isinstance(obj, dict):
-            return cls.model_validate(obj)
+            return DatiProduttoreOriginarioModel.parse_obj(obj)
 
-        _obj = cls.model_validate({
+        _obj = DatiProduttoreOriginarioModel.parse_obj({
             "nazione_id": obj.get("nazione_id"),
             "denominazione": obj.get("denominazione"),
             "codice_fiscale": obj.get("codice_fiscale")

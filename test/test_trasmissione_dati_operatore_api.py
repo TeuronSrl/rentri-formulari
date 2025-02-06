@@ -15,7 +15,7 @@
 
 import unittest
 
-from rentri_formulari.api.trasmissione_dati_operatore_api import TrasmissioneDatiOperatoreApi
+from rentri_formulari.api.trasmissione_dati_operatore_api import TrasmissioneDatiOperatoreApi  # noqa: E501
 
 
 class TestTrasmissioneDatiOperatoreApi(unittest.TestCase):
@@ -25,89 +25,89 @@ class TestTrasmissioneDatiOperatoreApi(unittest.TestCase):
         self.api = TrasmissioneDatiOperatoreApi()
 
     def tearDown(self) -> None:
-        pass
+        self.api.api_client.close()
 
     def test_trasmissioni_num_iscr_sito_get(self) -> None:
         """Test case for trasmissioni_num_iscr_sito_get
 
-        ⚠️[DEPRECATO] - utilizzare /trasmissioni/operatore/{numIscrSito} - Trasmissioni effettuate
+        ⚠️[DEPRECATO] - utilizzare /trasmissioni/operatore/{numIscrSito} - Trasmissioni effettuate  # noqa: E501
         """
         pass
 
     def test_trasmissioni_num_iscr_sito_identificativo_annulla_post(self) -> None:
         """Test case for trasmissioni_num_iscr_sito_identificativo_annulla_post
 
-        ⚠️[DEPRECATO] - utilizzare public/trasmissioni/operatore/{numIscrSito}/{identificativo}/annulla - Annulla trasmissione di dati del FIR digitale
+        ⚠️[DEPRECATO] - utilizzare public/trasmissioni/operatore/{numIscrSito}/{identificativo}/annulla - Annulla trasmissione di dati del FIR digitale  # noqa: E501
         """
         pass
 
     def test_trasmissioni_num_iscr_sito_identificativo_get(self) -> None:
         """Test case for trasmissioni_num_iscr_sito_identificativo_get
 
-        ⚠️[DEPRECATO] - utilizzare /trasmissioni/operatore/{numIscrSito}/{identificativo} - Dettaglio trasmissione
+        ⚠️[DEPRECATO] - utilizzare /trasmissioni/operatore/{numIscrSito}/{identificativo} - Dettaglio trasmissione  # noqa: E501
         """
         pass
 
     def test_trasmissioni_num_iscr_sito_numero_fir_estrai_post(self) -> None:
         """Test case for trasmissioni_num_iscr_sito_numero_fir_estrai_post
 
-        🔁[ASYNC] ⚠️[DEPRECATO] - utilizzare /trasmissioni/operatore/{numIscrSito}/{numeroFir}/estrai - Estrazione dati per FIR digitale
+        🔁[ASYNC] ⚠️[DEPRECATO] - utilizzare /trasmissioni/operatore/{numIscrSito}/{numeroFir}/estrai - Estrazione dati per FIR digitale  # noqa: E501
         """
         pass
 
     def test_trasmissioni_num_iscr_sito_post(self) -> None:
         """Test case for trasmissioni_num_iscr_sito_post
 
-        ⚠️[DEPRECATO] - utilizzare /trasmissioni/operatore/{numIscrSito} - Trasmette i dati del FIR digitale
+        ⚠️[DEPRECATO] - utilizzare /trasmissioni/operatore/{numIscrSito} - Trasmette i dati del FIR digitale  # noqa: E501
         """
         pass
 
     def test_trasmissioni_operatore_num_iscr_sito_get(self) -> None:
         """Test case for trasmissioni_operatore_num_iscr_sito_get
 
-        Trasmissioni effettuate
+        Trasmissioni effettuate  # noqa: E501
         """
         pass
 
     def test_trasmissioni_operatore_num_iscr_sito_identificativo_annulla_delete(self) -> None:
         """Test case for trasmissioni_operatore_num_iscr_sito_identificativo_annulla_delete
 
-        Annulla trasmissione di dati del FIR digitale
+        Annulla trasmissione di dati del FIR digitale  # noqa: E501
         """
         pass
 
     def test_trasmissioni_operatore_num_iscr_sito_identificativo_get(self) -> None:
         """Test case for trasmissioni_operatore_num_iscr_sito_identificativo_get
 
-        Dettaglio trasmissione
+        Dettaglio trasmissione  # noqa: E501
         """
         pass
 
     def test_trasmissioni_operatore_num_iscr_sito_numero_fir_estrai_post(self) -> None:
         """Test case for trasmissioni_operatore_num_iscr_sito_numero_fir_estrai_post
 
-        🔁[ASYNC] Estrazione dati per FIR digitale
+        🔁[ASYNC] Estrazione dati per FIR digitale  # noqa: E501
         """
         pass
 
     def test_trasmissioni_operatore_num_iscr_sito_post(self) -> None:
         """Test case for trasmissioni_operatore_num_iscr_sito_post
 
-        Trasmette i dati del FIR digitale
+        Trasmette i dati del FIR digitale  # noqa: E501
         """
         pass
 
     def test_trasmissioni_transazione_id_result_get(self) -> None:
         """Test case for trasmissioni_transazione_id_result_get
 
-        ⚠️[DEPRECATO] - utilizzare /{transazioneId}/result - Esito transazione
+        ⚠️[DEPRECATO] - utilizzare /{transazioneId}/result - Esito transazione  # noqa: E501
         """
         pass
 
     def test_trasmissioni_transazione_id_status_get(self) -> None:
         """Test case for trasmissioni_transazione_id_status_get
 
-        ⚠️[DEPRECATO] - utilizzare /{transazioneId}/status - Stato transazione
+        ⚠️[DEPRECATO] - utilizzare /{transazioneId}/status - Stato transazione  # noqa: E501
         """
         pass
 

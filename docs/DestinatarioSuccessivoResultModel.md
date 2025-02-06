@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id_destinatario** | **int** |  | [optional] 
@@ -25,7 +24,7 @@ json = "{}"
 # create an instance of DestinatarioSuccessivoResultModel from a JSON string
 destinatario_successivo_result_model_instance = DestinatarioSuccessivoResultModel.from_json(json)
 # print the JSON string representation of the object
-print(DestinatarioSuccessivoResultModel.to_json())
+print DestinatarioSuccessivoResultModel.to_json()
 
 # convert the object into a dict
 destinatario_successivo_result_model_dict = destinatario_successivo_result_model_instance.to_dict()

@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.tipo_trasmissione import TipoTrasmissione
+from rentri_formulari.models.tipo_trasmissione import TipoTrasmissione  # noqa: E501
 
 class TestTipoTrasmissione(unittest.TestCase):
     """TipoTrasmissione unit test stubs"""

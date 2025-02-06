@@ -3,7 +3,6 @@
 Dati destinatario
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id_destinatario** | **int** |  | [optional] 
@@ -27,7 +26,7 @@ json = "{}"
 # create an instance of NumeroFirDestinatarioPostRequest from a JSON string
 numero_fir_destinatario_post_request_instance = NumeroFirDestinatarioPostRequest.from_json(json)
 # print the JSON string representation of the object
-print(NumeroFirDestinatarioPostRequest.to_json())
+print NumeroFirDestinatarioPostRequest.to_json()
 
 # convert the object into a dict
 numero_fir_destinatario_post_request_dict = numero_fir_destinatario_post_request_instance.to_dict()

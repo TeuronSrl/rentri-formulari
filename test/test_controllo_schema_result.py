@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.controllo_schema_result import ControlloSchemaResult
+from rentri_formulari.models.controllo_schema_result import ControlloSchemaResult  # noqa: E501
 
 class TestControlloSchemaResult(unittest.TestCase):
     """ControlloSchemaResult unit test stubs"""
@@ -28,12 +29,12 @@ class TestControlloSchemaResult(unittest.TestCase):
 
     def make_instance(self, include_optional) -> ControlloSchemaResult:
         """Test ControlloSchemaResult
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `ControlloSchemaResult`
         """
-        model = ControlloSchemaResult()
+        model = ControlloSchemaResult()  # noqa: E501
         if include_optional:
             return ControlloSchemaResult(
                 codice = '',

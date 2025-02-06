@@ -3,7 +3,6 @@
 Normativa ADR
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **numero_onu** | **str** | Numero ONU | [optional] 
@@ -20,7 +19,7 @@ json = "{}"
 # create an instance of NormativaADRModel from a JSON string
 normativa_adr_model_instance = NormativaADRModel.from_json(json)
 # print the JSON string representation of the object
-print(NormativaADRModel.to_json())
+print NormativaADRModel.to_json()
 
 # convert the object into a dict
 normativa_adr_model_dict = normativa_adr_model_instance.to_dict()

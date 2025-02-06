@@ -3,7 +3,6 @@
 Dati della copia del FIR digitale
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **identificativo** | **str** | Identificativo univco della copia del FIR digitale caricata | [optional] 
@@ -31,7 +30,7 @@ json = "{}"
 # create an instance of CopiaDigitaleResult from a JSON string
 copia_digitale_result_instance = CopiaDigitaleResult.from_json(json)
 # print the JSON string representation of the object
-print(CopiaDigitaleResult.to_json())
+print CopiaDigitaleResult.to_json()
 
 # convert the object into a dict
 copia_digitale_result_dict = copia_digitale_result_instance.to_dict()

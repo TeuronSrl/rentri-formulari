@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.intermediario_item_result import IntermediarioItemResult
+from rentri_formulari.models.intermediario_item_result import IntermediarioItemResult  # noqa: E501
 
 class TestIntermediarioItemResult(unittest.TestCase):
     """IntermediarioItemResult unit test stubs"""
@@ -28,12 +29,12 @@ class TestIntermediarioItemResult(unittest.TestCase):
 
     def make_instance(self, include_optional) -> IntermediarioItemResult:
         """Test IntermediarioItemResult
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `IntermediarioItemResult`
         """
-        model = IntermediarioItemResult()
+        model = IntermediarioItemResult()  # noqa: E501
         if include_optional:
             return IntermediarioItemResult(
                 num_iscr_sito = '',

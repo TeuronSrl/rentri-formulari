@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.dati_trasmissione_formulario_model import DatiTrasmissioneFormularioModel
+from rentri_formulari.models.dati_trasmissione_formulario_model import DatiTrasmissioneFormularioModel  # noqa: E501
 
 class TestDatiTrasmissioneFormularioModel(unittest.TestCase):
     """DatiTrasmissioneFormularioModel unit test stubs"""
@@ -28,16 +29,16 @@ class TestDatiTrasmissioneFormularioModel(unittest.TestCase):
 
     def make_instance(self, include_optional) -> DatiTrasmissioneFormularioModel:
         """Test DatiTrasmissioneFormularioModel
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `DatiTrasmissioneFormularioModel`
         """
-        model = DatiTrasmissioneFormularioModel()
+        model = DatiTrasmissioneFormularioModel()  # noqa: E501
         if include_optional:
             return DatiTrasmissioneFormularioModel(
                 dati_partenza = rentri_formulari.models.dati_trasmissione_partenza_model.DatiTrasmissionePartenzaModel(
-                    numero_fir = 'WPQZYQ ) ._),,#_**&,\"%\"* - *- !\'# 1757701929816286488291663/.$\'\"&(_#+% #\"&%-/*- )!./ !),+#/)B0', 
+                    numero_fir = 'WPQZYQ ) ._),,#_**&,\"%\"* - *- !'# 1757701929816286488291663/.$'\"&(_#+% #\"&%-/*- )!./ !),+#/)B0', 
                     produttore = null, 
                     destinatario = null, 
                     trasportatori = [
@@ -98,7 +99,7 @@ class TestDatiTrasmissioneFormularioModel(unittest.TestCase):
         else:
             return DatiTrasmissioneFormularioModel(
                 dati_partenza = rentri_formulari.models.dati_trasmissione_partenza_model.DatiTrasmissionePartenzaModel(
-                    numero_fir = 'WPQZYQ ) ._),,#_**&,\"%\"* - *- !\'# 1757701929816286488291663/.$\'\"&(_#+% #\"&%-/*- )!./ !),+#/)B0', 
+                    numero_fir = 'WPQZYQ ) ._),,#_**&,\"%\"* - *- !'# 1757701929816286488291663/.$'\"&(_#+% #\"&%-/*- )!./ !),+#/)B0', 
                     produttore = null, 
                     destinatario = null, 
                     trasportatori = [

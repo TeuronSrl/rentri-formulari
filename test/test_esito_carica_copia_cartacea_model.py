@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.esito_carica_copia_cartacea_model import EsitoCaricaCopiaCartaceaModel
+from rentri_formulari.models.esito_carica_copia_cartacea_model import EsitoCaricaCopiaCartaceaModel  # noqa: E501
 
 class TestEsitoCaricaCopiaCartaceaModel(unittest.TestCase):
     """EsitoCaricaCopiaCartaceaModel unit test stubs"""
@@ -28,12 +29,12 @@ class TestEsitoCaricaCopiaCartaceaModel(unittest.TestCase):
 
     def make_instance(self, include_optional) -> EsitoCaricaCopiaCartaceaModel:
         """Test EsitoCaricaCopiaCartaceaModel
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `EsitoCaricaCopiaCartaceaModel`
         """
-        model = EsitoCaricaCopiaCartaceaModel()
+        model = EsitoCaricaCopiaCartaceaModel()  # noqa: E501
         if include_optional:
             return EsitoCaricaCopiaCartaceaModel(
                 identificativo = ''

@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **esito** | [**EsitoNuovoFormularioModel**](EsitoNuovoFormularioModel.md) | Esito | [optional] 
@@ -21,7 +20,7 @@ json = "{}"
 # create an instance of EsitoCreaFormularioModel from a JSON string
 esito_crea_formulario_model_instance = EsitoCreaFormularioModel.from_json(json)
 # print the JSON string representation of the object
-print(EsitoCreaFormularioModel.to_json())
+print EsitoCreaFormularioModel.to_json()
 
 # convert the object into a dict
 esito_crea_formulario_model_dict = esito_crea_formulario_model_instance.to_dict()

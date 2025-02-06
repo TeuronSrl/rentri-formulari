@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **dati_firma** | [**DatiFirmaResult**](DatiFirmaResult.md) |  | [optional] 
@@ -19,7 +18,7 @@ json = "{}"
 # create an instance of DatiAnnullamentoResultModel from a JSON string
 dati_annullamento_result_model_instance = DatiAnnullamentoResultModel.from_json(json)
 # print the JSON string representation of the object
-print(DatiAnnullamentoResultModel.to_json())
+print DatiAnnullamentoResultModel.to_json()
 
 # convert the object into a dict
 dati_annullamento_result_model_dict = dati_annullamento_result_model_instance.to_dict()

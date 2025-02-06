@@ -18,33 +18,31 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictStr, field_validator
-from typing import Any, ClassVar, Dict, List, Optional
-from typing_extensions import Annotated
+
+from typing import List, Optional
+from pydantic import BaseModel, Field, StrictStr, conlist, constr, validator
 from rentri_formulari.models.dati_intermediari_formulario_model import DatiIntermediariFormularioModel
 from rentri_formulari.models.dati_partenza_model_destinatario import DatiPartenzaModelDestinatario
 from rentri_formulari.models.dati_partenza_model_produttore import DatiPartenzaModelProduttore
 from rentri_formulari.models.dati_partenza_model_trasportatori_inner import DatiPartenzaModelTrasportatoriInner
 from rentri_formulari.models.dati_rifiuto_model import DatiRifiutoModel
 from rentri_formulari.models.dati_trasbordo_parziale_origine_model import DatiTrasbordoParzialeOrigineModel
-from typing import Optional, Set
-from typing_extensions import Self
 
 class DatiPartenzaModel(BaseModel):
     """
-    Dati di partenza del formulario
-    """ # noqa: E501
-    numero_fir: Optional[Annotated[str, Field(strict=True)]] = Field(default=None, description="Numero di vidimazione da attribuire al nuovo FIR digitale. Qualora non venga specificato, il sistema ne assegnerà uno automaticamente.")
+    Dati di partenza del formulario  # noqa: E501
+    """
+    numero_fir: Optional[constr(strict=True)] = Field(default=None, description="Numero di vidimazione da attribuire al nuovo FIR digitale. Qualora non venga specificato, il sistema ne assegnerà uno automaticamente.")
     produttore: Optional[DatiPartenzaModelProduttore] = None
-    destinatario: DatiPartenzaModelDestinatario
-    trasportatori: Annotated[List[DatiPartenzaModelTrasportatoriInner], Field(min_length=1)] = Field(description="Trasportatori")
-    intermediari: Optional[List[DatiIntermediariFormularioModel]] = Field(default=None, description="Intermediari")
-    rifiuto: DatiRifiutoModel = Field(description="Caratteristiche del rifiuto")
+    destinatario: DatiPartenzaModelDestinatario = Field(...)
+    trasportatori: conlist(DatiPartenzaModelTrasportatoriInner, min_items=1) = Field(default=..., description="Trasportatori")
+    intermediari: Optional[conlist(DatiIntermediariFormularioModel)] = Field(default=None, description="Intermediari")
+    rifiuto: DatiRifiutoModel = Field(default=..., description="Caratteristiche del rifiuto")
     trasbordo_parziale_origine: Optional[DatiTrasbordoParzialeOrigineModel] = Field(default=None, description="Dati relativi al trasbordo parziale da cui prende origine il formulario. Il dato deve essere valorizzato solo se il formulario prende origine da un trasbordo parziale. Se il dato viene valorizzato, la proprietà \"produttore\" non deve essere valorizzata.")
     annotazioni: Optional[StrictStr] = Field(default=None, description="Annotazioni")
-    __properties: ClassVar[List[str]] = ["numero_fir", "produttore", "destinatario", "trasportatori", "intermediari", "rifiuto", "trasbordo_parziale_origine", "annotazioni"]
+    __properties = ["numero_fir", "produttore", "destinatario", "trasportatori", "intermediari", "rifiuto", "trasbordo_parziale_origine", "annotazioni"]
 
-    @field_validator('numero_fir')
+    @validator('numero_fir')
     def numero_fir_validate_regular_expression(cls, value):
         """Validates the regular expression"""
         if value is None:
@@ -54,45 +52,30 @@ class DatiPartenzaModel(BaseModel):
             raise ValueError(r"must validate the regular expression /^([BCDFGHJKLMNPQRSTVWXYZ]{4,6})[ 	-\/_]*([0-9]+)[ 	-\/_]*([BCDFGHJKLMNPQRSTVWXYZ]{1,2})$/")
         return value
 
-    model_config = ConfigDict(
-        populate_by_name=True,
-        validate_assignment=True,
-        protected_namespaces=(),
-    )
-
+    class Config:
+        """Pydantic configuration"""
+        allow_population_by_field_name = True
+        validate_assignment = True
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""
-        return pprint.pformat(self.model_dump(by_alias=True))
+        return pprint.pformat(self.dict(by_alias=True))
 
     def to_json(self) -> str:
         """Returns the JSON representation of the model using alias"""
-        # TODO: pydantic v2: use .model_dump_json(by_alias=True, exclude_unset=True) instead
         return json.dumps(self.to_dict())
 
     @classmethod
-    def from_json(cls, json_str: str) -> Optional[Self]:
+    def from_json(cls, json_str: str) -> DatiPartenzaModel:
         """Create an instance of DatiPartenzaModel from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
-    def to_dict(self) -> Dict[str, Any]:
-        """Return the dictionary representation of the model using alias.
-
-        This has the following differences from calling pydantic's
-        `self.model_dump(by_alias=True)`:
-
-        * `None` is only added to the output dict for nullable fields that
-          were set at model initialization. Other fields with value `None`
-          are ignored.
-        """
-        excluded_fields: Set[str] = set([
-        ])
-
-        _dict = self.model_dump(
-            by_alias=True,
-            exclude=excluded_fields,
-            exclude_none=True,
-        )
+    def to_dict(self):
+        """Returns the dictionary representation of the model using alias"""
+        _dict = self.dict(by_alias=True,
+                          exclude={
+                          },
+                          exclude_none=True)
         # override the default output from pydantic by calling `to_dict()` of produttore
         if self.produttore:
             _dict['produttore'] = self.produttore.to_dict()
@@ -102,16 +85,16 @@ class DatiPartenzaModel(BaseModel):
         # override the default output from pydantic by calling `to_dict()` of each item in trasportatori (list)
         _items = []
         if self.trasportatori:
-            for _item_trasportatori in self.trasportatori:
-                if _item_trasportatori:
-                    _items.append(_item_trasportatori.to_dict())
+            for _item in self.trasportatori:
+                if _item:
+                    _items.append(_item.to_dict())
             _dict['trasportatori'] = _items
         # override the default output from pydantic by calling `to_dict()` of each item in intermediari (list)
         _items = []
         if self.intermediari:
-            for _item_intermediari in self.intermediari:
-                if _item_intermediari:
-                    _items.append(_item_intermediari.to_dict())
+            for _item in self.intermediari:
+                if _item:
+                    _items.append(_item.to_dict())
             _dict['intermediari'] = _items
         # override the default output from pydantic by calling `to_dict()` of rifiuto
         if self.rifiuto:
@@ -120,49 +103,49 @@ class DatiPartenzaModel(BaseModel):
         if self.trasbordo_parziale_origine:
             _dict['trasbordo_parziale_origine'] = self.trasbordo_parziale_origine.to_dict()
         # set to None if numero_fir (nullable) is None
-        # and model_fields_set contains the field
-        if self.numero_fir is None and "numero_fir" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.numero_fir is None and "numero_fir" in self.__fields_set__:
             _dict['numero_fir'] = None
 
         # set to None if produttore (nullable) is None
-        # and model_fields_set contains the field
-        if self.produttore is None and "produttore" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.produttore is None and "produttore" in self.__fields_set__:
             _dict['produttore'] = None
 
         # set to None if intermediari (nullable) is None
-        # and model_fields_set contains the field
-        if self.intermediari is None and "intermediari" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.intermediari is None and "intermediari" in self.__fields_set__:
             _dict['intermediari'] = None
 
         # set to None if trasbordo_parziale_origine (nullable) is None
-        # and model_fields_set contains the field
-        if self.trasbordo_parziale_origine is None and "trasbordo_parziale_origine" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.trasbordo_parziale_origine is None and "trasbordo_parziale_origine" in self.__fields_set__:
             _dict['trasbordo_parziale_origine'] = None
 
         # set to None if annotazioni (nullable) is None
-        # and model_fields_set contains the field
-        if self.annotazioni is None and "annotazioni" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.annotazioni is None and "annotazioni" in self.__fields_set__:
             _dict['annotazioni'] = None
 
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
+    def from_dict(cls, obj: dict) -> DatiPartenzaModel:
         """Create an instance of DatiPartenzaModel from a dict"""
         if obj is None:
             return None
 
         if not isinstance(obj, dict):
-            return cls.model_validate(obj)
+            return DatiPartenzaModel.parse_obj(obj)
 
-        _obj = cls.model_validate({
+        _obj = DatiPartenzaModel.parse_obj({
             "numero_fir": obj.get("numero_fir"),
-            "produttore": DatiPartenzaModelProduttore.from_dict(obj["produttore"]) if obj.get("produttore") is not None else None,
-            "destinatario": DatiPartenzaModelDestinatario.from_dict(obj["destinatario"]) if obj.get("destinatario") is not None else None,
-            "trasportatori": [DatiPartenzaModelTrasportatoriInner.from_dict(_item) for _item in obj["trasportatori"]] if obj.get("trasportatori") is not None else None,
-            "intermediari": [DatiIntermediariFormularioModel.from_dict(_item) for _item in obj["intermediari"]] if obj.get("intermediari") is not None else None,
-            "rifiuto": DatiRifiutoModel.from_dict(obj["rifiuto"]) if obj.get("rifiuto") is not None else None,
-            "trasbordo_parziale_origine": DatiTrasbordoParzialeOrigineModel.from_dict(obj["trasbordo_parziale_origine"]) if obj.get("trasbordo_parziale_origine") is not None else None,
+            "produttore": DatiPartenzaModelProduttore.from_dict(obj.get("produttore")) if obj.get("produttore") is not None else None,
+            "destinatario": DatiPartenzaModelDestinatario.from_dict(obj.get("destinatario")) if obj.get("destinatario") is not None else None,
+            "trasportatori": [DatiPartenzaModelTrasportatoriInner.from_dict(_item) for _item in obj.get("trasportatori")] if obj.get("trasportatori") is not None else None,
+            "intermediari": [DatiIntermediariFormularioModel.from_dict(_item) for _item in obj.get("intermediari")] if obj.get("intermediari") is not None else None,
+            "rifiuto": DatiRifiutoModel.from_dict(obj.get("rifiuto")) if obj.get("rifiuto") is not None else None,
+            "trasbordo_parziale_origine": DatiTrasbordoParzialeOrigineModel.from_dict(obj.get("trasbordo_parziale_origine")) if obj.get("trasbordo_parziale_origine") is not None else None,
             "annotazioni": obj.get("annotazioni")
         })
         return _obj

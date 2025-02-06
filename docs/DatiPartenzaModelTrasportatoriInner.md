@@ -3,7 +3,6 @@
 Dati trasportatore
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **denominazione** | **str** | Denominazione del soggetto | 
@@ -23,7 +22,7 @@ json = "{}"
 # create an instance of DatiPartenzaModelTrasportatoriInner from a JSON string
 dati_partenza_model_trasportatori_inner_instance = DatiPartenzaModelTrasportatoriInner.from_json(json)
 # print the JSON string representation of the object
-print(DatiPartenzaModelTrasportatoriInner.to_json())
+print DatiPartenzaModelTrasportatoriInner.to_json()
 
 # convert the object into a dict
 dati_partenza_model_trasportatori_inner_dict = dati_partenza_model_trasportatori_inner_instance.to_dict()

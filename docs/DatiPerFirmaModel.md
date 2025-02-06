@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **certificato** | **str** | Certificato in base64 | 
@@ -17,7 +16,7 @@ json = "{}"
 # create an instance of DatiPerFirmaModel from a JSON string
 dati_per_firma_model_instance = DatiPerFirmaModel.from_json(json)
 # print the JSON string representation of the object
-print(DatiPerFirmaModel.to_json())
+print DatiPerFirmaModel.to_json()
 
 # convert the object into a dict
 dati_per_firma_model_dict = dati_per_firma_model_instance.to_dict()

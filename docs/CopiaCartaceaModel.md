@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **file_content** | **bytearray** | Contenuto del file che rappresenta la copia cartacea del formulario codificato in base64 | 
@@ -25,7 +24,7 @@ json = "{}"
 # create an instance of CopiaCartaceaModel from a JSON string
 copia_cartacea_model_instance = CopiaCartaceaModel.from_json(json)
 # print the JSON string representation of the object
-print(CopiaCartaceaModel.to_json())
+print CopiaCartaceaModel.to_json()
 
 # convert the object into a dict
 copia_cartacea_model_dict = copia_cartacea_model_instance.to_dict()

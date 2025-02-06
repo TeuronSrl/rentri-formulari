@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.esito_validazione import EsitoValidazione
+from rentri_formulari.models.esito_validazione import EsitoValidazione  # noqa: E501
 
 class TestEsitoValidazione(unittest.TestCase):
     """EsitoValidazione unit test stubs"""

@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.controllo_formato_result import ControlloFormatoResult
+from rentri_formulari.models.controllo_formato_result import ControlloFormatoResult  # noqa: E501
 
 class TestControlloFormatoResult(unittest.TestCase):
     """ControlloFormatoResult unit test stubs"""
@@ -28,12 +29,12 @@ class TestControlloFormatoResult(unittest.TestCase):
 
     def make_instance(self, include_optional) -> ControlloFormatoResult:
         """Test ControlloFormatoResult
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `ControlloFormatoResult`
         """
-        model = ControlloFormatoResult()
+        model = ControlloFormatoResult()  # noqa: E501
         if include_optional:
             return ControlloFormatoResult(
                 codice = '',

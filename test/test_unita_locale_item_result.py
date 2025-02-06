@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.unita_locale_item_result import UnitaLocaleItemResult
+from rentri_formulari.models.unita_locale_item_result import UnitaLocaleItemResult  # noqa: E501
 
 class TestUnitaLocaleItemResult(unittest.TestCase):
     """UnitaLocaleItemResult unit test stubs"""
@@ -28,12 +29,12 @@ class TestUnitaLocaleItemResult(unittest.TestCase):
 
     def make_instance(self, include_optional) -> UnitaLocaleItemResult:
         """Test UnitaLocaleItemResult
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `UnitaLocaleItemResult`
         """
-        model = UnitaLocaleItemResult()
+        model = UnitaLocaleItemResult()  # noqa: E501
         if include_optional:
             return UnitaLocaleItemResult(
                 num_iscr_sito = '',

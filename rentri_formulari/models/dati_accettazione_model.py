@@ -19,103 +19,85 @@ import re  # noqa: F401
 import json
 
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict, Field, StrictBool
-from typing import Any, ClassVar, Dict, List, Optional
-from typing_extensions import Annotated
+from typing import Optional
+from pydantic import BaseModel, Field, StrictBool, constr
 from rentri_formulari.models.causali_respingimento import CausaliRespingimento
 from rentri_formulari.models.quantita_kg_model import QuantitaKgModel
 from rentri_formulari.models.tipi_accettazione import TipiAccettazione
-from typing import Optional, Set
-from typing_extensions import Self
 
 class DatiAccettazioneModel(BaseModel):
     """
-    Dati accettazione
-    """ # noqa: E501
-    tipo_accettazione: TipiAccettazione = Field(description="Tipo accettazione<p>Valori ammessi:<ul style=\"margin:0\"><li><i>A</i> - Accettato per intero</li><li><i>P</i> - Accettato parzialmente</li><li><i>R</i> - Respinto</li></ul></p>")
+    Dati accettazione  # noqa: E501
+    """
+    tipo_accettazione: TipiAccettazione = Field(default=..., description="Tipo accettazione<p>Valori ammessi:<ul style=\"margin:0\"><li><i>A</i> - Accettato per intero</li><li><i>P</i> - Accettato parzialmente</li><li><i>R</i> - Respinto</li></ul></p>")
     quantita_accettata: Optional[QuantitaKgModel] = Field(default=None, description="Quantita accettata")
     causale_respingimento: Optional[CausaliRespingimento] = Field(default=None, description="Causale di respingimento<p>Valori ammessi:<ul style=\"margin:0\"><li><i>NC</i> - Non Conformità, a titolo esemplificativo e non esaustivo, si riporta: rifiuti diverso da quello descritto dal formulario o da quanto dichiarato ai fini della pratica di conferimento all'impianto, rifiuto confezionato in modo non conforme da quanto previsto per la specifica destinazione o dalle norme applicabili, di stato fisico diverso da quello previsto)</li><li><i>IR</i> - Irricevibile, (a titolo esemplificativo e non esaustivo, si riporta: rifiuto non previsto dall'autorizzazione / iscrizione dell'impianto di destino, mancanza dei requisiti per l'ammissibilità all'impianto quali caratterizzazione di base, analisi di classificazione o di ammissibilità…)</li><li><i>A</i> - Indicare motivazione. A titolo esemplificativo e non esaustivo, si riporta: esaurimento volumetria disponibile per conferimento rifiuto, chiusura impianto per manutenzione straordinaria, ecc.</li></ul></p>")
-    motivo_respingimento: Optional[Annotated[str, Field(strict=True, max_length=1024)]] = Field(default=None, description="Motivo di respingimento per causale A")
-    data_ora_arrivo: datetime = Field(description="Data ora arrivo (formato ISO 8601 UTC)")
+    motivo_respingimento: Optional[constr(strict=True, max_length=1024)] = Field(default=None, description="Motivo di respingimento per causale A")
+    data_ora_arrivo: datetime = Field(default=..., description="Data ora arrivo (formato ISO 8601 UTC)")
     attesa_verifica_analitica: Optional[StrictBool] = Field(default=None, description="Da valorizzare a true se il destinatario sottopone il rifiuto ad analisi")
-    __properties: ClassVar[List[str]] = ["tipo_accettazione", "quantita_accettata", "causale_respingimento", "motivo_respingimento", "data_ora_arrivo", "attesa_verifica_analitica"]
+    __properties = ["tipo_accettazione", "quantita_accettata", "causale_respingimento", "motivo_respingimento", "data_ora_arrivo", "attesa_verifica_analitica"]
 
-    model_config = ConfigDict(
-        populate_by_name=True,
-        validate_assignment=True,
-        protected_namespaces=(),
-    )
-
+    class Config:
+        """Pydantic configuration"""
+        allow_population_by_field_name = True
+        validate_assignment = True
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""
-        return pprint.pformat(self.model_dump(by_alias=True))
+        return pprint.pformat(self.dict(by_alias=True))
 
     def to_json(self) -> str:
         """Returns the JSON representation of the model using alias"""
-        # TODO: pydantic v2: use .model_dump_json(by_alias=True, exclude_unset=True) instead
         return json.dumps(self.to_dict())
 
     @classmethod
-    def from_json(cls, json_str: str) -> Optional[Self]:
+    def from_json(cls, json_str: str) -> DatiAccettazioneModel:
         """Create an instance of DatiAccettazioneModel from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
-    def to_dict(self) -> Dict[str, Any]:
-        """Return the dictionary representation of the model using alias.
-
-        This has the following differences from calling pydantic's
-        `self.model_dump(by_alias=True)`:
-
-        * `None` is only added to the output dict for nullable fields that
-          were set at model initialization. Other fields with value `None`
-          are ignored.
-        """
-        excluded_fields: Set[str] = set([
-        ])
-
-        _dict = self.model_dump(
-            by_alias=True,
-            exclude=excluded_fields,
-            exclude_none=True,
-        )
+    def to_dict(self):
+        """Returns the dictionary representation of the model using alias"""
+        _dict = self.dict(by_alias=True,
+                          exclude={
+                          },
+                          exclude_none=True)
         # override the default output from pydantic by calling `to_dict()` of quantita_accettata
         if self.quantita_accettata:
             _dict['quantita_accettata'] = self.quantita_accettata.to_dict()
         # set to None if quantita_accettata (nullable) is None
-        # and model_fields_set contains the field
-        if self.quantita_accettata is None and "quantita_accettata" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.quantita_accettata is None and "quantita_accettata" in self.__fields_set__:
             _dict['quantita_accettata'] = None
 
         # set to None if causale_respingimento (nullable) is None
-        # and model_fields_set contains the field
-        if self.causale_respingimento is None and "causale_respingimento" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.causale_respingimento is None and "causale_respingimento" in self.__fields_set__:
             _dict['causale_respingimento'] = None
 
         # set to None if motivo_respingimento (nullable) is None
-        # and model_fields_set contains the field
-        if self.motivo_respingimento is None and "motivo_respingimento" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.motivo_respingimento is None and "motivo_respingimento" in self.__fields_set__:
             _dict['motivo_respingimento'] = None
 
         # set to None if attesa_verifica_analitica (nullable) is None
-        # and model_fields_set contains the field
-        if self.attesa_verifica_analitica is None and "attesa_verifica_analitica" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.attesa_verifica_analitica is None and "attesa_verifica_analitica" in self.__fields_set__:
             _dict['attesa_verifica_analitica'] = None
 
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
+    def from_dict(cls, obj: dict) -> DatiAccettazioneModel:
         """Create an instance of DatiAccettazioneModel from a dict"""
         if obj is None:
             return None
 
         if not isinstance(obj, dict):
-            return cls.model_validate(obj)
+            return DatiAccettazioneModel.parse_obj(obj)
 
-        _obj = cls.model_validate({
+        _obj = DatiAccettazioneModel.parse_obj({
             "tipo_accettazione": obj.get("tipo_accettazione"),
-            "quantita_accettata": QuantitaKgModel.from_dict(obj["quantita_accettata"]) if obj.get("quantita_accettata") is not None else None,
+            "quantita_accettata": QuantitaKgModel.from_dict(obj.get("quantita_accettata")) if obj.get("quantita_accettata") is not None else None,
             "causale_respingimento": obj.get("causale_respingimento"),
             "motivo_respingimento": obj.get("motivo_respingimento"),
             "data_ora_arrivo": obj.get("data_ora_arrivo"),

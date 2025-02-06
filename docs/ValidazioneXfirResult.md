@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **formulario** | [**DettaglioFormulario**](DettaglioFormulario.md) |  | [optional] 
@@ -26,7 +25,7 @@ json = "{}"
 # create an instance of ValidazioneXfirResult from a JSON string
 validazione_xfir_result_instance = ValidazioneXfirResult.from_json(json)
 # print the JSON string representation of the object
-print(ValidazioneXfirResult.to_json())
+print ValidazioneXfirResult.to_json()
 
 # convert the object into a dict
 validazione_xfir_result_dict = validazione_xfir_result_instance.to_dict()

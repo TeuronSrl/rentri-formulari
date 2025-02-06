@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.destinatario_successivo_result_model import DestinatarioSuccessivoResultModel
+from rentri_formulari.models.destinatario_successivo_result_model import DestinatarioSuccessivoResultModel  # noqa: E501
 
 class TestDestinatarioSuccessivoResultModel(unittest.TestCase):
     """DestinatarioSuccessivoResultModel unit test stubs"""
@@ -28,12 +29,12 @@ class TestDestinatarioSuccessivoResultModel(unittest.TestCase):
 
     def make_instance(self, include_optional) -> DestinatarioSuccessivoResultModel:
         """Test DestinatarioSuccessivoResultModel
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `DestinatarioSuccessivoResultModel`
         """
-        model = DestinatarioSuccessivoResultModel()
+        model = DestinatarioSuccessivoResultModel()  # noqa: E501
         if include_optional:
             return DestinatarioSuccessivoResultModel(
                 id_destinatario = 56,

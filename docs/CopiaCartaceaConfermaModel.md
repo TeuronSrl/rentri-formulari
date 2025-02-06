@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **identificativo** | **str** | Identificativo univoco della copia del FIR cartaceo | 
@@ -20,7 +19,7 @@ json = "{}"
 # create an instance of CopiaCartaceaConfermaModel from a JSON string
 copia_cartacea_conferma_model_instance = CopiaCartaceaConfermaModel.from_json(json)
 # print the JSON string representation of the object
-print(CopiaCartaceaConfermaModel.to_json())
+print CopiaCartaceaConfermaModel.to_json()
 
 # convert the object into a dict
 copia_cartacea_conferma_model_dict = copia_cartacea_conferma_model_instance.to_dict()

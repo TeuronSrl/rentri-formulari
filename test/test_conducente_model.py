@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.conducente_model import ConducenteModel
+from rentri_formulari.models.conducente_model import ConducenteModel  # noqa: E501
 
 class TestConducenteModel(unittest.TestCase):
     """ConducenteModel unit test stubs"""
@@ -28,12 +29,12 @@ class TestConducenteModel(unittest.TestCase):
 
     def make_instance(self, include_optional) -> ConducenteModel:
         """Test ConducenteModel
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `ConducenteModel`
         """
-        model = ConducenteModel()
+        model = ConducenteModel()  # noqa: E501
         if include_optional:
             return ConducenteModel(
                 nome = '0',

@@ -3,7 +3,6 @@
 Formulario
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **num_iscr_sito** | **str** | Numero iscrizione unità locale di riferimento a cui il formulario verrà associato.  L&#39;unità locale deve appartenere al produttore o al primo trasportatore. | 
@@ -20,7 +19,7 @@ json = "{}"
 # create an instance of NuovoFormularioModel from a JSON string
 nuovo_formulario_model_instance = NuovoFormularioModel.from_json(json)
 # print the JSON string representation of the object
-print(NuovoFormularioModel.to_json())
+print NuovoFormularioModel.to_json()
 
 # convert the object into a dict
 nuovo_formulario_model_dict = nuovo_formulario_model_instance.to_dict()

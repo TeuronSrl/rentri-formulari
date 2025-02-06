@@ -18,8 +18,9 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field
-from typing import Any, ClassVar, Dict, List, Optional
+
+from typing import List, Optional
+from pydantic import BaseModel, Field, conlist
 from rentri_formulari.models.dati_accettazione_model import DatiAccettazioneModel
 from rentri_formulari.models.dati_annotazione_model import DatiAnnotazioneModel
 from rentri_formulari.models.dati_destinazioni_successive_trasmissioni_model import DatiDestinazioniSuccessiveTrasmissioniModel
@@ -28,71 +29,54 @@ from rentri_formulari.models.dati_trasbordo_parziale_trasmissione_model import D
 from rentri_formulari.models.dati_trasbordo_totale_trasmissione_model import DatiTrasbordoTotaleTrasmissioneModel
 from rentri_formulari.models.dati_trasmissione_partenza_model import DatiTrasmissionePartenzaModel
 from rentri_formulari.models.dati_trasporto_trasmissione_base_model1 import DatiTrasportoTrasmissioneBaseModel1
-from typing import Optional, Set
-from typing_extensions import Self
 
 class DatiTrasmissioneFormularioModel(BaseModel):
     """
     DatiTrasmissioneFormularioModel
-    """ # noqa: E501
-    dati_partenza: DatiTrasmissionePartenzaModel
-    dati_trasporto: Optional[List[DatiTrasportoTrasmissioneBaseModel1]] = None
+    """
+    dati_partenza: DatiTrasmissionePartenzaModel = Field(...)
+    dati_trasporto: Optional[conlist(DatiTrasportoTrasmissioneBaseModel1)] = None
     dati_accettazione: Optional[DatiAccettazioneModel] = Field(default=None, description="Dati accettazione")
-    dati_annotazioni: Optional[List[DatiAnnotazioneModel]] = None
+    dati_annotazioni: Optional[conlist(DatiAnnotazioneModel)] = None
     dati_trasbordo_totale: Optional[DatiTrasbordoTotaleTrasmissioneModel] = None
-    dati_trasbordi_parziali: Optional[List[DatiTrasbordoParzialeTrasmissioneModel]] = None
-    dati_soste_tecniche: Optional[List[DatiSostaTecnicaTrasmissioneModel]] = None
-    dati_destinazioni_successive: Optional[List[DatiDestinazioniSuccessiveTrasmissioniModel]] = None
-    __properties: ClassVar[List[str]] = ["dati_partenza", "dati_trasporto", "dati_accettazione", "dati_annotazioni", "dati_trasbordo_totale", "dati_trasbordi_parziali", "dati_soste_tecniche", "dati_destinazioni_successive"]
+    dati_trasbordi_parziali: Optional[conlist(DatiTrasbordoParzialeTrasmissioneModel)] = None
+    dati_soste_tecniche: Optional[conlist(DatiSostaTecnicaTrasmissioneModel)] = None
+    dati_destinazioni_successive: Optional[conlist(DatiDestinazioniSuccessiveTrasmissioniModel)] = None
+    __properties = ["dati_partenza", "dati_trasporto", "dati_accettazione", "dati_annotazioni", "dati_trasbordo_totale", "dati_trasbordi_parziali", "dati_soste_tecniche", "dati_destinazioni_successive"]
 
-    model_config = ConfigDict(
-        populate_by_name=True,
-        validate_assignment=True,
-        protected_namespaces=(),
-    )
-
+    class Config:
+        """Pydantic configuration"""
+        allow_population_by_field_name = True
+        validate_assignment = True
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""
-        return pprint.pformat(self.model_dump(by_alias=True))
+        return pprint.pformat(self.dict(by_alias=True))
 
     def to_json(self) -> str:
         """Returns the JSON representation of the model using alias"""
-        # TODO: pydantic v2: use .model_dump_json(by_alias=True, exclude_unset=True) instead
         return json.dumps(self.to_dict())
 
     @classmethod
-    def from_json(cls, json_str: str) -> Optional[Self]:
+    def from_json(cls, json_str: str) -> DatiTrasmissioneFormularioModel:
         """Create an instance of DatiTrasmissioneFormularioModel from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
-    def to_dict(self) -> Dict[str, Any]:
-        """Return the dictionary representation of the model using alias.
-
-        This has the following differences from calling pydantic's
-        `self.model_dump(by_alias=True)`:
-
-        * `None` is only added to the output dict for nullable fields that
-          were set at model initialization. Other fields with value `None`
-          are ignored.
-        """
-        excluded_fields: Set[str] = set([
-        ])
-
-        _dict = self.model_dump(
-            by_alias=True,
-            exclude=excluded_fields,
-            exclude_none=True,
-        )
+    def to_dict(self):
+        """Returns the dictionary representation of the model using alias"""
+        _dict = self.dict(by_alias=True,
+                          exclude={
+                          },
+                          exclude_none=True)
         # override the default output from pydantic by calling `to_dict()` of dati_partenza
         if self.dati_partenza:
             _dict['dati_partenza'] = self.dati_partenza.to_dict()
         # override the default output from pydantic by calling `to_dict()` of each item in dati_trasporto (list)
         _items = []
         if self.dati_trasporto:
-            for _item_dati_trasporto in self.dati_trasporto:
-                if _item_dati_trasporto:
-                    _items.append(_item_dati_trasporto.to_dict())
+            for _item in self.dati_trasporto:
+                if _item:
+                    _items.append(_item.to_dict())
             _dict['dati_trasporto'] = _items
         # override the default output from pydantic by calling `to_dict()` of dati_accettazione
         if self.dati_accettazione:
@@ -100,9 +84,9 @@ class DatiTrasmissioneFormularioModel(BaseModel):
         # override the default output from pydantic by calling `to_dict()` of each item in dati_annotazioni (list)
         _items = []
         if self.dati_annotazioni:
-            for _item_dati_annotazioni in self.dati_annotazioni:
-                if _item_dati_annotazioni:
-                    _items.append(_item_dati_annotazioni.to_dict())
+            for _item in self.dati_annotazioni:
+                if _item:
+                    _items.append(_item.to_dict())
             _dict['dati_annotazioni'] = _items
         # override the default output from pydantic by calling `to_dict()` of dati_trasbordo_totale
         if self.dati_trasbordo_totale:
@@ -110,79 +94,79 @@ class DatiTrasmissioneFormularioModel(BaseModel):
         # override the default output from pydantic by calling `to_dict()` of each item in dati_trasbordi_parziali (list)
         _items = []
         if self.dati_trasbordi_parziali:
-            for _item_dati_trasbordi_parziali in self.dati_trasbordi_parziali:
-                if _item_dati_trasbordi_parziali:
-                    _items.append(_item_dati_trasbordi_parziali.to_dict())
+            for _item in self.dati_trasbordi_parziali:
+                if _item:
+                    _items.append(_item.to_dict())
             _dict['dati_trasbordi_parziali'] = _items
         # override the default output from pydantic by calling `to_dict()` of each item in dati_soste_tecniche (list)
         _items = []
         if self.dati_soste_tecniche:
-            for _item_dati_soste_tecniche in self.dati_soste_tecniche:
-                if _item_dati_soste_tecniche:
-                    _items.append(_item_dati_soste_tecniche.to_dict())
+            for _item in self.dati_soste_tecniche:
+                if _item:
+                    _items.append(_item.to_dict())
             _dict['dati_soste_tecniche'] = _items
         # override the default output from pydantic by calling `to_dict()` of each item in dati_destinazioni_successive (list)
         _items = []
         if self.dati_destinazioni_successive:
-            for _item_dati_destinazioni_successive in self.dati_destinazioni_successive:
-                if _item_dati_destinazioni_successive:
-                    _items.append(_item_dati_destinazioni_successive.to_dict())
+            for _item in self.dati_destinazioni_successive:
+                if _item:
+                    _items.append(_item.to_dict())
             _dict['dati_destinazioni_successive'] = _items
         # set to None if dati_trasporto (nullable) is None
-        # and model_fields_set contains the field
-        if self.dati_trasporto is None and "dati_trasporto" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.dati_trasporto is None and "dati_trasporto" in self.__fields_set__:
             _dict['dati_trasporto'] = None
 
         # set to None if dati_accettazione (nullable) is None
-        # and model_fields_set contains the field
-        if self.dati_accettazione is None and "dati_accettazione" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.dati_accettazione is None and "dati_accettazione" in self.__fields_set__:
             _dict['dati_accettazione'] = None
 
         # set to None if dati_annotazioni (nullable) is None
-        # and model_fields_set contains the field
-        if self.dati_annotazioni is None and "dati_annotazioni" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.dati_annotazioni is None and "dati_annotazioni" in self.__fields_set__:
             _dict['dati_annotazioni'] = None
 
         # set to None if dati_trasbordo_totale (nullable) is None
-        # and model_fields_set contains the field
-        if self.dati_trasbordo_totale is None and "dati_trasbordo_totale" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.dati_trasbordo_totale is None and "dati_trasbordo_totale" in self.__fields_set__:
             _dict['dati_trasbordo_totale'] = None
 
         # set to None if dati_trasbordi_parziali (nullable) is None
-        # and model_fields_set contains the field
-        if self.dati_trasbordi_parziali is None and "dati_trasbordi_parziali" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.dati_trasbordi_parziali is None and "dati_trasbordi_parziali" in self.__fields_set__:
             _dict['dati_trasbordi_parziali'] = None
 
         # set to None if dati_soste_tecniche (nullable) is None
-        # and model_fields_set contains the field
-        if self.dati_soste_tecniche is None and "dati_soste_tecniche" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.dati_soste_tecniche is None and "dati_soste_tecniche" in self.__fields_set__:
             _dict['dati_soste_tecniche'] = None
 
         # set to None if dati_destinazioni_successive (nullable) is None
-        # and model_fields_set contains the field
-        if self.dati_destinazioni_successive is None and "dati_destinazioni_successive" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.dati_destinazioni_successive is None and "dati_destinazioni_successive" in self.__fields_set__:
             _dict['dati_destinazioni_successive'] = None
 
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
+    def from_dict(cls, obj: dict) -> DatiTrasmissioneFormularioModel:
         """Create an instance of DatiTrasmissioneFormularioModel from a dict"""
         if obj is None:
             return None
 
         if not isinstance(obj, dict):
-            return cls.model_validate(obj)
+            return DatiTrasmissioneFormularioModel.parse_obj(obj)
 
-        _obj = cls.model_validate({
-            "dati_partenza": DatiTrasmissionePartenzaModel.from_dict(obj["dati_partenza"]) if obj.get("dati_partenza") is not None else None,
-            "dati_trasporto": [DatiTrasportoTrasmissioneBaseModel1.from_dict(_item) for _item in obj["dati_trasporto"]] if obj.get("dati_trasporto") is not None else None,
-            "dati_accettazione": DatiAccettazioneModel.from_dict(obj["dati_accettazione"]) if obj.get("dati_accettazione") is not None else None,
-            "dati_annotazioni": [DatiAnnotazioneModel.from_dict(_item) for _item in obj["dati_annotazioni"]] if obj.get("dati_annotazioni") is not None else None,
-            "dati_trasbordo_totale": DatiTrasbordoTotaleTrasmissioneModel.from_dict(obj["dati_trasbordo_totale"]) if obj.get("dati_trasbordo_totale") is not None else None,
-            "dati_trasbordi_parziali": [DatiTrasbordoParzialeTrasmissioneModel.from_dict(_item) for _item in obj["dati_trasbordi_parziali"]] if obj.get("dati_trasbordi_parziali") is not None else None,
-            "dati_soste_tecniche": [DatiSostaTecnicaTrasmissioneModel.from_dict(_item) for _item in obj["dati_soste_tecniche"]] if obj.get("dati_soste_tecniche") is not None else None,
-            "dati_destinazioni_successive": [DatiDestinazioniSuccessiveTrasmissioniModel.from_dict(_item) for _item in obj["dati_destinazioni_successive"]] if obj.get("dati_destinazioni_successive") is not None else None
+        _obj = DatiTrasmissioneFormularioModel.parse_obj({
+            "dati_partenza": DatiTrasmissionePartenzaModel.from_dict(obj.get("dati_partenza")) if obj.get("dati_partenza") is not None else None,
+            "dati_trasporto": [DatiTrasportoTrasmissioneBaseModel1.from_dict(_item) for _item in obj.get("dati_trasporto")] if obj.get("dati_trasporto") is not None else None,
+            "dati_accettazione": DatiAccettazioneModel.from_dict(obj.get("dati_accettazione")) if obj.get("dati_accettazione") is not None else None,
+            "dati_annotazioni": [DatiAnnotazioneModel.from_dict(_item) for _item in obj.get("dati_annotazioni")] if obj.get("dati_annotazioni") is not None else None,
+            "dati_trasbordo_totale": DatiTrasbordoTotaleTrasmissioneModel.from_dict(obj.get("dati_trasbordo_totale")) if obj.get("dati_trasbordo_totale") is not None else None,
+            "dati_trasbordi_parziali": [DatiTrasbordoParzialeTrasmissioneModel.from_dict(_item) for _item in obj.get("dati_trasbordi_parziali")] if obj.get("dati_trasbordi_parziali") is not None else None,
+            "dati_soste_tecniche": [DatiSostaTecnicaTrasmissioneModel.from_dict(_item) for _item in obj.get("dati_soste_tecniche")] if obj.get("dati_soste_tecniche") is not None else None,
+            "dati_destinazioni_successive": [DatiDestinazioniSuccessiveTrasmissioniModel.from_dict(_item) for _item in obj.get("dati_destinazioni_successive")] if obj.get("dati_destinazioni_successive") is not None else None
         })
         return _obj
 

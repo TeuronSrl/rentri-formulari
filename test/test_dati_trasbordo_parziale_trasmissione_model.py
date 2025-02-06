@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.dati_trasbordo_parziale_trasmissione_model import DatiTrasbordoParzialeTrasmissioneModel
+from rentri_formulari.models.dati_trasbordo_parziale_trasmissione_model import DatiTrasbordoParzialeTrasmissioneModel  # noqa: E501
 
 class TestDatiTrasbordoParzialeTrasmissioneModel(unittest.TestCase):
     """DatiTrasbordoParzialeTrasmissioneModel unit test stubs"""
@@ -28,12 +29,12 @@ class TestDatiTrasbordoParzialeTrasmissioneModel(unittest.TestCase):
 
     def make_instance(self, include_optional) -> DatiTrasbordoParzialeTrasmissioneModel:
         """Test DatiTrasbordoParzialeTrasmissioneModel
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `DatiTrasbordoParzialeTrasmissioneModel`
         """
-        model = DatiTrasbordoParzialeTrasmissioneModel()
+        model = DatiTrasbordoParzialeTrasmissioneModel()  # noqa: E501
         if include_optional:
             return DatiTrasbordoParzialeTrasmissioneModel(
                 trasportatore_id = 56,

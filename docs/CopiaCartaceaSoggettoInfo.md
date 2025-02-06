@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **nazione_id** | **str** | Codice ISO 3166-1 alpha-2 della nazione, in caso di \&quot;IT\&quot; è possibile omettere.  Vengono accettati solo codici previsti dallo standard ISO 3166-1 alpha-2.  Vedi API di codifica: &lt;i&gt;GET /codifiche/v1.0/nazioni&lt;/i&gt;  &lt;i&gt;Questo campo viene utilizzato esclusivamente per validare i dati di input in base alla nazione di appartenenza (non viene memorizzato e quindi restituito in output).&lt;/i&gt; | [optional] 
@@ -21,7 +20,7 @@ json = "{}"
 # create an instance of CopiaCartaceaSoggettoInfo from a JSON string
 copia_cartacea_soggetto_info_instance = CopiaCartaceaSoggettoInfo.from_json(json)
 # print the JSON string representation of the object
-print(CopiaCartaceaSoggettoInfo.to_json())
+print CopiaCartaceaSoggettoInfo.to_json()
 
 # convert the object into a dict
 copia_cartacea_soggetto_info_dict = copia_cartacea_soggetto_info_instance.to_dict()

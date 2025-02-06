@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **identificativo** | **str** |  | [optional] 
@@ -21,7 +20,7 @@ json = "{}"
 # create an instance of CopiaDigitaleRuoloItemResult from a JSON string
 copia_digitale_ruolo_item_result_instance = CopiaDigitaleRuoloItemResult.from_json(json)
 # print the JSON string representation of the object
-print(CopiaDigitaleRuoloItemResult.to_json())
+print CopiaDigitaleRuoloItemResult.to_json()
 
 # convert the object into a dict
 copia_digitale_ruolo_item_result_dict = copia_digitale_ruolo_item_result_instance.to_dict()

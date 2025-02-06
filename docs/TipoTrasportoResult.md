@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **tipo_trasporto** | [**TipoTrasporto**](TipoTrasporto.md) |  | [optional] 
@@ -17,7 +16,7 @@ json = "{}"
 # create an instance of TipoTrasportoResult from a JSON string
 tipo_trasporto_result_instance = TipoTrasportoResult.from_json(json)
 # print the JSON string representation of the object
-print(TipoTrasportoResult.to_json())
+print TipoTrasportoResult.to_json()
 
 # convert the object into a dict
 tipo_trasporto_result_dict = tipo_trasporto_result_instance.to_dict()

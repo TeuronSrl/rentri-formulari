@@ -21,8 +21,9 @@ Ottiene la lista delle trasmissioni di dati di FIR digitali effettuate per l'uni
 ### Example
 
 * Bearer (JWT) Authentication (Bearer):
-
 ```python
+import time
+import os
 import rentri_formulari
 from rentri_formulari.models.trasmissione_dati_item_result import TrasmissioneDatiItemResult
 from rentri_formulari.rest import ApiException
@@ -71,7 +72,6 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 ### Parameters
 
-
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **num_iscr_sito** | **str**| Numero iscrizione dell&#39;unità locale per cui si vogliono recuperare le trasmissioni | 
@@ -98,7 +98,6 @@ Name | Type | Description  | Notes
  - **Accept**: application/json, application/problem+json
 
 ### HTTP response details
-
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | OK |  * Paging-PageCount - Numero totale di pagine. <br>  * Paging-Page - Numero di pagina. <br>  * Paging-PageSize - Dimensione della pagina. <br>  * Paging-TotalRecordCount - Numero totale di record. <br>  |
@@ -119,8 +118,9 @@ Pone in stato \"annullata\" la trasmissione di dati del FIR digitale specificata
 ### Example
 
 * Bearer (JWT) Authentication (Bearer):
-
 ```python
+import time
+import os
 import rentri_formulari
 from rentri_formulari.rest import ApiException
 from pprint import pprint
@@ -159,7 +159,6 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 ### Parameters
 
-
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **num_iscr_sito** | **str**|  | 
@@ -179,7 +178,6 @@ void (empty response body)
  - **Accept**: application/problem+json
 
 ### HTTP response details
-
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | OK |  -  |
@@ -201,8 +199,9 @@ Recupera le informazioni di dettaglio della trasmissione di dati di FIR digitale
 ### Example
 
 * Bearer (JWT) Authentication (Bearer):
-
 ```python
+import time
+import os
 import rentri_formulari
 from rentri_formulari.models.trasmissione_dati_result import TrasmissioneDatiResult
 from rentri_formulari.rest import ApiException
@@ -244,7 +243,6 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 ### Parameters
 
-
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **num_iscr_sito** | **str**| Numero iscrizione dell&#39;unità locale per cui si vogliono recuperare le trasmissioni | 
@@ -264,7 +262,6 @@ Name | Type | Description  | Notes
  - **Accept**: application/json, application/problem+json
 
 ### HTTP response details
-
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | OK |  -  |
@@ -285,8 +282,9 @@ Effettua l'estrazione dei dati che devono essere trasmessi dal file del FIR digi
 ### Example
 
 * Bearer (JWT) Authentication (Bearer):
-
 ```python
+import time
+import os
 import rentri_formulari
 from rentri_formulari.models.estrai_dati_xfir_model import EstraiDatiXfirModel
 from rentri_formulari.models.transazione_model import TransazioneModel
@@ -331,7 +329,6 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 ### Parameters
 
-
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **num_iscr_sito** | **str**|  | 
@@ -353,7 +350,6 @@ Name | Type | Description  | Notes
  - **Accept**: application/json, application/problem+json
 
 ### HTTP response details
-
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **202** | Accepted |  * Location - URL per verificare lo stato dell&#39;elaborazione. Restituito solo se non viene specificata una URL di callback nell&#39;header X-ReplyTo. <br>  |
@@ -375,8 +371,9 @@ Effettua la trasmissione dei dati estratti da un FIR digitale riferibili all'uni
 ### Example
 
 * Bearer (JWT) Authentication (Bearer):
-
 ```python
+import time
+import os
 import rentri_formulari
 from rentri_formulari.models.dati_trasmissione_formulario_model import DatiTrasmissioneFormularioModel
 from rentri_formulari.models.trasmissione_formulario_response import TrasmissioneFormularioResponse
@@ -419,7 +416,6 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 ### Parameters
 
-
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **num_iscr_sito** | **str**|  | 
@@ -439,7 +435,6 @@ Name | Type | Description  | Notes
  - **Accept**: application/json, application/problem+json
 
 ### HTTP response details
-
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **201** | Created |  * Location - URL per verificare lo stato dell&#39;elaborazione. Restituito solo se non viene specificata una URL di callback nell&#39;header X-ReplyTo. <br>  |

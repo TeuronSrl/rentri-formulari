@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **versione** | **int** |  | [optional] 
@@ -19,7 +18,7 @@ json = "{}"
 # create an instance of AzioniResult from a JSON string
 azioni_result_instance = AzioniResult.from_json(json)
 # print the JSON string representation of the object
-print(AzioniResult.to_json())
+print AzioniResult.to_json()
 
 # convert the object into a dict
 azioni_result_dict = azioni_result_instance.to_dict()

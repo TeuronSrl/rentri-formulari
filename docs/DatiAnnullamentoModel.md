@@ -3,7 +3,6 @@
 Dati richiesti per l'annullamento di un FIR
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **note** | **str** | Note di annullamento | 
@@ -19,7 +18,7 @@ json = "{}"
 # create an instance of DatiAnnullamentoModel from a JSON string
 dati_annullamento_model_instance = DatiAnnullamentoModel.from_json(json)
 # print the JSON string representation of the object
-print(DatiAnnullamentoModel.to_json())
+print DatiAnnullamentoModel.to_json()
 
 # convert the object into a dict
 dati_annullamento_model_dict = dati_annullamento_model_instance.to_dict()

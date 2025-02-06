@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **num_iscr_sito** | **str** |  | [optional] 
@@ -20,7 +19,7 @@ json = "{}"
 # create an instance of TrasportatoreItemResult from a JSON string
 trasportatore_item_result_instance = TrasportatoreItemResult.from_json(json)
 # print the JSON string representation of the object
-print(TrasportatoreItemResult.to_json())
+print TrasportatoreItemResult.to_json()
 
 # convert the object into a dict
 trasportatore_item_result_dict = trasportatore_item_result_instance.to_dict()

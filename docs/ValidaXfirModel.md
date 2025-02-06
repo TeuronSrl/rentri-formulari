@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **xfir** | **bytearray** | Contenuto del file xFIR | 
@@ -17,7 +16,7 @@ json = "{}"
 # create an instance of ValidaXfirModel from a JSON string
 valida_xfir_model_instance = ValidaXfirModel.from_json(json)
 # print the JSON string representation of the object
-print(ValidaXfirModel.to_json())
+print ValidaXfirModel.to_json()
 
 # convert the object into a dict
 valida_xfir_model_dict = valida_xfir_model_instance.to_dict()

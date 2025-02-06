@@ -15,7 +15,7 @@
 
 import unittest
 
-from rentri_formulari.api.copia_fir_cartaceo_api import CopiaFIRCartaceoApi
+from rentri_formulari.api.copia_fir_cartaceo_api import CopiaFIRCartaceoApi  # noqa: E501
 
 
 class TestCopiaFIRCartaceoApi(unittest.TestCase):
@@ -25,82 +25,82 @@ class TestCopiaFIRCartaceoApi(unittest.TestCase):
         self.api = CopiaFIRCartaceoApi()
 
     def tearDown(self) -> None:
-        pass
+        self.api.api_client.close()
 
     def test_copia_cartacea_caricamento_num_iscr_sito_get(self) -> None:
         """Test case for copia_cartacea_caricamento_num_iscr_sito_get
 
-        Elenco copie FIR cartaceo caricate
+        Elenco copie FIR cartaceo caricate  # noqa: E501
         """
         pass
 
     def test_copia_cartacea_caricamento_num_iscr_sito_identificativo_delete(self) -> None:
         """Test case for copia_cartacea_caricamento_num_iscr_sito_identificativo_delete
 
-        Cancella copia FIR cartaceo
+        Cancella copia FIR cartaceo  # noqa: E501
         """
         pass
 
     def test_copia_cartacea_caricamento_num_iscr_sito_identificativo_documento_get(self) -> None:
         """Test case for copia_cartacea_caricamento_num_iscr_sito_identificativo_documento_get
 
-        Documento copia FIR cartaceo
+        Documento copia FIR cartaceo  # noqa: E501
         """
         pass
 
     def test_copia_cartacea_caricamento_num_iscr_sito_identificativo_get(self) -> None:
         """Test case for copia_cartacea_caricamento_num_iscr_sito_identificativo_get
 
-        Dettaglio copia FIR cartaceo
+        Dettaglio copia FIR cartaceo  # noqa: E501
         """
         pass
 
     def test_copia_cartacea_caricamento_num_iscr_sito_post(self) -> None:
         """Test case for copia_cartacea_caricamento_num_iscr_sito_post
 
-        🔁[ASYNC] Carica copia FIR cartaceo
+        🔁[ASYNC] Carica copia FIR cartaceo  # noqa: E501
         """
         pass
 
     def test_copia_cartacea_conferma_identificativo_soggetto_get(self) -> None:
         """Test case for copia_cartacea_conferma_identificativo_soggetto_get
 
-        Copie FIR cartacei disponibili
+        Copie FIR cartacei disponibili  # noqa: E501
         """
         pass
 
     def test_copia_cartacea_conferma_identificativo_soggetto_identificativo_documento_get(self) -> None:
         """Test case for copia_cartacea_conferma_identificativo_soggetto_identificativo_documento_get
 
-        Documento copia FIR cartaceo disponibile
+        Documento copia FIR cartaceo disponibile  # noqa: E501
         """
         pass
 
     def test_copia_cartacea_conferma_identificativo_soggetto_identificativo_get(self) -> None:
         """Test case for copia_cartacea_conferma_identificativo_soggetto_identificativo_get
 
-        Dettaglio copia FIR cartaceo disponibile
+        Dettaglio copia FIR cartaceo disponibile  # noqa: E501
         """
         pass
 
     def test_copia_cartacea_conferma_identificativo_soggetto_put(self) -> None:
         """Test case for copia_cartacea_conferma_identificativo_soggetto_put
 
-        Conferma copia FIR cartaceo disponibile
+        Conferma copia FIR cartaceo disponibile  # noqa: E501
         """
         pass
 
     def test_copia_cartacea_transazione_id_result_get(self) -> None:
         """Test case for copia_cartacea_transazione_id_result_get
 
-        ⚠️[DEPRECATO] - utilizzare /{transazioneId}/result - Esito transazione
+        ⚠️[DEPRECATO] - utilizzare /{transazioneId}/result - Esito transazione  # noqa: E501
         """
         pass
 
     def test_copia_cartacea_transazione_id_status_get(self) -> None:
         """Test case for copia_cartacea_transazione_id_status_get
 
-        ⚠️[DEPRECATO] - utilizzare /{transazioneId}/status - Stato transazione
+        ⚠️[DEPRECATO] - utilizzare /{transazioneId}/status - Stato transazione  # noqa: E501
         """
         pass
 

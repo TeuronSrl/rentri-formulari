@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.dati_destinazioni_successive_trasmissioni_model import DatiDestinazioniSuccessiveTrasmissioniModel
+from rentri_formulari.models.dati_destinazioni_successive_trasmissioni_model import DatiDestinazioniSuccessiveTrasmissioniModel  # noqa: E501
 
 class TestDatiDestinazioniSuccessiveTrasmissioniModel(unittest.TestCase):
     """DatiDestinazioniSuccessiveTrasmissioniModel unit test stubs"""
@@ -28,12 +29,12 @@ class TestDatiDestinazioniSuccessiveTrasmissioniModel(unittest.TestCase):
 
     def make_instance(self, include_optional) -> DatiDestinazioniSuccessiveTrasmissioniModel:
         """Test DatiDestinazioniSuccessiveTrasmissioniModel
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `DatiDestinazioniSuccessiveTrasmissioniModel`
         """
-        model = DatiDestinazioniSuccessiveTrasmissioniModel()
+        model = DatiDestinazioniSuccessiveTrasmissioniModel()  # noqa: E501
         if include_optional:
             return DatiDestinazioniSuccessiveTrasmissioniModel(
                 destinatario = None,

@@ -18,76 +18,59 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictBool
-from typing import Any, ClassVar, Dict, List, Optional
-from typing_extensions import Annotated
+
+from typing import List, Optional
+from pydantic import BaseModel, Field, StrictBool, conlist, constr
 from rentri_formulari.models.analisi_classificazione_model import AnalisiClassificazioneModel
 from rentri_formulari.models.caratteristiche_pericolo import CaratteristichePericolo
 from rentri_formulari.models.normativa_adr_model import NormativaADRModel
 from rentri_formulari.models.provenienza_rifiuto import ProvenienzaRifiuto
 from rentri_formulari.models.quantita_model import QuantitaModel
 from rentri_formulari.models.stati_fisici import StatiFisici
-from typing import Optional, Set
-from typing_extensions import Self
 
 class DatiRifiutoModel(BaseModel):
     """
-    Identificazione del rifiuto
-    """ # noqa: E501
-    codice_eer: Annotated[str, Field(min_length=1, strict=True, max_length=8)] = Field(description="Codice EER")
-    descrizione: Optional[Annotated[str, Field(strict=True, max_length=250)]] = Field(default=None, description="Descrizione del rifiuto, richiesta se il Codice EER specificato è di tipo .99")
-    provenienza: ProvenienzaRifiuto = Field(description="Provenienza<p>Valori ammessi:<ul style=\"margin:0\"><li><i>U</i> - Urbano</li><li><i>S</i> - Speciale</li></ul></p>")
-    caratteristiche_chimico_fisiche: Optional[Annotated[str, Field(strict=True, max_length=500)]] = Field(default=None, description="Caratteristiche chimico fisiche del rifiuto")
-    caratteristiche_pericolo: Optional[List[CaratteristichePericolo]] = Field(default=None, description="Classificazione di pericolo (HP), richiesta se e solo se il Codice EER si riferisce ad un rifiuto pericoloso<p>Valori ammessi:<ul style=\"margin:0\"><li><i>HP01</i> - Esplosivo</li><li><i>HP02</i> - Comburente</li><li><i>HP03</i> - Infiammabile</li><li><i>HP04</i> - Irritante - Irritazione cutanea e lesioni oculari</li><li><i>HP05</i> - Tossicità specifica per organi bersaglio (STOT)/Tossicità in caso di respirazione</li><li><i>HP06</i> - Tossicità acuta</li><li><i>HP07</i> - Cancerogeno</li><li><i>HP08</i> - Corrosivo</li><li><i>HP09</i> - Infettivo</li><li><i>HP10</i> - Tossico per la riproduzione</li><li><i>HP11</i> - Mutageno</li><li><i>HP12</i> - Liberazione di gas a tossicità acuta</li><li><i>HP13</i> - Sensibilizzante</li><li><i>HP14</i> - Ecotossico</li><li><i>HP15</i> - Rifiuto che non possiede direttamente una delle caratteristiche di pericolo già menzionate, ma può manifestarla successivamente</li></ul></p>")
-    stato_fisico: StatiFisici = Field(description="Stato fisico<p>Valori ammessi:<ul style=\"margin:0\"><li><i>SP</i> - In polvere o pulverulento</li><li><i>S</i> - Solido</li><li><i>FP</i> - Fangoso</li><li><i>L</i> - Liquido</li><li><i>VS</i> - Vischioso sciropposo</li></ul></p>")
+    Identificazione del rifiuto  # noqa: E501
+    """
+    codice_eer: constr(strict=True, max_length=8, min_length=1) = Field(default=..., description="Codice EER")
+    descrizione: Optional[constr(strict=True, max_length=250)] = Field(default=None, description="Descrizione del rifiuto, richiesta se il Codice EER specificato è di tipo .99")
+    provenienza: ProvenienzaRifiuto = Field(default=..., description="Provenienza<p>Valori ammessi:<ul style=\"margin:0\"><li><i>U</i> - Urbano</li><li><i>S</i> - Speciale</li></ul></p>")
+    caratteristiche_chimico_fisiche: Optional[constr(strict=True, max_length=500)] = Field(default=None, description="Caratteristiche chimico fisiche del rifiuto")
+    caratteristiche_pericolo: Optional[conlist(CaratteristichePericolo)] = Field(default=None, description="Classificazione di pericolo (HP), richiesta se e solo se il Codice EER si riferisce ad un rifiuto pericoloso<p>Valori ammessi:<ul style=\"margin:0\"><li><i>HP01</i> - Esplosivo</li><li><i>HP02</i> - Comburente</li><li><i>HP03</i> - Infiammabile</li><li><i>HP04</i> - Irritante - Irritazione cutanea e lesioni oculari</li><li><i>HP05</i> - Tossicità specifica per organi bersaglio (STOT)/Tossicità in caso di respirazione</li><li><i>HP06</i> - Tossicità acuta</li><li><i>HP07</i> - Cancerogeno</li><li><i>HP08</i> - Corrosivo</li><li><i>HP09</i> - Infettivo</li><li><i>HP10</i> - Tossico per la riproduzione</li><li><i>HP11</i> - Mutageno</li><li><i>HP12</i> - Liberazione di gas a tossicità acuta</li><li><i>HP13</i> - Sensibilizzante</li><li><i>HP14</i> - Ecotossico</li><li><i>HP15</i> - Rifiuto che non possiede direttamente una delle caratteristiche di pericolo già menzionate, ma può manifestarla successivamente</li></ul></p>")
+    stato_fisico: StatiFisici = Field(default=..., description="Stato fisico<p>Valori ammessi:<ul style=\"margin:0\"><li><i>SP</i> - In polvere o pulverulento</li><li><i>S</i> - Solido</li><li><i>FP</i> - Fangoso</li><li><i>L</i> - Liquido</li><li><i>VS</i> - Vischioso sciropposo</li></ul></p>")
     quantita: Optional[QuantitaModel] = Field(default=None, description="Quantità")
     verificato_in_partenza: Optional[StrictBool] = Field(default=None, description="Verificato in partenza")
     trasporto_adr: Optional[StrictBool] = Field(default=None, description="Trasporto ADR")
     dati_adr: Optional[NormativaADRModel] = Field(default=None, description="Dati ADR.  Il dato non deve essere indicato se la proprietà \"trasporto_adr\" è diversa da true.")
     analisi_classificazione: Optional[AnalisiClassificazioneModel] = Field(default=None, description="Analisi/Classificazione")
-    numero_colli: Optional[Annotated[str, Field(strict=True, max_length=50)]] = Field(default=None, description="Numero di colli")
+    numero_colli: Optional[constr(strict=True, max_length=50)] = Field(default=None, description="Numero di colli")
     rinfusa: Optional[StrictBool] = Field(default=None, description="Rinfusa")
-    __properties: ClassVar[List[str]] = ["codice_eer", "descrizione", "provenienza", "caratteristiche_chimico_fisiche", "caratteristiche_pericolo", "stato_fisico", "quantita", "verificato_in_partenza", "trasporto_adr", "dati_adr", "analisi_classificazione", "numero_colli", "rinfusa"]
+    __properties = ["codice_eer", "descrizione", "provenienza", "caratteristiche_chimico_fisiche", "caratteristiche_pericolo", "stato_fisico", "quantita", "verificato_in_partenza", "trasporto_adr", "dati_adr", "analisi_classificazione", "numero_colli", "rinfusa"]
 
-    model_config = ConfigDict(
-        populate_by_name=True,
-        validate_assignment=True,
-        protected_namespaces=(),
-    )
-
+    class Config:
+        """Pydantic configuration"""
+        allow_population_by_field_name = True
+        validate_assignment = True
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""
-        return pprint.pformat(self.model_dump(by_alias=True))
+        return pprint.pformat(self.dict(by_alias=True))
 
     def to_json(self) -> str:
         """Returns the JSON representation of the model using alias"""
-        # TODO: pydantic v2: use .model_dump_json(by_alias=True, exclude_unset=True) instead
         return json.dumps(self.to_dict())
 
     @classmethod
-    def from_json(cls, json_str: str) -> Optional[Self]:
+    def from_json(cls, json_str: str) -> DatiRifiutoModel:
         """Create an instance of DatiRifiutoModel from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
-    def to_dict(self) -> Dict[str, Any]:
-        """Return the dictionary representation of the model using alias.
-
-        This has the following differences from calling pydantic's
-        `self.model_dump(by_alias=True)`:
-
-        * `None` is only added to the output dict for nullable fields that
-          were set at model initialization. Other fields with value `None`
-          are ignored.
-        """
-        excluded_fields: Set[str] = set([
-        ])
-
-        _dict = self.model_dump(
-            by_alias=True,
-            exclude=excluded_fields,
-            exclude_none=True,
-        )
+    def to_dict(self):
+        """Returns the dictionary representation of the model using alias"""
+        _dict = self.dict(by_alias=True,
+                          exclude={
+                          },
+                          exclude_none=True)
         # override the default output from pydantic by calling `to_dict()` of quantita
         if self.quantita:
             _dict['quantita'] = self.quantita.to_dict()
@@ -98,78 +81,78 @@ class DatiRifiutoModel(BaseModel):
         if self.analisi_classificazione:
             _dict['analisi_classificazione'] = self.analisi_classificazione.to_dict()
         # set to None if descrizione (nullable) is None
-        # and model_fields_set contains the field
-        if self.descrizione is None and "descrizione" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.descrizione is None and "descrizione" in self.__fields_set__:
             _dict['descrizione'] = None
 
         # set to None if caratteristiche_chimico_fisiche (nullable) is None
-        # and model_fields_set contains the field
-        if self.caratteristiche_chimico_fisiche is None and "caratteristiche_chimico_fisiche" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.caratteristiche_chimico_fisiche is None and "caratteristiche_chimico_fisiche" in self.__fields_set__:
             _dict['caratteristiche_chimico_fisiche'] = None
 
         # set to None if caratteristiche_pericolo (nullable) is None
-        # and model_fields_set contains the field
-        if self.caratteristiche_pericolo is None and "caratteristiche_pericolo" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.caratteristiche_pericolo is None and "caratteristiche_pericolo" in self.__fields_set__:
             _dict['caratteristiche_pericolo'] = None
 
         # set to None if quantita (nullable) is None
-        # and model_fields_set contains the field
-        if self.quantita is None and "quantita" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.quantita is None and "quantita" in self.__fields_set__:
             _dict['quantita'] = None
 
         # set to None if verificato_in_partenza (nullable) is None
-        # and model_fields_set contains the field
-        if self.verificato_in_partenza is None and "verificato_in_partenza" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.verificato_in_partenza is None and "verificato_in_partenza" in self.__fields_set__:
             _dict['verificato_in_partenza'] = None
 
         # set to None if trasporto_adr (nullable) is None
-        # and model_fields_set contains the field
-        if self.trasporto_adr is None and "trasporto_adr" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.trasporto_adr is None and "trasporto_adr" in self.__fields_set__:
             _dict['trasporto_adr'] = None
 
         # set to None if dati_adr (nullable) is None
-        # and model_fields_set contains the field
-        if self.dati_adr is None and "dati_adr" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.dati_adr is None and "dati_adr" in self.__fields_set__:
             _dict['dati_adr'] = None
 
         # set to None if analisi_classificazione (nullable) is None
-        # and model_fields_set contains the field
-        if self.analisi_classificazione is None and "analisi_classificazione" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.analisi_classificazione is None and "analisi_classificazione" in self.__fields_set__:
             _dict['analisi_classificazione'] = None
 
         # set to None if numero_colli (nullable) is None
-        # and model_fields_set contains the field
-        if self.numero_colli is None and "numero_colli" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.numero_colli is None and "numero_colli" in self.__fields_set__:
             _dict['numero_colli'] = None
 
         # set to None if rinfusa (nullable) is None
-        # and model_fields_set contains the field
-        if self.rinfusa is None and "rinfusa" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.rinfusa is None and "rinfusa" in self.__fields_set__:
             _dict['rinfusa'] = None
 
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
+    def from_dict(cls, obj: dict) -> DatiRifiutoModel:
         """Create an instance of DatiRifiutoModel from a dict"""
         if obj is None:
             return None
 
         if not isinstance(obj, dict):
-            return cls.model_validate(obj)
+            return DatiRifiutoModel.parse_obj(obj)
 
-        _obj = cls.model_validate({
+        _obj = DatiRifiutoModel.parse_obj({
             "codice_eer": obj.get("codice_eer"),
             "descrizione": obj.get("descrizione"),
             "provenienza": obj.get("provenienza"),
             "caratteristiche_chimico_fisiche": obj.get("caratteristiche_chimico_fisiche"),
             "caratteristiche_pericolo": obj.get("caratteristiche_pericolo"),
             "stato_fisico": obj.get("stato_fisico"),
-            "quantita": QuantitaModel.from_dict(obj["quantita"]) if obj.get("quantita") is not None else None,
+            "quantita": QuantitaModel.from_dict(obj.get("quantita")) if obj.get("quantita") is not None else None,
             "verificato_in_partenza": obj.get("verificato_in_partenza"),
             "trasporto_adr": obj.get("trasporto_adr"),
-            "dati_adr": NormativaADRModel.from_dict(obj["dati_adr"]) if obj.get("dati_adr") is not None else None,
-            "analisi_classificazione": AnalisiClassificazioneModel.from_dict(obj["analisi_classificazione"]) if obj.get("analisi_classificazione") is not None else None,
+            "dati_adr": NormativaADRModel.from_dict(obj.get("dati_adr")) if obj.get("dati_adr") is not None else None,
+            "analisi_classificazione": AnalisiClassificazioneModel.from_dict(obj.get("analisi_classificazione")) if obj.get("analisi_classificazione") is not None else None,
             "numero_colli": obj.get("numero_colli"),
             "rinfusa": obj.get("rinfusa")
         })

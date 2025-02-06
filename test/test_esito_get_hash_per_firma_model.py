@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.esito_get_hash_per_firma_model import EsitoGetHashPerFirmaModel
+from rentri_formulari.models.esito_get_hash_per_firma_model import EsitoGetHashPerFirmaModel  # noqa: E501
 
 class TestEsitoGetHashPerFirmaModel(unittest.TestCase):
     """EsitoGetHashPerFirmaModel unit test stubs"""
@@ -28,12 +29,12 @@ class TestEsitoGetHashPerFirmaModel(unittest.TestCase):
 
     def make_instance(self, include_optional) -> EsitoGetHashPerFirmaModel:
         """Test EsitoGetHashPerFirmaModel
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `EsitoGetHashPerFirmaModel`
         """
-        model = EsitoGetHashPerFirmaModel()
+        model = EsitoGetHashPerFirmaModel()  # noqa: E501
         if include_optional:
             return EsitoGetHashPerFirmaModel(
                 hash_algorithm = '',

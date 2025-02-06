@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.dati_trasporto_ferroviario_trasmissione_model import DatiTrasportoFerroviarioTrasmissioneModel
+from rentri_formulari.models.dati_trasporto_ferroviario_trasmissione_model import DatiTrasportoFerroviarioTrasmissioneModel  # noqa: E501
 
 class TestDatiTrasportoFerroviarioTrasmissioneModel(unittest.TestCase):
     """DatiTrasportoFerroviarioTrasmissioneModel unit test stubs"""
@@ -28,12 +29,12 @@ class TestDatiTrasportoFerroviarioTrasmissioneModel(unittest.TestCase):
 
     def make_instance(self, include_optional) -> DatiTrasportoFerroviarioTrasmissioneModel:
         """Test DatiTrasportoFerroviarioTrasmissioneModel
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `DatiTrasportoFerroviarioTrasmissioneModel`
         """
-        model = DatiTrasportoFerroviarioTrasmissioneModel()
+        model = DatiTrasportoFerroviarioTrasmissioneModel()  # noqa: E501
         if include_optional:
             return DatiTrasportoFerroviarioTrasmissioneModel(
                 treno = '0',

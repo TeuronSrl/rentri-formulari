@@ -3,7 +3,6 @@
 Dati trasportatore
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **denominazione** | **str** | Denominazione del soggetto | 
@@ -22,7 +21,7 @@ json = "{}"
 # create an instance of DatiTrasportatoreFormularioModel from a JSON string
 dati_trasportatore_formulario_model_instance = DatiTrasportatoreFormularioModel.from_json(json)
 # print the JSON string representation of the object
-print(DatiTrasportatoreFormularioModel.to_json())
+print DatiTrasportatoreFormularioModel.to_json()
 
 # convert the object into a dict
 dati_trasportatore_formulario_model_dict = dati_trasportatore_formulario_model_instance.to_dict()

@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **numero_fir_origine** | **str** |  | [optional] 
@@ -18,7 +17,7 @@ json = "{}"
 # create an instance of TrasbordoParzialeOrigineResult from a JSON string
 trasbordo_parziale_origine_result_instance = TrasbordoParzialeOrigineResult.from_json(json)
 # print the JSON string representation of the object
-print(TrasbordoParzialeOrigineResult.to_json())
+print TrasbordoParzialeOrigineResult.to_json()
 
 # convert the object into a dict
 trasbordo_parziale_origine_result_dict = trasbordo_parziale_origine_result_instance.to_dict()

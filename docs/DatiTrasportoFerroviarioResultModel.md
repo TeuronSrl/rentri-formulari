@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **tipo_trasporto** | [**TipoTrasporto**](TipoTrasporto.md) |  | [optional] 
@@ -24,7 +23,7 @@ json = "{}"
 # create an instance of DatiTrasportoFerroviarioResultModel from a JSON string
 dati_trasporto_ferroviario_result_model_instance = DatiTrasportoFerroviarioResultModel.from_json(json)
 # print the JSON string representation of the object
-print(DatiTrasportoFerroviarioResultModel.to_json())
+print DatiTrasportoFerroviarioResultModel.to_json()
 
 # convert the object into a dict
 dati_trasporto_ferroviario_result_model_dict = dati_trasporto_ferroviario_result_model_instance.to_dict()

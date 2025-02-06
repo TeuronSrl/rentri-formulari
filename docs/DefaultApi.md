@@ -19,8 +19,9 @@ Verifica dello stato dell'API.<hr/><i>Servizio richiamabile in modalità <b>STUB
 ### Example
 
 * Bearer (JWT) Authentication (Bearer):
-
 ```python
+import time
+import os
 import rentri_formulari
 from rentri_formulari.rest import ApiException
 from pprint import pprint
@@ -56,7 +57,6 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 
 ### Parameters
-
 This endpoint does not need any parameter.
 
 ### Return type
@@ -73,7 +73,6 @@ void (empty response body)
  - **Accept**: application/problem+json
 
 ### HTTP response details
-
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | OK |  -  |
@@ -92,8 +91,9 @@ Ottiene l'esito dell'elaborazione di una richiesta di elaborazione per un formul
 ### Example
 
 * Bearer (JWT) Authentication (Bearer):
-
 ```python
+import time
+import os
 import rentri_formulari
 from rentri_formulari.models.esito_formulario_model import EsitoFormularioModel
 from rentri_formulari.rest import ApiException
@@ -134,7 +134,6 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 ### Parameters
 
-
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **transazione_id** | **str**| Id della richiesta | 
@@ -153,7 +152,6 @@ Name | Type | Description  | Notes
  - **Accept**: application/json, application/problem+json
 
 ### HTTP response details
-
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | Esito dell&#39;elaborazione con eventuali errori |  -  |
@@ -175,8 +173,9 @@ Ottiene lo stato di elaborazione di una richiesta di elaborazione per un formula
 ### Example
 
 * Bearer (JWT) Authentication (Bearer):
-
 ```python
+import time
+import os
 import rentri_formulari
 from rentri_formulari.rest import ApiException
 from pprint import pprint
@@ -214,7 +213,6 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 ### Parameters
 
-
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **transazione_id** | **str**| Id della richiesta. | 
@@ -233,7 +231,6 @@ void (empty response body)
  - **Accept**: application/problem+json
 
 ### HTTP response details
-
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | Richiesta non ancora elaborata |  -  |

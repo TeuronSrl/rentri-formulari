@@ -151,6 +151,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Errore non gestito (contattare l'assistenza)
           content:
@@ -243,6 +245,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Errore non gestito (contattare l'assistenza)
           content:
@@ -318,6 +322,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Errore non gestito (contattare l'assistenza).
           content:
@@ -406,6 +412,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Errore non gestito (contattare l'assistenza)
           content:
@@ -511,6 +519,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -647,6 +657,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -730,6 +742,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Errore non gestito (contattare l'assistenza)
           content:
@@ -793,6 +807,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Errore non gestito (contattare l'assistenza)
           content:
@@ -877,6 +893,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -983,6 +1001,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -1098,6 +1118,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -1189,6 +1211,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Errore non gestito (contattare l'assistenza).
           content:
@@ -1276,6 +1300,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -1417,6 +1443,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -1481,6 +1509,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Errore non gestito (contattare l'assistenza).
           content:
@@ -1568,6 +1598,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -1669,6 +1701,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -1748,6 +1782,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Errore non gestito (contattare l'assistenza)
           content:
@@ -1804,6 +1840,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Errore non gestito (contattare l'assistenza)
           content:
@@ -1887,6 +1925,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -1957,6 +1997,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Errore non gestito (contattare l'assistenza).
           content:
@@ -2007,6 +2049,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Errore non gestito (contattare l'assistenza)
           content:
@@ -2088,6 +2132,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -2193,6 +2239,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -2304,6 +2352,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -2373,6 +2423,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Errore non gestito (contattare l'assistenza).
           content:
@@ -2422,6 +2474,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Errore non gestito (contattare l'assistenza)
           content:
@@ -2478,6 +2532,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Errore non gestito (contattare l'assistenza)
           content:
@@ -2529,6 +2585,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Errore non gestito (contattare l'assistenza).
           content:
@@ -2588,6 +2646,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Errore non gestito (contattare l'assistenza).
           content:
@@ -2676,6 +2736,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -2806,6 +2868,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -2866,6 +2930,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -2924,6 +2990,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -2980,6 +3048,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -3104,6 +3174,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -3162,6 +3234,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -3216,6 +3290,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -3270,6 +3346,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -3317,6 +3395,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Errore non gestito (contattare l'assistenza).
           content:
@@ -3372,6 +3452,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Errore non gestito (contattare l'assistenza).
           content:
@@ -3461,6 +3543,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Errore non gestito (contattare l'assistenza)
           content:
@@ -3628,6 +3712,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -3686,6 +3772,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -3742,6 +3830,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -3794,6 +3884,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -3945,6 +4037,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -3997,6 +4091,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -4049,6 +4145,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -4112,6 +4210,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -4213,6 +4313,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Errore non gestito (contattare l'assistenza).
           content:
@@ -4239,6 +4341,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -4361,6 +4465,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -4427,6 +4533,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -4482,6 +4590,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -4540,6 +4650,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -4629,6 +4741,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -4702,6 +4816,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Errore non gestito (contattare l'assistenza)
           content:
@@ -4759,6 +4875,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Errore non gestito (contattare l'assistenza)
           content:
@@ -4880,6 +4998,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -4943,6 +5063,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -4994,6 +5116,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -5048,6 +5172,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -5136,6 +5262,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -5279,6 +5407,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -5342,6 +5472,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -5393,6 +5525,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -5447,6 +5581,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -5535,6 +5671,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Internal Server Error
           content:
@@ -5634,6 +5772,8 @@ paths:
               description: >-
                 Indica quanto tempo il fruitore deve attendere prima di
                 effettuare una nuova richiesta.
+              schema:
+                  type: string
         '500':
           description: Errore non gestito (contattare l'assistenza)
           content:
@@ -5809,7 +5949,7 @@ components:
         nazione_id:
           maxLength: 2
           minLength: 1
-          pattern: ^(?!.*(?i)it).*$
+          pattern: ^(?!.*[Ii][Tt]).*$
           type: string
           description: >-
             Codice ISO 3166-1 alpha-2 della nazione, in caso di "IT" è possibile

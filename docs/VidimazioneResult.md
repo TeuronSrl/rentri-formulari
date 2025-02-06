@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **codice_fiscale** | **str** |  | [optional] 
@@ -18,7 +17,7 @@ json = "{}"
 # create an instance of VidimazioneResult from a JSON string
 vidimazione_result_instance = VidimazioneResult.from_json(json)
 # print the JSON string representation of the object
-print(VidimazioneResult.to_json())
+print VidimazioneResult.to_json()
 
 # convert the object into a dict
 vidimazione_result_dict = vidimazione_result_instance.to_dict()

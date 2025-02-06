@@ -3,7 +3,6 @@
 Esito
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **transazione_id** | **str** | Identificativo della transazione asincrona | [optional] 
@@ -21,7 +20,7 @@ json = "{}"
 # create an instance of EsitoModel from a JSON string
 esito_model_instance = EsitoModel.from_json(json)
 # print the JSON string representation of the object
-print(EsitoModel.to_json())
+print EsitoModel.to_json()
 
 # convert the object into a dict
 esito_model_dict = esito_model_instance.to_dict()

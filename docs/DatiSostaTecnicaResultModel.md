@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **data_ora_trasbordo** | **datetime** | Formato ISO 8601 UTC | [optional] 
@@ -22,7 +21,7 @@ json = "{}"
 # create an instance of DatiSostaTecnicaResultModel from a JSON string
 dati_sosta_tecnica_result_model_instance = DatiSostaTecnicaResultModel.from_json(json)
 # print the JSON string representation of the object
-print(DatiSostaTecnicaResultModel.to_json())
+print DatiSostaTecnicaResultModel.to_json()
 
 # convert the object into a dict
 dati_sosta_tecnica_result_model_dict = dati_sosta_tecnica_result_model_instance.to_dict()

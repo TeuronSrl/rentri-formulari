@@ -3,7 +3,6 @@
 Conducente
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **nome** | **str** | Nome | 
@@ -19,7 +18,7 @@ json = "{}"
 # create an instance of ConducenteModel from a JSON string
 conducente_model_instance = ConducenteModel.from_json(json)
 # print the JSON string representation of the object
-print(ConducenteModel.to_json())
+print ConducenteModel.to_json()
 
 # convert the object into a dict
 conducente_model_dict = conducente_model_instance.to_dict()

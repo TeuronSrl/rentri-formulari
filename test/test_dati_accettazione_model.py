@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.dati_accettazione_model import DatiAccettazioneModel
+from rentri_formulari.models.dati_accettazione_model import DatiAccettazioneModel  # noqa: E501
 
 class TestDatiAccettazioneModel(unittest.TestCase):
     """DatiAccettazioneModel unit test stubs"""
@@ -28,12 +29,12 @@ class TestDatiAccettazioneModel(unittest.TestCase):
 
     def make_instance(self, include_optional) -> DatiAccettazioneModel:
         """Test DatiAccettazioneModel
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `DatiAccettazioneModel`
         """
-        model = DatiAccettazioneModel()
+        model = DatiAccettazioneModel()  # noqa: E501
         if include_optional:
             return DatiAccettazioneModel(
                 tipo_accettazione = 'A',

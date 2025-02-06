@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.copia_cartacea_conferma_model import CopiaCartaceaConfermaModel
+from rentri_formulari.models.copia_cartacea_conferma_model import CopiaCartaceaConfermaModel  # noqa: E501
 
 class TestCopiaCartaceaConfermaModel(unittest.TestCase):
     """CopiaCartaceaConfermaModel unit test stubs"""
@@ -28,12 +29,12 @@ class TestCopiaCartaceaConfermaModel(unittest.TestCase):
 
     def make_instance(self, include_optional) -> CopiaCartaceaConfermaModel:
         """Test CopiaCartaceaConfermaModel
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `CopiaCartaceaConfermaModel`
         """
-        model = CopiaCartaceaConfermaModel()
+        model = CopiaCartaceaConfermaModel()  # noqa: E501
         if include_optional:
             return CopiaCartaceaConfermaModel(
                 identificativo = '0',

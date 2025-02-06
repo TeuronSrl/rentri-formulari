@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.validazione_xfir_result import ValidazioneXfirResult
+from rentri_formulari.models.validazione_xfir_result import ValidazioneXfirResult  # noqa: E501
 
 class TestValidazioneXfirResult(unittest.TestCase):
     """ValidazioneXfirResult unit test stubs"""
@@ -28,12 +29,12 @@ class TestValidazioneXfirResult(unittest.TestCase):
 
     def make_instance(self, include_optional) -> ValidazioneXfirResult:
         """Test ValidazioneXfirResult
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `ValidazioneXfirResult`
         """
-        model = ValidazioneXfirResult()
+        model = ValidazioneXfirResult()  # noqa: E501
         if include_optional:
             return ValidazioneXfirResult(
                 formulario = rentri_formulari.models.dettaglio_formulario.DettaglioFormulario(

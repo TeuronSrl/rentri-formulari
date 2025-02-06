@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.vidimazione_result import VidimazioneResult
+from rentri_formulari.models.vidimazione_result import VidimazioneResult  # noqa: E501
 
 class TestVidimazioneResult(unittest.TestCase):
     """VidimazioneResult unit test stubs"""
@@ -28,12 +29,12 @@ class TestVidimazioneResult(unittest.TestCase):
 
     def make_instance(self, include_optional) -> VidimazioneResult:
         """Test VidimazioneResult
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `VidimazioneResult`
         """
-        model = VidimazioneResult()
+        model = VidimazioneResult()  # noqa: E501
         if include_optional:
             return VidimazioneResult(
                 codice_fiscale = '',

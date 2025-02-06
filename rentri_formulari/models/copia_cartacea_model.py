@@ -19,126 +19,108 @@ import re  # noqa: F401
 import json
 
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict, Field, StrictBytes, StrictStr, field_validator
-from typing import Any, ClassVar, Dict, List, Optional, Union
-from typing_extensions import Annotated
+from typing import List, Optional, Union
+from pydantic import BaseModel, Field, StrictBytes, StrictStr, conlist, constr, validator
 from rentri_formulari.models.copia_cartacea_soggetto_info import CopiaCartaceaSoggettoInfo
-from typing import Optional, Set
-from typing_extensions import Self
 
 class CopiaCartaceaModel(BaseModel):
     """
     CopiaCartaceaModel
-    """ # noqa: E501
-    file_content: Union[StrictBytes, StrictStr] = Field(description="Contenuto del file che rappresenta la copia cartacea del formulario codificato in base64")
-    nome_file: Annotated[str, Field(min_length=1, strict=True)] = Field(description="Nome del file")
-    mime: Annotated[str, Field(min_length=1, strict=True)] = Field(description="Tipo MIME del file da caricare")
-    numero_fir: Annotated[str, Field(min_length=1, strict=True)] = Field(description="Numero del FIR cartaceo, rilasciato al momento della vidimazione")
-    data_emissione: datetime = Field(description="Data emissione del formulario cartaceo (formato ISO 8601 UTC) È necessario specificare una data antecedente o uguale alla data corrente")
-    produttore: CopiaCartaceaSoggettoInfo = Field(description="Dati del produttore a cui si rende disponibile la copia cartacea")
-    trasportatori: Optional[List[CopiaCartaceaSoggettoInfo]] = None
-    intermediari: Optional[List[CopiaCartaceaSoggettoInfo]] = None
-    note: Optional[Annotated[str, Field(strict=True, max_length=500)]] = Field(default=None, description="Eventuali note riguardanti la copia cartacea")
-    __properties: ClassVar[List[str]] = ["file_content", "nome_file", "mime", "numero_fir", "data_emissione", "produttore", "trasportatori", "intermediari", "note"]
+    """
+    file_content: Union[StrictBytes, StrictStr] = Field(default=..., description="Contenuto del file che rappresenta la copia cartacea del formulario codificato in base64")
+    nome_file: constr(strict=True, min_length=1) = Field(default=..., description="Nome del file")
+    mime: constr(strict=True, min_length=1) = Field(default=..., description="Tipo MIME del file da caricare")
+    numero_fir: constr(strict=True, min_length=1) = Field(default=..., description="Numero del FIR cartaceo, rilasciato al momento della vidimazione")
+    data_emissione: datetime = Field(default=..., description="Data emissione del formulario cartaceo (formato ISO 8601 UTC) È necessario specificare una data antecedente o uguale alla data corrente")
+    produttore: CopiaCartaceaSoggettoInfo = Field(default=..., description="Dati del produttore a cui si rende disponibile la copia cartacea")
+    trasportatori: Optional[conlist(CopiaCartaceaSoggettoInfo)] = None
+    intermediari: Optional[conlist(CopiaCartaceaSoggettoInfo)] = None
+    note: Optional[constr(strict=True, max_length=500)] = Field(default=None, description="Eventuali note riguardanti la copia cartacea")
+    __properties = ["file_content", "nome_file", "mime", "numero_fir", "data_emissione", "produttore", "trasportatori", "intermediari", "note"]
 
-    @field_validator('numero_fir')
+    @validator('numero_fir')
     def numero_fir_validate_regular_expression(cls, value):
         """Validates the regular expression"""
         if not re.match(r"^([BCDFGHJKLMNPQRSTVWXYZ]{4,6})[ 	-\/_]*([0-9]+)[ 	-\/_]*([BCDFGHJKLMNPQRSTVWXYZ]{1,2})$", value):
             raise ValueError(r"must validate the regular expression /^([BCDFGHJKLMNPQRSTVWXYZ]{4,6})[ 	-\/_]*([0-9]+)[ 	-\/_]*([BCDFGHJKLMNPQRSTVWXYZ]{1,2})$/")
         return value
 
-    model_config = ConfigDict(
-        populate_by_name=True,
-        validate_assignment=True,
-        protected_namespaces=(),
-    )
-
+    class Config:
+        """Pydantic configuration"""
+        allow_population_by_field_name = True
+        validate_assignment = True
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""
-        return pprint.pformat(self.model_dump(by_alias=True))
+        return pprint.pformat(self.dict(by_alias=True))
 
     def to_json(self) -> str:
         """Returns the JSON representation of the model using alias"""
-        # TODO: pydantic v2: use .model_dump_json(by_alias=True, exclude_unset=True) instead
         return json.dumps(self.to_dict())
 
     @classmethod
-    def from_json(cls, json_str: str) -> Optional[Self]:
+    def from_json(cls, json_str: str) -> CopiaCartaceaModel:
         """Create an instance of CopiaCartaceaModel from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
-    def to_dict(self) -> Dict[str, Any]:
-        """Return the dictionary representation of the model using alias.
-
-        This has the following differences from calling pydantic's
-        `self.model_dump(by_alias=True)`:
-
-        * `None` is only added to the output dict for nullable fields that
-          were set at model initialization. Other fields with value `None`
-          are ignored.
-        """
-        excluded_fields: Set[str] = set([
-        ])
-
-        _dict = self.model_dump(
-            by_alias=True,
-            exclude=excluded_fields,
-            exclude_none=True,
-        )
+    def to_dict(self):
+        """Returns the dictionary representation of the model using alias"""
+        _dict = self.dict(by_alias=True,
+                          exclude={
+                          },
+                          exclude_none=True)
         # override the default output from pydantic by calling `to_dict()` of produttore
         if self.produttore:
             _dict['produttore'] = self.produttore.to_dict()
         # override the default output from pydantic by calling `to_dict()` of each item in trasportatori (list)
         _items = []
         if self.trasportatori:
-            for _item_trasportatori in self.trasportatori:
-                if _item_trasportatori:
-                    _items.append(_item_trasportatori.to_dict())
+            for _item in self.trasportatori:
+                if _item:
+                    _items.append(_item.to_dict())
             _dict['trasportatori'] = _items
         # override the default output from pydantic by calling `to_dict()` of each item in intermediari (list)
         _items = []
         if self.intermediari:
-            for _item_intermediari in self.intermediari:
-                if _item_intermediari:
-                    _items.append(_item_intermediari.to_dict())
+            for _item in self.intermediari:
+                if _item:
+                    _items.append(_item.to_dict())
             _dict['intermediari'] = _items
         # set to None if trasportatori (nullable) is None
-        # and model_fields_set contains the field
-        if self.trasportatori is None and "trasportatori" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.trasportatori is None and "trasportatori" in self.__fields_set__:
             _dict['trasportatori'] = None
 
         # set to None if intermediari (nullable) is None
-        # and model_fields_set contains the field
-        if self.intermediari is None and "intermediari" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.intermediari is None and "intermediari" in self.__fields_set__:
             _dict['intermediari'] = None
 
         # set to None if note (nullable) is None
-        # and model_fields_set contains the field
-        if self.note is None and "note" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.note is None and "note" in self.__fields_set__:
             _dict['note'] = None
 
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
+    def from_dict(cls, obj: dict) -> CopiaCartaceaModel:
         """Create an instance of CopiaCartaceaModel from a dict"""
         if obj is None:
             return None
 
         if not isinstance(obj, dict):
-            return cls.model_validate(obj)
+            return CopiaCartaceaModel.parse_obj(obj)
 
-        _obj = cls.model_validate({
+        _obj = CopiaCartaceaModel.parse_obj({
             "file_content": obj.get("file_content"),
             "nome_file": obj.get("nome_file"),
             "mime": obj.get("mime"),
             "numero_fir": obj.get("numero_fir"),
             "data_emissione": obj.get("data_emissione"),
-            "produttore": CopiaCartaceaSoggettoInfo.from_dict(obj["produttore"]) if obj.get("produttore") is not None else None,
-            "trasportatori": [CopiaCartaceaSoggettoInfo.from_dict(_item) for _item in obj["trasportatori"]] if obj.get("trasportatori") is not None else None,
-            "intermediari": [CopiaCartaceaSoggettoInfo.from_dict(_item) for _item in obj["intermediari"]] if obj.get("intermediari") is not None else None,
+            "produttore": CopiaCartaceaSoggettoInfo.from_dict(obj.get("produttore")) if obj.get("produttore") is not None else None,
+            "trasportatori": [CopiaCartaceaSoggettoInfo.from_dict(_item) for _item in obj.get("trasportatori")] if obj.get("trasportatori") is not None else None,
+            "intermediari": [CopiaCartaceaSoggettoInfo.from_dict(_item) for _item in obj.get("intermediari")] if obj.get("intermediari") is not None else None,
             "note": obj.get("note")
         })
         return _obj

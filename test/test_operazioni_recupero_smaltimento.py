@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.operazioni_recupero_smaltimento import OperazioniRecuperoSmaltimento
+from rentri_formulari.models.operazioni_recupero_smaltimento import OperazioniRecuperoSmaltimento  # noqa: E501
 
 class TestOperazioniRecuperoSmaltimento(unittest.TestCase):
     """OperazioniRecuperoSmaltimento unit test stubs"""

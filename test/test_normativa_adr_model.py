@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.normativa_adr_model import NormativaADRModel
+from rentri_formulari.models.normativa_adr_model import NormativaADRModel  # noqa: E501
 
 class TestNormativaADRModel(unittest.TestCase):
     """NormativaADRModel unit test stubs"""
@@ -28,12 +29,12 @@ class TestNormativaADRModel(unittest.TestCase):
 
     def make_instance(self, include_optional) -> NormativaADRModel:
         """Test NormativaADRModel
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `NormativaADRModel`
         """
-        model = NormativaADRModel()
+        model = NormativaADRModel()  # noqa: E501
         if include_optional:
             return NormativaADRModel(
                 numero_onu = '',

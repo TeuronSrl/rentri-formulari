@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **numero_fir** | **str** |  | [optional] 
@@ -33,7 +32,7 @@ json = "{}"
 # create an instance of FormularioItemResult from a JSON string
 formulario_item_result_instance = FormularioItemResult.from_json(json)
 # print the JSON string representation of the object
-print(FormularioItemResult.to_json())
+print FormularioItemResult.to_json()
 
 # convert the object into a dict
 formulario_item_result_dict = formulario_item_result_instance.to_dict()

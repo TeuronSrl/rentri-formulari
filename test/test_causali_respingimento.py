@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.causali_respingimento import CausaliRespingimento
+from rentri_formulari.models.causali_respingimento import CausaliRespingimento  # noqa: E501
 
 class TestCausaliRespingimento(unittest.TestCase):
     """CausaliRespingimento unit test stubs"""

@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **quantita** | [**QuantitaModel**](QuantitaModel.md) |  | 
@@ -18,7 +17,7 @@ json = "{}"
 # create an instance of QuantitaRifiutoModel from a JSON string
 quantita_rifiuto_model_instance = QuantitaRifiutoModel.from_json(json)
 # print the JSON string representation of the object
-print(QuantitaRifiutoModel.to_json())
+print QuantitaRifiutoModel.to_json()
 
 # convert the object into a dict
 quantita_rifiuto_model_dict = quantita_rifiuto_model_instance.to_dict()

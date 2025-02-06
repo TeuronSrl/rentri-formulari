@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.ruolo_conferma_copia_cartacea import RuoloConfermaCopiaCartacea
+from rentri_formulari.models.ruolo_conferma_copia_cartacea import RuoloConfermaCopiaCartacea  # noqa: E501
 
 class TestRuoloConfermaCopiaCartacea(unittest.TestCase):
     """RuoloConfermaCopiaCartacea unit test stubs"""

@@ -3,7 +3,6 @@
 Dati di partenza del formulario
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **numero_fir** | **str** | Numero di vidimazione da attribuire al nuovo FIR digitale. Qualora non venga specificato, il sistema ne assegnerà uno automaticamente. | [optional] 
@@ -25,7 +24,7 @@ json = "{}"
 # create an instance of DatiPartenzaModel from a JSON string
 dati_partenza_model_instance = DatiPartenzaModel.from_json(json)
 # print the JSON string representation of the object
-print(DatiPartenzaModel.to_json())
+print DatiPartenzaModel.to_json()
 
 # convert the object into a dict
 dati_partenza_model_dict = dati_partenza_model_instance.to_dict()

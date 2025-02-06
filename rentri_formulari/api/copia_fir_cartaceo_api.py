@@ -12,15 +12,20 @@
     Do not edit the class manually.
 """  # noqa: E501
 
-import warnings
-from pydantic import validate_call, Field, StrictFloat, StrictStr, StrictInt
-from typing import Any, Dict, List, Optional, Tuple, Union
-from typing_extensions import Annotated
 
-from datetime import datetime
-from pydantic import Field, StrictBool, StrictStr, field_validator
-from typing import List, Optional
+import re  # noqa: F401
+import io
+import warnings
+
+from pydantic import validate_arguments, ValidationError
+
 from typing_extensions import Annotated
+from datetime import datetime
+
+from pydantic import Field, StrictBool, StrictStr, conint, constr, validator
+
+from typing import List, Optional
+
 from rentri_formulari.models.copia_cartacea_conferma_model import CopiaCartaceaConfermaModel
 from rentri_formulari.models.copia_cartacea_model import CopiaCartaceaModel
 from rentri_formulari.models.copia_cartacea_result import CopiaCartaceaResult
@@ -28,9 +33,12 @@ from rentri_formulari.models.downloadable_base_response import DownloadableBaseR
 from rentri_formulari.models.esito_copia_cartacea_model import EsitoCopiaCartaceaModel
 from rentri_formulari.models.transazione_model import TransazioneModel
 
-from rentri_formulari.api_client import ApiClient, RequestSerialized
+from rentri_formulari.api_client import ApiClient
 from rentri_formulari.api_response import ApiResponse
-from rentri_formulari.rest import RESTResponseType
+from rentri_formulari.exceptions import (  # noqa: F401
+    ApiTypeError,
+    ApiValueError
+)
 
 
 class CopiaFIRCartaceoApi:
@@ -45,31 +53,16 @@ class CopiaFIRCartaceoApi:
             api_client = ApiClient.get_default()
         self.api_client = api_client
 
+    @validate_arguments
+    def copia_cartacea_caricamento_num_iscr_sito_get(self, num_iscr_sito : Annotated[constr(strict=True), Field(..., description="Numero iscrizione unità locale del trasportatore che ha caricato le copie dei FIR cartacei             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\"")], paging_page : Annotated[Optional[conint(strict=True, le=2147483647, ge=1)], Field(description="Valore per l'header Paging-Page")] = None, paging_page_size : Annotated[Optional[conint(strict=True, le=1000, ge=1)], Field(description="Valore per l'header Paging-PageSize")] = None, numero_fir : Annotated[Optional[StrictStr], Field(description="Pattern per filtrare i numeri delle copie dei FIR cartacei da restituire")] = None, confermate : Annotated[Optional[StrictBool], Field(description="Opzione per filtrare solo le copie dei FIR cartacei confermate o solo quelle non confermate, non specificare il valore per averle tutte")] = None, **kwargs) -> List[CopiaCartaceaResult]:  # noqa: E501
+        """Elenco copie FIR cartaceo caricate  # noqa: E501
 
-    @validate_call
-    def copia_cartacea_caricamento_num_iscr_sito_get(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True, description="Numero iscrizione unità locale del trasportatore che ha caricato le copie dei FIR cartacei             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\"")],
-        paging_page: Annotated[Optional[Annotated[int, Field(le=2147483647, strict=True, ge=1)]], Field(description="Valore per l'header Paging-Page")] = None,
-        paging_page_size: Annotated[Optional[Annotated[int, Field(le=1000, strict=True, ge=1)]], Field(description="Valore per l'header Paging-PageSize")] = None,
-        numero_fir: Annotated[Optional[StrictStr], Field(description="Pattern per filtrare i numeri delle copie dei FIR cartacei da restituire")] = None,
-        confermate: Annotated[Optional[StrictBool], Field(description="Opzione per filtrare solo le copie dei FIR cartacei confermate o solo quelle non confermate, non specificare il valore per averle tutte")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> List[CopiaCartaceaResult]:
-        """Elenco copie FIR cartaceo caricate
+        Ottiene la lista delle copie dei FIR cartacei caricate dall'unità locale del trasportatore.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-        Ottiene la lista delle copie dei FIR cartacei caricate dall'unità locale del trasportatore.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>
+        >>> thread = api.copia_cartacea_caricamento_num_iscr_sito_get(num_iscr_sito, paging_page, paging_page_size, numero_fir, confermate, async_req=True)
+        >>> result = thread.get()
 
         :param num_iscr_sito: Numero iscrizione unità locale del trasportatore che ha caricato le copie dei FIR cartacei             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\" (required)
         :type num_iscr_sito: str
@@ -81,82 +74,33 @@ class CopiaFIRCartaceoApi:
         :type numero_fir: str
         :param confermate: Opzione per filtrare solo le copie dei FIR cartacei confermate o solo quelle non confermate, non specificare il valore per averle tutte
         :type confermate: bool
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: List[CopiaCartaceaResult]
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the copia_cartacea_caricamento_num_iscr_sito_get_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.copia_cartacea_caricamento_num_iscr_sito_get_with_http_info(num_iscr_sito, paging_page, paging_page_size, numero_fir, confermate, **kwargs)  # noqa: E501
 
-        _param = self._copia_cartacea_caricamento_num_iscr_sito_get_serialize(
-            num_iscr_sito=num_iscr_sito,
-            paging_page=paging_page,
-            paging_page_size=paging_page_size,
-            numero_fir=numero_fir,
-            confermate=confermate,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def copia_cartacea_caricamento_num_iscr_sito_get_with_http_info(self, num_iscr_sito : Annotated[constr(strict=True), Field(..., description="Numero iscrizione unità locale del trasportatore che ha caricato le copie dei FIR cartacei             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\"")], paging_page : Annotated[Optional[conint(strict=True, le=2147483647, ge=1)], Field(description="Valore per l'header Paging-Page")] = None, paging_page_size : Annotated[Optional[conint(strict=True, le=1000, ge=1)], Field(description="Valore per l'header Paging-PageSize")] = None, numero_fir : Annotated[Optional[StrictStr], Field(description="Pattern per filtrare i numeri delle copie dei FIR cartacei da restituire")] = None, confermate : Annotated[Optional[StrictBool], Field(description="Opzione per filtrare solo le copie dei FIR cartacei confermate o solo quelle non confermate, non specificare il valore per averle tutte")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        """Elenco copie FIR cartaceo caricate  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "List[CopiaCartaceaResult]",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Ottiene la lista delle copie dei FIR cartacei caricate dall'unità locale del trasportatore.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def copia_cartacea_caricamento_num_iscr_sito_get_with_http_info(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True, description="Numero iscrizione unità locale del trasportatore che ha caricato le copie dei FIR cartacei             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\"")],
-        paging_page: Annotated[Optional[Annotated[int, Field(le=2147483647, strict=True, ge=1)]], Field(description="Valore per l'header Paging-Page")] = None,
-        paging_page_size: Annotated[Optional[Annotated[int, Field(le=1000, strict=True, ge=1)]], Field(description="Valore per l'header Paging-PageSize")] = None,
-        numero_fir: Annotated[Optional[StrictStr], Field(description="Pattern per filtrare i numeri delle copie dei FIR cartacei da restituire")] = None,
-        confermate: Annotated[Optional[StrictBool], Field(description="Opzione per filtrare solo le copie dei FIR cartacei confermate o solo quelle non confermate, non specificare il valore per averle tutte")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[List[CopiaCartaceaResult]]:
-        """Elenco copie FIR cartaceo caricate
-
-        Ottiene la lista delle copie dei FIR cartacei caricate dall'unità locale del trasportatore.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>
+        >>> thread = api.copia_cartacea_caricamento_num_iscr_sito_get_with_http_info(num_iscr_sito, paging_page, paging_page_size, numero_fir, confermate, async_req=True)
+        >>> result = thread.get()
 
         :param num_iscr_sito: Numero iscrizione unità locale del trasportatore che ha caricato le copie dei FIR cartacei             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\" (required)
         :type num_iscr_sito: str
@@ -168,860 +112,549 @@ class CopiaFIRCartaceoApi:
         :type numero_fir: str
         :param confermate: Opzione per filtrare solo le copie dei FIR cartacei confermate o solo quelle non confermate, non specificare il valore per averle tutte
         :type confermate: bool
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(List[CopiaCartaceaResult], status_code(int), headers(HTTPHeaderDict))
+        """
 
-        _param = self._copia_cartacea_caricamento_num_iscr_sito_get_serialize(
-            num_iscr_sito=num_iscr_sito,
-            paging_page=paging_page,
-            paging_page_size=paging_page_size,
-            numero_fir=numero_fir,
-            confermate=confermate,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
+        _params = locals()
+
+        _all_params = [
+            'num_iscr_sito',
+            'paging_page',
+            'paging_page_size',
+            'numero_fir',
+            'confermate'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
+            ]
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method copia_cartacea_caricamento_num_iscr_sito_get" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
+
+        _collection_formats = {}
+
+        # process the path parameters
+        _path_params = {}
+        if _params['num_iscr_sito'] is not None:
+            _path_params['num_iscr_sito'] = _params['num_iscr_sito']
+
+
+        # process the query parameters
+        _query_params = []
+        if _params.get('numero_fir') is not None:  # noqa: E501
+            _query_params.append(('numero_fir', _params['numero_fir']))
+
+        if _params.get('confermate') is not None:  # noqa: E501
+            _query_params.append(('confermate', _params['confermate']))
+
+        # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
+        if _params['paging_page'] is not None:
+            _header_params['Paging-Page'] = _params['paging_page']
+
+        if _params['paging_page_size'] is not None:
+            _header_params['Paging-PageSize'] = _params['paging_page_size']
+
+        # process the form parameters
+        _form_params = []
+        _files = {}
+        # process the body parameter
+        _body_params = None
+        # set the HTTP header `Accept`
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
+
+        # authentication setting
+        _auth_settings = ['Bearer']  # noqa: E501
+
+        _response_types_map = {
             '200': "List[CopiaCartaceaResult]",
             '403': None,
             '404': None,
             '429': None,
             '500': "ProblemDetails",
         }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
 
-
-    @validate_call
-    def copia_cartacea_caricamento_num_iscr_sito_get_without_preload_content(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True, description="Numero iscrizione unità locale del trasportatore che ha caricato le copie dei FIR cartacei             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\"")],
-        paging_page: Annotated[Optional[Annotated[int, Field(le=2147483647, strict=True, ge=1)]], Field(description="Valore per l'header Paging-Page")] = None,
-        paging_page_size: Annotated[Optional[Annotated[int, Field(le=1000, strict=True, ge=1)]], Field(description="Valore per l'header Paging-PageSize")] = None,
-        numero_fir: Annotated[Optional[StrictStr], Field(description="Pattern per filtrare i numeri delle copie dei FIR cartacei da restituire")] = None,
-        confermate: Annotated[Optional[StrictBool], Field(description="Opzione per filtrare solo le copie dei FIR cartacei confermate o solo quelle non confermate, non specificare il valore per averle tutte")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """Elenco copie FIR cartaceo caricate
-
-        Ottiene la lista delle copie dei FIR cartacei caricate dall'unità locale del trasportatore.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>
-
-        :param num_iscr_sito: Numero iscrizione unità locale del trasportatore che ha caricato le copie dei FIR cartacei             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\" (required)
-        :type num_iscr_sito: str
-        :param paging_page: Valore per l'header Paging-Page
-        :type paging_page: int
-        :param paging_page_size: Valore per l'header Paging-PageSize
-        :type paging_page_size: int
-        :param numero_fir: Pattern per filtrare i numeri delle copie dei FIR cartacei da restituire
-        :type numero_fir: str
-        :param confermate: Opzione per filtrare solo le copie dei FIR cartacei confermate o solo quelle non confermate, non specificare il valore per averle tutte
-        :type confermate: bool
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._copia_cartacea_caricamento_num_iscr_sito_get_serialize(
-            num_iscr_sito=num_iscr_sito,
-            paging_page=paging_page,
-            paging_page_size=paging_page_size,
-            numero_fir=numero_fir,
-            confermate=confermate,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
-
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "List[CopiaCartaceaResult]",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
-
-
-    def _copia_cartacea_caricamento_num_iscr_sito_get_serialize(
-        self,
-        num_iscr_sito,
-        paging_page,
-        paging_page_size,
-        numero_fir,
-        confermate,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
-
-        # process the path parameters
-        if num_iscr_sito is not None:
-            _path_params['num_iscr_sito'] = num_iscr_sito
-        # process the query parameters
-        if numero_fir is not None:
-            
-            _query_params.append(('numero_fir', numero_fir))
-            
-        if confermate is not None:
-            
-            _query_params.append(('confermate', confermate))
-            
-        # process the header parameters
-        if paging_page is not None:
-            _header_params['Paging-Page'] = paging_page
-        if paging_page_size is not None:
-            _header_params['Paging-PageSize'] = paging_page_size
-        # process the form parameters
-        # process the body parameter
-
-
-        # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
-
-
-        # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
-
-        return self.api_client.param_serialize(
-            method='GET',
-            resource_path='/copia-cartacea/caricamento/{num_iscr_sito}',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        return self.api_client.call_api(
+            '/copia-cartacea/caricamento/{num_iscr_sito}', 'GET',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def copia_cartacea_caricamento_num_iscr_sito_identificativo_delete(self, num_iscr_sito : Annotated[constr(strict=True), Field(..., description="Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo.             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\"")], identificativo : Annotated[StrictStr, Field(..., description="Identificativo della copia del FIR cartaceo da cancellare")], **kwargs) -> None:  # noqa: E501
+        """Cancella copia FIR cartaceo  # noqa: E501
 
+        Elimina il caricamento della copia del FIR cartaceo. L'operazione è possibile solo se nessuno dei soggetti a cui è stata resa disponibile la copia del FIR cartaceo l'ha già presa in carico con l'operazione di conferma.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre un codice di stato 422) anche in ambiente di produzione.</i><hr/>  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def copia_cartacea_caricamento_num_iscr_sito_identificativo_delete(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True, description="Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo.             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\"")],
-        identificativo: Annotated[StrictStr, Field(description="Identificativo della copia del FIR cartaceo da cancellare")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> None:
-        """Cancella copia FIR cartaceo
-
-        Elimina il caricamento della copia del FIR cartaceo. L'operazione è possibile solo se nessuno dei soggetti a cui è stata resa disponibile la copia del FIR cartaceo l'ha già presa in carico con l'operazione di conferma.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre un codice di stato 422) anche in ambiente di produzione.</i><hr/>
+        >>> thread = api.copia_cartacea_caricamento_num_iscr_sito_identificativo_delete(num_iscr_sito, identificativo, async_req=True)
+        >>> result = thread.get()
 
         :param num_iscr_sito: Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo.             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\" (required)
         :type num_iscr_sito: str
         :param identificativo: Identificativo della copia del FIR cartaceo da cancellare (required)
         :type identificativo: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: None
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the copia_cartacea_caricamento_num_iscr_sito_identificativo_delete_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.copia_cartacea_caricamento_num_iscr_sito_identificativo_delete_with_http_info(num_iscr_sito, identificativo, **kwargs)  # noqa: E501
 
-        _param = self._copia_cartacea_caricamento_num_iscr_sito_identificativo_delete_serialize(
-            num_iscr_sito=num_iscr_sito,
-            identificativo=identificativo,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def copia_cartacea_caricamento_num_iscr_sito_identificativo_delete_with_http_info(self, num_iscr_sito : Annotated[constr(strict=True), Field(..., description="Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo.             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\"")], identificativo : Annotated[StrictStr, Field(..., description="Identificativo della copia del FIR cartaceo da cancellare")], **kwargs) -> ApiResponse:  # noqa: E501
+        """Cancella copia FIR cartaceo  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '204': None,
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Elimina il caricamento della copia del FIR cartaceo. L'operazione è possibile solo se nessuno dei soggetti a cui è stata resa disponibile la copia del FIR cartaceo l'ha già presa in carico con l'operazione di conferma.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre un codice di stato 422) anche in ambiente di produzione.</i><hr/>  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def copia_cartacea_caricamento_num_iscr_sito_identificativo_delete_with_http_info(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True, description="Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo.             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\"")],
-        identificativo: Annotated[StrictStr, Field(description="Identificativo della copia del FIR cartaceo da cancellare")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[None]:
-        """Cancella copia FIR cartaceo
-
-        Elimina il caricamento della copia del FIR cartaceo. L'operazione è possibile solo se nessuno dei soggetti a cui è stata resa disponibile la copia del FIR cartaceo l'ha già presa in carico con l'operazione di conferma.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre un codice di stato 422) anche in ambiente di produzione.</i><hr/>
+        >>> thread = api.copia_cartacea_caricamento_num_iscr_sito_identificativo_delete_with_http_info(num_iscr_sito, identificativo, async_req=True)
+        >>> result = thread.get()
 
         :param num_iscr_sito: Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo.             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\" (required)
         :type num_iscr_sito: str
         :param identificativo: Identificativo della copia del FIR cartaceo da cancellare (required)
         :type identificativo: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: None
+        """
 
-        _param = self._copia_cartacea_caricamento_num_iscr_sito_identificativo_delete_serialize(
-            num_iscr_sito=num_iscr_sito,
-            identificativo=identificativo,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '204': None,
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def copia_cartacea_caricamento_num_iscr_sito_identificativo_delete_without_preload_content(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True, description="Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo.             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\"")],
-        identificativo: Annotated[StrictStr, Field(description="Identificativo della copia del FIR cartaceo da cancellare")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'num_iscr_sito',
+            'identificativo'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """Cancella copia FIR cartaceo
-
-        Elimina il caricamento della copia del FIR cartaceo. L'operazione è possibile solo se nessuno dei soggetti a cui è stata resa disponibile la copia del FIR cartaceo l'ha già presa in carico con l'operazione di conferma.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre un codice di stato 422) anche in ambiente di produzione.</i><hr/>
-
-        :param num_iscr_sito: Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo.             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\" (required)
-        :type num_iscr_sito: str
-        :param identificativo: Identificativo della copia del FIR cartaceo da cancellare (required)
-        :type identificativo: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._copia_cartacea_caricamento_num_iscr_sito_identificativo_delete_serialize(
-            num_iscr_sito=num_iscr_sito,
-            identificativo=identificativo,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '204': None,
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method copia_cartacea_caricamento_num_iscr_sito_identificativo_delete" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    def _copia_cartacea_caricamento_num_iscr_sito_identificativo_delete_serialize(
-        self,
-        num_iscr_sito,
-        identificativo,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if num_iscr_sito is not None:
-            _path_params['num_iscr_sito'] = num_iscr_sito
-        if identificativo is not None:
-            _path_params['identificativo'] = identificativo
+        _path_params = {}
+        if _params['num_iscr_sito'] is not None:
+            _path_params['num_iscr_sito'] = _params['num_iscr_sito']
+
+        if _params['identificativo'] is not None:
+            _path_params['identificativo'] = _params['identificativo']
+
+
         # process the query parameters
+        _query_params = []
         # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
+        _form_params = []
+        _files = {}
         # process the body parameter
-
-
+        _body_params = None
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/problem+json'
-                ]
-            )
-
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/problem+json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='DELETE',
-            resource_path='/copia-cartacea/caricamento/{num_iscr_sito}/{identificativo}',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {}
+
+        return self.api_client.call_api(
+            '/copia-cartacea/caricamento/{num_iscr_sito}/{identificativo}', 'DELETE',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def copia_cartacea_caricamento_num_iscr_sito_identificativo_documento_get(self, num_iscr_sito : Annotated[constr(strict=True), Field(..., description="Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo.             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\"")], identificativo : Annotated[StrictStr, Field(..., description="Identificativo della copia del FIR cartaceo della quale restituire il documento caricato")], **kwargs) -> DownloadableBaseResponse:  # noqa: E501
+        """Documento copia FIR cartaceo  # noqa: E501
 
+        Restituisce il file contenente la copia del FIR cartaceo caricata.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def copia_cartacea_caricamento_num_iscr_sito_identificativo_documento_get(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True, description="Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo.             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\"")],
-        identificativo: Annotated[StrictStr, Field(description="Identificativo della copia del FIR cartaceo della quale restituire il documento caricato")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> DownloadableBaseResponse:
-        """Documento copia FIR cartaceo
-
-        Restituisce il file contenente la copia del FIR cartaceo caricata.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>
+        >>> thread = api.copia_cartacea_caricamento_num_iscr_sito_identificativo_documento_get(num_iscr_sito, identificativo, async_req=True)
+        >>> result = thread.get()
 
         :param num_iscr_sito: Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo.             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\" (required)
         :type num_iscr_sito: str
         :param identificativo: Identificativo della copia del FIR cartaceo della quale restituire il documento caricato (required)
         :type identificativo: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
+        :return: Returns the result object.
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: DownloadableBaseResponse
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the copia_cartacea_caricamento_num_iscr_sito_identificativo_documento_get_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.copia_cartacea_caricamento_num_iscr_sito_identificativo_documento_get_with_http_info(num_iscr_sito, identificativo, **kwargs)  # noqa: E501
+
+    @validate_arguments
+    def copia_cartacea_caricamento_num_iscr_sito_identificativo_documento_get_with_http_info(self, num_iscr_sito : Annotated[constr(strict=True), Field(..., description="Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo.             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\"")], identificativo : Annotated[StrictStr, Field(..., description="Identificativo della copia del FIR cartaceo della quale restituire il documento caricato")], **kwargs) -> ApiResponse:  # noqa: E501
+        """Documento copia FIR cartaceo  # noqa: E501
+
+        Restituisce il file contenente la copia del FIR cartaceo caricata.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+
+        >>> thread = api.copia_cartacea_caricamento_num_iscr_sito_identificativo_documento_get_with_http_info(num_iscr_sito, identificativo, async_req=True)
+        >>> result = thread.get()
+
+        :param num_iscr_sito: Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo.             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\" (required)
+        :type num_iscr_sito: str
+        :param identificativo: Identificativo della copia del FIR cartaceo della quale restituire il documento caricato (required)
+        :type identificativo: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(DownloadableBaseResponse, status_code(int), headers(HTTPHeaderDict))
+        """
 
-        _param = self._copia_cartacea_caricamento_num_iscr_sito_identificativo_documento_get_serialize(
-            num_iscr_sito=num_iscr_sito,
-            identificativo=identificativo,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
+        _params = locals()
+
+        _all_params = [
+            'num_iscr_sito',
+            'identificativo'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
+            ]
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method copia_cartacea_caricamento_num_iscr_sito_identificativo_documento_get" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
+
+        _collection_formats = {}
+
+        # process the path parameters
+        _path_params = {}
+        if _params['num_iscr_sito'] is not None:
+            _path_params['num_iscr_sito'] = _params['num_iscr_sito']
+
+        if _params['identificativo'] is not None:
+            _path_params['identificativo'] = _params['identificativo']
+
+
+        # process the query parameters
+        _query_params = []
+        # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
+        # process the form parameters
+        _form_params = []
+        _files = {}
+        # process the body parameter
+        _body_params = None
+        # set the HTTP header `Accept`
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
+
+        # authentication setting
+        _auth_settings = ['Bearer']  # noqa: E501
+
+        _response_types_map = {
             '200': "DownloadableBaseResponse",
             '403': None,
             '404': None,
             '429': None,
             '500': "ProblemDetails",
         }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
 
-
-    @validate_call
-    def copia_cartacea_caricamento_num_iscr_sito_identificativo_documento_get_with_http_info(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True, description="Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo.             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\"")],
-        identificativo: Annotated[StrictStr, Field(description="Identificativo della copia del FIR cartaceo della quale restituire il documento caricato")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[DownloadableBaseResponse]:
-        """Documento copia FIR cartaceo
-
-        Restituisce il file contenente la copia del FIR cartaceo caricata.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>
-
-        :param num_iscr_sito: Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo.             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\" (required)
-        :type num_iscr_sito: str
-        :param identificativo: Identificativo della copia del FIR cartaceo della quale restituire il documento caricato (required)
-        :type identificativo: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._copia_cartacea_caricamento_num_iscr_sito_identificativo_documento_get_serialize(
-            num_iscr_sito=num_iscr_sito,
-            identificativo=identificativo,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
-
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "DownloadableBaseResponse",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def copia_cartacea_caricamento_num_iscr_sito_identificativo_documento_get_without_preload_content(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True, description="Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo.             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\"")],
-        identificativo: Annotated[StrictStr, Field(description="Identificativo della copia del FIR cartaceo della quale restituire il documento caricato")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """Documento copia FIR cartaceo
-
-        Restituisce il file contenente la copia del FIR cartaceo caricata.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>
-
-        :param num_iscr_sito: Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo.             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\" (required)
-        :type num_iscr_sito: str
-        :param identificativo: Identificativo della copia del FIR cartaceo della quale restituire il documento caricato (required)
-        :type identificativo: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._copia_cartacea_caricamento_num_iscr_sito_identificativo_documento_get_serialize(
-            num_iscr_sito=num_iscr_sito,
-            identificativo=identificativo,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
-
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "DownloadableBaseResponse",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
-
-
-    def _copia_cartacea_caricamento_num_iscr_sito_identificativo_documento_get_serialize(
-        self,
-        num_iscr_sito,
-        identificativo,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
-
-        # process the path parameters
-        if num_iscr_sito is not None:
-            _path_params['num_iscr_sito'] = num_iscr_sito
-        if identificativo is not None:
-            _path_params['identificativo'] = identificativo
-        # process the query parameters
-        # process the header parameters
-        # process the form parameters
-        # process the body parameter
-
-
-        # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
-
-
-        # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
-
-        return self.api_client.param_serialize(
-            method='GET',
-            resource_path='/copia-cartacea/caricamento/{num_iscr_sito}/{identificativo}/documento',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        return self.api_client.call_api(
+            '/copia-cartacea/caricamento/{num_iscr_sito}/{identificativo}/documento', 'GET',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def copia_cartacea_caricamento_num_iscr_sito_identificativo_get(self, num_iscr_sito : Annotated[constr(strict=True), Field(..., description="Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\"")], identificativo : Annotated[StrictStr, Field(..., description="Identificativo della copia del FIR cartaceo")], **kwargs) -> CopiaCartaceaResult:  # noqa: E501
+        """Dettaglio copia FIR cartaceo  # noqa: E501
 
+        Recupera le informazioni di dettaglio del caricamento della copia del FIR cartaceo specificata.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def copia_cartacea_caricamento_num_iscr_sito_identificativo_get(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True, description="Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\"")],
-        identificativo: Annotated[StrictStr, Field(description="Identificativo della copia del FIR cartaceo")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> CopiaCartaceaResult:
-        """Dettaglio copia FIR cartaceo
-
-        Recupera le informazioni di dettaglio del caricamento della copia del FIR cartaceo specificata.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>
+        >>> thread = api.copia_cartacea_caricamento_num_iscr_sito_identificativo_get(num_iscr_sito, identificativo, async_req=True)
+        >>> result = thread.get()
 
         :param num_iscr_sito: Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\" (required)
         :type num_iscr_sito: str
         :param identificativo: Identificativo della copia del FIR cartaceo (required)
         :type identificativo: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
+        :return: Returns the result object.
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: CopiaCartaceaResult
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the copia_cartacea_caricamento_num_iscr_sito_identificativo_get_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.copia_cartacea_caricamento_num_iscr_sito_identificativo_get_with_http_info(num_iscr_sito, identificativo, **kwargs)  # noqa: E501
+
+    @validate_arguments
+    def copia_cartacea_caricamento_num_iscr_sito_identificativo_get_with_http_info(self, num_iscr_sito : Annotated[constr(strict=True), Field(..., description="Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\"")], identificativo : Annotated[StrictStr, Field(..., description="Identificativo della copia del FIR cartaceo")], **kwargs) -> ApiResponse:  # noqa: E501
+        """Dettaglio copia FIR cartaceo  # noqa: E501
+
+        Recupera le informazioni di dettaglio del caricamento della copia del FIR cartaceo specificata.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+
+        >>> thread = api.copia_cartacea_caricamento_num_iscr_sito_identificativo_get_with_http_info(num_iscr_sito, identificativo, async_req=True)
+        >>> result = thread.get()
+
+        :param num_iscr_sito: Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\" (required)
+        :type num_iscr_sito: str
+        :param identificativo: Identificativo della copia del FIR cartaceo (required)
+        :type identificativo: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(CopiaCartaceaResult, status_code(int), headers(HTTPHeaderDict))
+        """
 
-        _param = self._copia_cartacea_caricamento_num_iscr_sito_identificativo_get_serialize(
-            num_iscr_sito=num_iscr_sito,
-            identificativo=identificativo,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
+        _params = locals()
+
+        _all_params = [
+            'num_iscr_sito',
+            'identificativo'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
+            ]
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method copia_cartacea_caricamento_num_iscr_sito_identificativo_get" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
+
+        _collection_formats = {}
+
+        # process the path parameters
+        _path_params = {}
+        if _params['num_iscr_sito'] is not None:
+            _path_params['num_iscr_sito'] = _params['num_iscr_sito']
+
+        if _params['identificativo'] is not None:
+            _path_params['identificativo'] = _params['identificativo']
+
+
+        # process the query parameters
+        _query_params = []
+        # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
+        # process the form parameters
+        _form_params = []
+        _files = {}
+        # process the body parameter
+        _body_params = None
+        # set the HTTP header `Accept`
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
+
+        # authentication setting
+        _auth_settings = ['Bearer']  # noqa: E501
+
+        _response_types_map = {
             '200': "CopiaCartaceaResult",
             '400': "ProblemDetails",
             '403': None,
@@ -1029,255 +662,34 @@ class CopiaFIRCartaceoApi:
             '429': None,
             '500': "ProblemDetails",
         }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
 
-
-    @validate_call
-    def copia_cartacea_caricamento_num_iscr_sito_identificativo_get_with_http_info(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True, description="Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\"")],
-        identificativo: Annotated[StrictStr, Field(description="Identificativo della copia del FIR cartaceo")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[CopiaCartaceaResult]:
-        """Dettaglio copia FIR cartaceo
-
-        Recupera le informazioni di dettaglio del caricamento della copia del FIR cartaceo specificata.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>
-
-        :param num_iscr_sito: Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\" (required)
-        :type num_iscr_sito: str
-        :param identificativo: Identificativo della copia del FIR cartaceo (required)
-        :type identificativo: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._copia_cartacea_caricamento_num_iscr_sito_identificativo_get_serialize(
-            num_iscr_sito=num_iscr_sito,
-            identificativo=identificativo,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
-
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "CopiaCartaceaResult",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def copia_cartacea_caricamento_num_iscr_sito_identificativo_get_without_preload_content(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True, description="Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\"")],
-        identificativo: Annotated[StrictStr, Field(description="Identificativo della copia del FIR cartaceo")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """Dettaglio copia FIR cartaceo
-
-        Recupera le informazioni di dettaglio del caricamento della copia del FIR cartaceo specificata.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>
-
-        :param num_iscr_sito: Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\" (required)
-        :type num_iscr_sito: str
-        :param identificativo: Identificativo della copia del FIR cartaceo (required)
-        :type identificativo: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._copia_cartacea_caricamento_num_iscr_sito_identificativo_get_serialize(
-            num_iscr_sito=num_iscr_sito,
-            identificativo=identificativo,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
-
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "CopiaCartaceaResult",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
-
-
-    def _copia_cartacea_caricamento_num_iscr_sito_identificativo_get_serialize(
-        self,
-        num_iscr_sito,
-        identificativo,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
-
-        # process the path parameters
-        if num_iscr_sito is not None:
-            _path_params['num_iscr_sito'] = num_iscr_sito
-        if identificativo is not None:
-            _path_params['identificativo'] = identificativo
-        # process the query parameters
-        # process the header parameters
-        # process the form parameters
-        # process the body parameter
-
-
-        # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
-
-
-        # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
-
-        return self.api_client.param_serialize(
-            method='GET',
-            resource_path='/copia-cartacea/caricamento/{num_iscr_sito}/{identificativo}',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        return self.api_client.call_api(
+            '/copia-cartacea/caricamento/{num_iscr_sito}/{identificativo}', 'GET',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def copia_cartacea_caricamento_num_iscr_sito_post(self, num_iscr_sito : Annotated[constr(strict=True), Field(..., description="Numero iscrizione unità locale del trasportatore che carica la copia del FIR cartaceo. Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\".")], copia_cartacea_model : Annotated[CopiaCartaceaModel, Field(..., description="Dati relativi alla copia del FIR cartaceo e ai soggetti a cui la si rende disponibile")], x_reply_to : Annotated[Optional[StrictStr], Field(description="URL di callback opzionale alla quale verrà inviata la notifica di fine elaborazione")] = None, **kwargs) -> TransazioneModel:  # noqa: E501
+        """🔁[ASYNC] Carica copia FIR cartaceo  # noqa: E501
 
+        Acquisisce la richiesta di restituzione della copia del FIR cartaceo che consente al Trasportatore di renderla disponibile ai soggetti specificati.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.   Il file caricato deve essere in formato PDF e non deve superare i 5MB. <hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre un codice di stato 422) anche in ambiente di produzione.</i><hr/><br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def copia_cartacea_caricamento_num_iscr_sito_post(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True, description="Numero iscrizione unità locale del trasportatore che carica la copia del FIR cartaceo. Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\".")],
-        copia_cartacea_model: Annotated[CopiaCartaceaModel, Field(description="Dati relativi alla copia del FIR cartaceo e ai soggetti a cui la si rende disponibile")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback opzionale alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> TransazioneModel:
-        """🔁[ASYNC] Carica copia FIR cartaceo
-
-        Acquisisce la richiesta di restituzione della copia del FIR cartaceo che consente al Trasportatore di renderla disponibile ai soggetti specificati.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.   Il file caricato deve essere in formato PDF e non deve superare i 5MB. <hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre un codice di stato 422) anche in ambiente di produzione.</i><hr/><br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.copia_cartacea_caricamento_num_iscr_sito_post(num_iscr_sito, copia_cartacea_model, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param num_iscr_sito: Numero iscrizione unità locale del trasportatore che carica la copia del FIR cartaceo. Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\". (required)
         :type num_iscr_sito: str
@@ -1285,79 +697,33 @@ class CopiaFIRCartaceoApi:
         :type copia_cartacea_model: CopiaCartaceaModel
         :param x_reply_to: URL di callback opzionale alla quale verrà inviata la notifica di fine elaborazione
         :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: TransazioneModel
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the copia_cartacea_caricamento_num_iscr_sito_post_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.copia_cartacea_caricamento_num_iscr_sito_post_with_http_info(num_iscr_sito, copia_cartacea_model, x_reply_to, **kwargs)  # noqa: E501
 
-        _param = self._copia_cartacea_caricamento_num_iscr_sito_post_serialize(
-            num_iscr_sito=num_iscr_sito,
-            copia_cartacea_model=copia_cartacea_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def copia_cartacea_caricamento_num_iscr_sito_post_with_http_info(self, num_iscr_sito : Annotated[constr(strict=True), Field(..., description="Numero iscrizione unità locale del trasportatore che carica la copia del FIR cartaceo. Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\".")], copia_cartacea_model : Annotated[CopiaCartaceaModel, Field(..., description="Dati relativi alla copia del FIR cartaceo e ai soggetti a cui la si rende disponibile")], x_reply_to : Annotated[Optional[StrictStr], Field(description="URL di callback opzionale alla quale verrà inviata la notifica di fine elaborazione")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        """🔁[ASYNC] Carica copia FIR cartaceo  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Acquisisce la richiesta di restituzione della copia del FIR cartaceo che consente al Trasportatore di renderla disponibile ai soggetti specificati.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.   Il file caricato deve essere in formato PDF e non deve superare i 5MB. <hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre un codice di stato 422) anche in ambiente di produzione.</i><hr/><br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def copia_cartacea_caricamento_num_iscr_sito_post_with_http_info(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True, description="Numero iscrizione unità locale del trasportatore che carica la copia del FIR cartaceo. Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\".")],
-        copia_cartacea_model: Annotated[CopiaCartaceaModel, Field(description="Dati relativi alla copia del FIR cartaceo e ai soggetti a cui la si rende disponibile")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback opzionale alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[TransazioneModel]:
-        """🔁[ASYNC] Carica copia FIR cartaceo
-
-        Acquisisce la richiesta di restituzione della copia del FIR cartaceo che consente al Trasportatore di renderla disponibile ai soggetti specificati.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.   Il file caricato deve essere in formato PDF e non deve superare i 5MB. <hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre un codice di stato 422) anche in ambiente di produzione.</i><hr/><br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.copia_cartacea_caricamento_num_iscr_sito_post_with_http_info(num_iscr_sito, copia_cartacea_model, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param num_iscr_sito: Numero iscrizione unità locale del trasportatore che carica la copia del FIR cartaceo. Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\". (required)
         :type num_iscr_sito: str
@@ -1365,244 +731,133 @@ class CopiaFIRCartaceoApi:
         :type copia_cartacea_model: CopiaCartaceaModel
         :param x_reply_to: URL di callback opzionale alla quale verrà inviata la notifica di fine elaborazione
         :type x_reply_to: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(TransazioneModel, status_code(int), headers(HTTPHeaderDict))
+        """
 
-        _param = self._copia_cartacea_caricamento_num_iscr_sito_post_serialize(
-            num_iscr_sito=num_iscr_sito,
-            copia_cartacea_model=copia_cartacea_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def copia_cartacea_caricamento_num_iscr_sito_post_without_preload_content(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True, description="Numero iscrizione unità locale del trasportatore che carica la copia del FIR cartaceo. Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\".")],
-        copia_cartacea_model: Annotated[CopiaCartaceaModel, Field(description="Dati relativi alla copia del FIR cartaceo e ai soggetti a cui la si rende disponibile")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback opzionale alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'num_iscr_sito',
+            'copia_cartacea_model',
+            'x_reply_to'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """🔁[ASYNC] Carica copia FIR cartaceo
-
-        Acquisisce la richiesta di restituzione della copia del FIR cartaceo che consente al Trasportatore di renderla disponibile ai soggetti specificati.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.   Il file caricato deve essere in formato PDF e non deve superare i 5MB. <hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre un codice di stato 422) anche in ambiente di produzione.</i><hr/><br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
-
-        :param num_iscr_sito: Numero iscrizione unità locale del trasportatore che carica la copia del FIR cartaceo. Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\". (required)
-        :type num_iscr_sito: str
-        :param copia_cartacea_model: Dati relativi alla copia del FIR cartaceo e ai soggetti a cui la si rende disponibile (required)
-        :type copia_cartacea_model: CopiaCartaceaModel
-        :param x_reply_to: URL di callback opzionale alla quale verrà inviata la notifica di fine elaborazione
-        :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._copia_cartacea_caricamento_num_iscr_sito_post_serialize(
-            num_iscr_sito=num_iscr_sito,
-            copia_cartacea_model=copia_cartacea_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method copia_cartacea_caricamento_num_iscr_sito_post" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    def _copia_cartacea_caricamento_num_iscr_sito_post_serialize(
-        self,
-        num_iscr_sito,
-        copia_cartacea_model,
-        x_reply_to,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if num_iscr_sito is not None:
-            _path_params['num_iscr_sito'] = num_iscr_sito
-        # process the query parameters
-        # process the header parameters
-        if x_reply_to is not None:
-            _header_params['X-ReplyTo'] = x_reply_to
-        # process the form parameters
-        # process the body parameter
-        if copia_cartacea_model is not None:
-            _body_params = copia_cartacea_model
+        _path_params = {}
+        if _params['num_iscr_sito'] is not None:
+            _path_params['num_iscr_sito'] = _params['num_iscr_sito']
 
+
+        # process the query parameters
+        _query_params = []
+        # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
+        if _params['x_reply_to'] is not None:
+            _header_params['X-ReplyTo'] = _params['x_reply_to']
+
+        # process the form parameters
+        _form_params = []
+        _files = {}
+        # process the body parameter
+        _body_params = None
+        if _params['copia_cartacea_model'] is not None:
+            _body_params = _params['copia_cartacea_model']
 
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
 
         # set the HTTP header `Content-Type`
-        if _content_type:
-            _header_params['Content-Type'] = _content_type
-        else:
-            _default_content_type = (
-                self.api_client.select_header_content_type(
-                    [
-                        'application/json'
-                    ]
-                )
-            )
-            if _default_content_type is not None:
-                _header_params['Content-Type'] = _default_content_type
+        _content_types_list = _params.get('_content_type',
+            self.api_client.select_header_content_type(
+                ['application/json']))
+        if _content_types_list:
+                _header_params['Content-Type'] = _content_types_list
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='POST',
-            resource_path='/copia-cartacea/caricamento/{num_iscr_sito}',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {
+            '200': "TransazioneModel",
+            '400': "ProblemDetails",
+            '403': None,
+            '404': None,
+            '429': None,
+            '500': "ProblemDetails",
+        }
+
+        return self.api_client.call_api(
+            '/copia-cartacea/caricamento/{num_iscr_sito}', 'POST',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def copia_cartacea_conferma_identificativo_soggetto_get(self, identificativo_soggetto : Annotated[StrictStr, Field(..., description="Codice fiscale del soggetto per cui richiedere l'elenco delle copie dei FIR cartacei disponibili")], numero_fir : Annotated[Optional[StrictStr], Field(description="Numero FIR della copia del FIR digitale")] = None, confermate : Annotated[Optional[StrictBool], Field(description="Filtra le copie dei FIR digitali confermate o non confermate.")] = None, data_emissione_da : Annotated[Optional[datetime], Field(description="Data di emissione a partire dalla quale si richiedono le copie dei FIR digitali (formato ISO 8601 UTC)")] = None, data_emissione_a : Annotated[Optional[datetime], Field(description="Data massima di emissione entro la quale si richiedono le copie dei FIR digitali (formato ISO 8601 UTC)")] = None, num_iscr_sito : Annotated[Optional[StrictStr], Field(description="Eventuale numero di iscrizione dell'unità locale per la quale si richiedeono le copie cartacee dei FIR")] = None, paging_page : Annotated[Optional[conint(strict=True, le=2147483647, ge=1)], Field(description="Valore per l'header Paging-Page")] = None, paging_page_size : Annotated[Optional[conint(strict=True, le=1000, ge=1)], Field(description="Valore per l'header Paging-PageSize")] = None, **kwargs) -> List[CopiaCartaceaResult]:  # noqa: E501
+        """Copie FIR cartacei disponibili  # noqa: E501
 
+        Ottiene la lista delle copie dei FIR cartacei, disponibili per la conferma o già confermati, per il soggetto specificato.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def copia_cartacea_conferma_identificativo_soggetto_get(
-        self,
-        identificativo_soggetto: Annotated[StrictStr, Field(description="Codice fiscale del soggetto per cui richiedere l'elenco delle copie dei FIR cartacei disponibili")],
-        numero_fir: Annotated[Optional[StrictStr], Field(description="Numero FIR della copia del FIR digitale")] = None,
-        confermate: Annotated[Optional[StrictBool], Field(description="Filtra le copie dei FIR digitali confermate o non confermate.")] = None,
-        data_emissione_da: Annotated[Optional[datetime], Field(description="Data di emissione a partire dalla quale si richiedono le copie dei FIR digitali (formato ISO 8601 UTC)")] = None,
-        data_emissione_a: Annotated[Optional[datetime], Field(description="Data massima di emissione entro la quale si richiedono le copie dei FIR digitali (formato ISO 8601 UTC)")] = None,
-        num_iscr_sito: Annotated[Optional[StrictStr], Field(description="Eventuale numero di iscrizione dell'unità locale per la quale si richiedeono le copie cartacee dei FIR")] = None,
-        paging_page: Annotated[Optional[Annotated[int, Field(le=2147483647, strict=True, ge=1)]], Field(description="Valore per l'header Paging-Page")] = None,
-        paging_page_size: Annotated[Optional[Annotated[int, Field(le=1000, strict=True, ge=1)]], Field(description="Valore per l'header Paging-PageSize")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> List[CopiaCartaceaResult]:
-        """Copie FIR cartacei disponibili
-
-        Ottiene la lista delle copie dei FIR cartacei, disponibili per la conferma o già confermati, per il soggetto specificato.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>
+        >>> thread = api.copia_cartacea_conferma_identificativo_soggetto_get(identificativo_soggetto, numero_fir, confermate, data_emissione_da, data_emissione_a, num_iscr_sito, paging_page, paging_page_size, async_req=True)
+        >>> result = thread.get()
 
         :param identificativo_soggetto: Codice fiscale del soggetto per cui richiedere l'elenco delle copie dei FIR cartacei disponibili (required)
         :type identificativo_soggetto: str
@@ -1620,88 +875,33 @@ class CopiaFIRCartaceoApi:
         :type paging_page: int
         :param paging_page_size: Valore per l'header Paging-PageSize
         :type paging_page_size: int
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: List[CopiaCartaceaResult]
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the copia_cartacea_conferma_identificativo_soggetto_get_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.copia_cartacea_conferma_identificativo_soggetto_get_with_http_info(identificativo_soggetto, numero_fir, confermate, data_emissione_da, data_emissione_a, num_iscr_sito, paging_page, paging_page_size, **kwargs)  # noqa: E501
 
-        _param = self._copia_cartacea_conferma_identificativo_soggetto_get_serialize(
-            identificativo_soggetto=identificativo_soggetto,
-            numero_fir=numero_fir,
-            confermate=confermate,
-            data_emissione_da=data_emissione_da,
-            data_emissione_a=data_emissione_a,
-            num_iscr_sito=num_iscr_sito,
-            paging_page=paging_page,
-            paging_page_size=paging_page_size,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def copia_cartacea_conferma_identificativo_soggetto_get_with_http_info(self, identificativo_soggetto : Annotated[StrictStr, Field(..., description="Codice fiscale del soggetto per cui richiedere l'elenco delle copie dei FIR cartacei disponibili")], numero_fir : Annotated[Optional[StrictStr], Field(description="Numero FIR della copia del FIR digitale")] = None, confermate : Annotated[Optional[StrictBool], Field(description="Filtra le copie dei FIR digitali confermate o non confermate.")] = None, data_emissione_da : Annotated[Optional[datetime], Field(description="Data di emissione a partire dalla quale si richiedono le copie dei FIR digitali (formato ISO 8601 UTC)")] = None, data_emissione_a : Annotated[Optional[datetime], Field(description="Data massima di emissione entro la quale si richiedono le copie dei FIR digitali (formato ISO 8601 UTC)")] = None, num_iscr_sito : Annotated[Optional[StrictStr], Field(description="Eventuale numero di iscrizione dell'unità locale per la quale si richiedeono le copie cartacee dei FIR")] = None, paging_page : Annotated[Optional[conint(strict=True, le=2147483647, ge=1)], Field(description="Valore per l'header Paging-Page")] = None, paging_page_size : Annotated[Optional[conint(strict=True, le=1000, ge=1)], Field(description="Valore per l'header Paging-PageSize")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        """Copie FIR cartacei disponibili  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "List[CopiaCartaceaResult]",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Ottiene la lista delle copie dei FIR cartacei, disponibili per la conferma o già confermati, per il soggetto specificato.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def copia_cartacea_conferma_identificativo_soggetto_get_with_http_info(
-        self,
-        identificativo_soggetto: Annotated[StrictStr, Field(description="Codice fiscale del soggetto per cui richiedere l'elenco delle copie dei FIR cartacei disponibili")],
-        numero_fir: Annotated[Optional[StrictStr], Field(description="Numero FIR della copia del FIR digitale")] = None,
-        confermate: Annotated[Optional[StrictBool], Field(description="Filtra le copie dei FIR digitali confermate o non confermate.")] = None,
-        data_emissione_da: Annotated[Optional[datetime], Field(description="Data di emissione a partire dalla quale si richiedono le copie dei FIR digitali (formato ISO 8601 UTC)")] = None,
-        data_emissione_a: Annotated[Optional[datetime], Field(description="Data massima di emissione entro la quale si richiedono le copie dei FIR digitali (formato ISO 8601 UTC)")] = None,
-        num_iscr_sito: Annotated[Optional[StrictStr], Field(description="Eventuale numero di iscrizione dell'unità locale per la quale si richiedeono le copie cartacee dei FIR")] = None,
-        paging_page: Annotated[Optional[Annotated[int, Field(le=2147483647, strict=True, ge=1)]], Field(description="Valore per l'header Paging-Page")] = None,
-        paging_page_size: Annotated[Optional[Annotated[int, Field(le=1000, strict=True, ge=1)]], Field(description="Valore per l'header Paging-PageSize")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[List[CopiaCartaceaResult]]:
-        """Copie FIR cartacei disponibili
-
-        Ottiene la lista delle copie dei FIR cartacei, disponibili per la conferma o già confermati, per il soggetto specificato.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>
+        >>> thread = api.copia_cartacea_conferma_identificativo_soggetto_get_with_http_info(identificativo_soggetto, numero_fir, confermate, data_emissione_da, data_emissione_a, num_iscr_sito, paging_page, paging_page_size, async_req=True)
+        >>> result = thread.get()
 
         :param identificativo_soggetto: Codice fiscale del soggetto per cui richiedere l'elenco delle copie dei FIR cartacei disponibili (required)
         :type identificativo_soggetto: str
@@ -1719,1709 +919,881 @@ class CopiaFIRCartaceoApi:
         :type paging_page: int
         :param paging_page_size: Valore per l'header Paging-PageSize
         :type paging_page_size: int
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(List[CopiaCartaceaResult], status_code(int), headers(HTTPHeaderDict))
+        """
 
-        _param = self._copia_cartacea_conferma_identificativo_soggetto_get_serialize(
-            identificativo_soggetto=identificativo_soggetto,
-            numero_fir=numero_fir,
-            confermate=confermate,
-            data_emissione_da=data_emissione_da,
-            data_emissione_a=data_emissione_a,
-            num_iscr_sito=num_iscr_sito,
-            paging_page=paging_page,
-            paging_page_size=paging_page_size,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "List[CopiaCartaceaResult]",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def copia_cartacea_conferma_identificativo_soggetto_get_without_preload_content(
-        self,
-        identificativo_soggetto: Annotated[StrictStr, Field(description="Codice fiscale del soggetto per cui richiedere l'elenco delle copie dei FIR cartacei disponibili")],
-        numero_fir: Annotated[Optional[StrictStr], Field(description="Numero FIR della copia del FIR digitale")] = None,
-        confermate: Annotated[Optional[StrictBool], Field(description="Filtra le copie dei FIR digitali confermate o non confermate.")] = None,
-        data_emissione_da: Annotated[Optional[datetime], Field(description="Data di emissione a partire dalla quale si richiedono le copie dei FIR digitali (formato ISO 8601 UTC)")] = None,
-        data_emissione_a: Annotated[Optional[datetime], Field(description="Data massima di emissione entro la quale si richiedono le copie dei FIR digitali (formato ISO 8601 UTC)")] = None,
-        num_iscr_sito: Annotated[Optional[StrictStr], Field(description="Eventuale numero di iscrizione dell'unità locale per la quale si richiedeono le copie cartacee dei FIR")] = None,
-        paging_page: Annotated[Optional[Annotated[int, Field(le=2147483647, strict=True, ge=1)]], Field(description="Valore per l'header Paging-Page")] = None,
-        paging_page_size: Annotated[Optional[Annotated[int, Field(le=1000, strict=True, ge=1)]], Field(description="Valore per l'header Paging-PageSize")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'identificativo_soggetto',
+            'numero_fir',
+            'confermate',
+            'data_emissione_da',
+            'data_emissione_a',
+            'num_iscr_sito',
+            'paging_page',
+            'paging_page_size'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """Copie FIR cartacei disponibili
-
-        Ottiene la lista delle copie dei FIR cartacei, disponibili per la conferma o già confermati, per il soggetto specificato.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>
-
-        :param identificativo_soggetto: Codice fiscale del soggetto per cui richiedere l'elenco delle copie dei FIR cartacei disponibili (required)
-        :type identificativo_soggetto: str
-        :param numero_fir: Numero FIR della copia del FIR digitale
-        :type numero_fir: str
-        :param confermate: Filtra le copie dei FIR digitali confermate o non confermate.
-        :type confermate: bool
-        :param data_emissione_da: Data di emissione a partire dalla quale si richiedono le copie dei FIR digitali (formato ISO 8601 UTC)
-        :type data_emissione_da: datetime
-        :param data_emissione_a: Data massima di emissione entro la quale si richiedono le copie dei FIR digitali (formato ISO 8601 UTC)
-        :type data_emissione_a: datetime
-        :param num_iscr_sito: Eventuale numero di iscrizione dell'unità locale per la quale si richiedeono le copie cartacee dei FIR
-        :type num_iscr_sito: str
-        :param paging_page: Valore per l'header Paging-Page
-        :type paging_page: int
-        :param paging_page_size: Valore per l'header Paging-PageSize
-        :type paging_page_size: int
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._copia_cartacea_conferma_identificativo_soggetto_get_serialize(
-            identificativo_soggetto=identificativo_soggetto,
-            numero_fir=numero_fir,
-            confermate=confermate,
-            data_emissione_da=data_emissione_da,
-            data_emissione_a=data_emissione_a,
-            num_iscr_sito=num_iscr_sito,
-            paging_page=paging_page,
-            paging_page_size=paging_page_size,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "List[CopiaCartaceaResult]",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method copia_cartacea_conferma_identificativo_soggetto_get" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    def _copia_cartacea_conferma_identificativo_soggetto_get_serialize(
-        self,
-        identificativo_soggetto,
-        numero_fir,
-        confermate,
-        data_emissione_da,
-        data_emissione_a,
-        num_iscr_sito,
-        paging_page,
-        paging_page_size,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if identificativo_soggetto is not None:
-            _path_params['identificativo_soggetto'] = identificativo_soggetto
+        _path_params = {}
+        if _params['identificativo_soggetto'] is not None:
+            _path_params['identificativo_soggetto'] = _params['identificativo_soggetto']
+
+
         # process the query parameters
-        if numero_fir is not None:
-            
-            _query_params.append(('numero_fir', numero_fir))
-            
-        if confermate is not None:
-            
-            _query_params.append(('confermate', confermate))
-            
-        if data_emissione_da is not None:
-            if isinstance(data_emissione_da, datetime):
-                _query_params.append(
-                    (
-                        'data_emissione_da',
-                        data_emissione_da.strftime(
-                            self.api_client.configuration.datetime_format
-                        )
-                    )
-                )
+        _query_params = []
+        if _params.get('numero_fir') is not None:  # noqa: E501
+            _query_params.append(('numero_fir', _params['numero_fir']))
+
+        if _params.get('confermate') is not None:  # noqa: E501
+            _query_params.append(('confermate', _params['confermate']))
+
+        if _params.get('data_emissione_da') is not None:  # noqa: E501
+            if isinstance(_params['data_emissione_da'], datetime):
+                _query_params.append(('data_emissione_da', _params['data_emissione_da'].strftime(self.api_client.configuration.datetime_format)))
             else:
-                _query_params.append(('data_emissione_da', data_emissione_da))
-            
-        if data_emissione_a is not None:
-            if isinstance(data_emissione_a, datetime):
-                _query_params.append(
-                    (
-                        'data_emissione_a',
-                        data_emissione_a.strftime(
-                            self.api_client.configuration.datetime_format
-                        )
-                    )
-                )
+                _query_params.append(('data_emissione_da', _params['data_emissione_da']))
+
+        if _params.get('data_emissione_a') is not None:  # noqa: E501
+            if isinstance(_params['data_emissione_a'], datetime):
+                _query_params.append(('data_emissione_a', _params['data_emissione_a'].strftime(self.api_client.configuration.datetime_format)))
             else:
-                _query_params.append(('data_emissione_a', data_emissione_a))
-            
-        if num_iscr_sito is not None:
-            
-            _query_params.append(('num_iscr_sito', num_iscr_sito))
-            
+                _query_params.append(('data_emissione_a', _params['data_emissione_a']))
+
+        if _params.get('num_iscr_sito') is not None:  # noqa: E501
+            _query_params.append(('num_iscr_sito', _params['num_iscr_sito']))
+
         # process the header parameters
-        if paging_page is not None:
-            _header_params['Paging-Page'] = paging_page
-        if paging_page_size is not None:
-            _header_params['Paging-PageSize'] = paging_page_size
+        _header_params = dict(_params.get('_headers', {}))
+        if _params['paging_page'] is not None:
+            _header_params['Paging-Page'] = _params['paging_page']
+
+        if _params['paging_page_size'] is not None:
+            _header_params['Paging-PageSize'] = _params['paging_page_size']
+
         # process the form parameters
+        _form_params = []
+        _files = {}
         # process the body parameter
-
-
+        _body_params = None
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
-
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='GET',
-            resource_path='/copia-cartacea/conferma/{identificativo_soggetto}',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {
+            '200': "List[CopiaCartaceaResult]",
+            '403': None,
+            '404': None,
+            '429': None,
+            '500': "ProblemDetails",
+        }
+
+        return self.api_client.call_api(
+            '/copia-cartacea/conferma/{identificativo_soggetto}', 'GET',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def copia_cartacea_conferma_identificativo_soggetto_identificativo_documento_get(self, identificativo_soggetto : Annotated[StrictStr, Field(..., description="Codice fiscale del soggetto per il quale si richiede il documento della copia del FIR cartaceo")], identificativo : Annotated[StrictStr, Field(..., description="Identificativo della copia del FIR cartaceo caricata dal trasportatore")], **kwargs) -> DownloadableBaseResponse:  # noqa: E501
+        """Documento copia FIR cartaceo disponibile  # noqa: E501
 
+        Restituisce il documento della copia del FIR cartaceo specificata caricata dal trasportatore.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def copia_cartacea_conferma_identificativo_soggetto_identificativo_documento_get(
-        self,
-        identificativo_soggetto: Annotated[StrictStr, Field(description="Codice fiscale del soggetto per il quale si richiede il documento della copia del FIR cartaceo")],
-        identificativo: Annotated[StrictStr, Field(description="Identificativo della copia del FIR cartaceo caricata dal trasportatore")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> DownloadableBaseResponse:
-        """Documento copia FIR cartaceo disponibile
-
-        Restituisce il documento della copia del FIR cartaceo specificata caricata dal trasportatore.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>
+        >>> thread = api.copia_cartacea_conferma_identificativo_soggetto_identificativo_documento_get(identificativo_soggetto, identificativo, async_req=True)
+        >>> result = thread.get()
 
         :param identificativo_soggetto: Codice fiscale del soggetto per il quale si richiede il documento della copia del FIR cartaceo (required)
         :type identificativo_soggetto: str
         :param identificativo: Identificativo della copia del FIR cartaceo caricata dal trasportatore (required)
         :type identificativo: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
+        :return: Returns the result object.
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: DownloadableBaseResponse
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the copia_cartacea_conferma_identificativo_soggetto_identificativo_documento_get_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.copia_cartacea_conferma_identificativo_soggetto_identificativo_documento_get_with_http_info(identificativo_soggetto, identificativo, **kwargs)  # noqa: E501
+
+    @validate_arguments
+    def copia_cartacea_conferma_identificativo_soggetto_identificativo_documento_get_with_http_info(self, identificativo_soggetto : Annotated[StrictStr, Field(..., description="Codice fiscale del soggetto per il quale si richiede il documento della copia del FIR cartaceo")], identificativo : Annotated[StrictStr, Field(..., description="Identificativo della copia del FIR cartaceo caricata dal trasportatore")], **kwargs) -> ApiResponse:  # noqa: E501
+        """Documento copia FIR cartaceo disponibile  # noqa: E501
+
+        Restituisce il documento della copia del FIR cartaceo specificata caricata dal trasportatore.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+
+        >>> thread = api.copia_cartacea_conferma_identificativo_soggetto_identificativo_documento_get_with_http_info(identificativo_soggetto, identificativo, async_req=True)
+        >>> result = thread.get()
+
+        :param identificativo_soggetto: Codice fiscale del soggetto per il quale si richiede il documento della copia del FIR cartaceo (required)
+        :type identificativo_soggetto: str
+        :param identificativo: Identificativo della copia del FIR cartaceo caricata dal trasportatore (required)
+        :type identificativo: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(DownloadableBaseResponse, status_code(int), headers(HTTPHeaderDict))
+        """
 
-        _param = self._copia_cartacea_conferma_identificativo_soggetto_identificativo_documento_get_serialize(
-            identificativo_soggetto=identificativo_soggetto,
-            identificativo=identificativo,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
+        _params = locals()
+
+        _all_params = [
+            'identificativo_soggetto',
+            'identificativo'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
+            ]
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method copia_cartacea_conferma_identificativo_soggetto_identificativo_documento_get" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
+
+        _collection_formats = {}
+
+        # process the path parameters
+        _path_params = {}
+        if _params['identificativo_soggetto'] is not None:
+            _path_params['identificativo_soggetto'] = _params['identificativo_soggetto']
+
+        if _params['identificativo'] is not None:
+            _path_params['identificativo'] = _params['identificativo']
+
+
+        # process the query parameters
+        _query_params = []
+        # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
+        # process the form parameters
+        _form_params = []
+        _files = {}
+        # process the body parameter
+        _body_params = None
+        # set the HTTP header `Accept`
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
+
+        # authentication setting
+        _auth_settings = ['Bearer']  # noqa: E501
+
+        _response_types_map = {
             '200': "DownloadableBaseResponse",
             '403': None,
             '404': None,
             '429': None,
             '500': "ProblemDetails",
         }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
 
-
-    @validate_call
-    def copia_cartacea_conferma_identificativo_soggetto_identificativo_documento_get_with_http_info(
-        self,
-        identificativo_soggetto: Annotated[StrictStr, Field(description="Codice fiscale del soggetto per il quale si richiede il documento della copia del FIR cartaceo")],
-        identificativo: Annotated[StrictStr, Field(description="Identificativo della copia del FIR cartaceo caricata dal trasportatore")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[DownloadableBaseResponse]:
-        """Documento copia FIR cartaceo disponibile
-
-        Restituisce il documento della copia del FIR cartaceo specificata caricata dal trasportatore.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>
-
-        :param identificativo_soggetto: Codice fiscale del soggetto per il quale si richiede il documento della copia del FIR cartaceo (required)
-        :type identificativo_soggetto: str
-        :param identificativo: Identificativo della copia del FIR cartaceo caricata dal trasportatore (required)
-        :type identificativo: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._copia_cartacea_conferma_identificativo_soggetto_identificativo_documento_get_serialize(
-            identificativo_soggetto=identificativo_soggetto,
-            identificativo=identificativo,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
-
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "DownloadableBaseResponse",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def copia_cartacea_conferma_identificativo_soggetto_identificativo_documento_get_without_preload_content(
-        self,
-        identificativo_soggetto: Annotated[StrictStr, Field(description="Codice fiscale del soggetto per il quale si richiede il documento della copia del FIR cartaceo")],
-        identificativo: Annotated[StrictStr, Field(description="Identificativo della copia del FIR cartaceo caricata dal trasportatore")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """Documento copia FIR cartaceo disponibile
-
-        Restituisce il documento della copia del FIR cartaceo specificata caricata dal trasportatore.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>
-
-        :param identificativo_soggetto: Codice fiscale del soggetto per il quale si richiede il documento della copia del FIR cartaceo (required)
-        :type identificativo_soggetto: str
-        :param identificativo: Identificativo della copia del FIR cartaceo caricata dal trasportatore (required)
-        :type identificativo: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._copia_cartacea_conferma_identificativo_soggetto_identificativo_documento_get_serialize(
-            identificativo_soggetto=identificativo_soggetto,
-            identificativo=identificativo,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
-
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "DownloadableBaseResponse",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
-
-
-    def _copia_cartacea_conferma_identificativo_soggetto_identificativo_documento_get_serialize(
-        self,
-        identificativo_soggetto,
-        identificativo,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
-
-        # process the path parameters
-        if identificativo_soggetto is not None:
-            _path_params['identificativo_soggetto'] = identificativo_soggetto
-        if identificativo is not None:
-            _path_params['identificativo'] = identificativo
-        # process the query parameters
-        # process the header parameters
-        # process the form parameters
-        # process the body parameter
-
-
-        # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
-
-
-        # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
-
-        return self.api_client.param_serialize(
-            method='GET',
-            resource_path='/copia-cartacea/conferma/{identificativo_soggetto}/{identificativo}/documento',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        return self.api_client.call_api(
+            '/copia-cartacea/conferma/{identificativo_soggetto}/{identificativo}/documento', 'GET',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def copia_cartacea_conferma_identificativo_soggetto_identificativo_get(self, identificativo_soggetto : Annotated[StrictStr, Field(..., description="Codice fiscale del soggetto a cui è resa disponibile la copia del FIR cartaceo")], identificativo : Annotated[StrictStr, Field(..., description="Identificativo della copia del FIR cartaceo per cui vengono richieste le informazioni di dettaglio")], **kwargs) -> CopiaCartaceaResult:  # noqa: E501
+        """Dettaglio copia FIR cartaceo disponibile  # noqa: E501
 
+        Restituisce il dettaglio dei dati di caricamento della copia del FIR cartaceo caricata dal trasportatore.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def copia_cartacea_conferma_identificativo_soggetto_identificativo_get(
-        self,
-        identificativo_soggetto: Annotated[StrictStr, Field(description="Codice fiscale del soggetto a cui è resa disponibile la copia del FIR cartaceo")],
-        identificativo: Annotated[StrictStr, Field(description="Identificativo della copia del FIR cartaceo per cui vengono richieste le informazioni di dettaglio")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> CopiaCartaceaResult:
-        """Dettaglio copia FIR cartaceo disponibile
-
-        Restituisce il dettaglio dei dati di caricamento della copia del FIR cartaceo caricata dal trasportatore.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>
+        >>> thread = api.copia_cartacea_conferma_identificativo_soggetto_identificativo_get(identificativo_soggetto, identificativo, async_req=True)
+        >>> result = thread.get()
 
         :param identificativo_soggetto: Codice fiscale del soggetto a cui è resa disponibile la copia del FIR cartaceo (required)
         :type identificativo_soggetto: str
         :param identificativo: Identificativo della copia del FIR cartaceo per cui vengono richieste le informazioni di dettaglio (required)
         :type identificativo: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: CopiaCartaceaResult
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the copia_cartacea_conferma_identificativo_soggetto_identificativo_get_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.copia_cartacea_conferma_identificativo_soggetto_identificativo_get_with_http_info(identificativo_soggetto, identificativo, **kwargs)  # noqa: E501
 
-        _param = self._copia_cartacea_conferma_identificativo_soggetto_identificativo_get_serialize(
-            identificativo_soggetto=identificativo_soggetto,
-            identificativo=identificativo,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def copia_cartacea_conferma_identificativo_soggetto_identificativo_get_with_http_info(self, identificativo_soggetto : Annotated[StrictStr, Field(..., description="Codice fiscale del soggetto a cui è resa disponibile la copia del FIR cartaceo")], identificativo : Annotated[StrictStr, Field(..., description="Identificativo della copia del FIR cartaceo per cui vengono richieste le informazioni di dettaglio")], **kwargs) -> ApiResponse:  # noqa: E501
+        """Dettaglio copia FIR cartaceo disponibile  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "CopiaCartaceaResult",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Restituisce il dettaglio dei dati di caricamento della copia del FIR cartaceo caricata dal trasportatore.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def copia_cartacea_conferma_identificativo_soggetto_identificativo_get_with_http_info(
-        self,
-        identificativo_soggetto: Annotated[StrictStr, Field(description="Codice fiscale del soggetto a cui è resa disponibile la copia del FIR cartaceo")],
-        identificativo: Annotated[StrictStr, Field(description="Identificativo della copia del FIR cartaceo per cui vengono richieste le informazioni di dettaglio")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[CopiaCartaceaResult]:
-        """Dettaglio copia FIR cartaceo disponibile
-
-        Restituisce il dettaglio dei dati di caricamento della copia del FIR cartaceo caricata dal trasportatore.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>
+        >>> thread = api.copia_cartacea_conferma_identificativo_soggetto_identificativo_get_with_http_info(identificativo_soggetto, identificativo, async_req=True)
+        >>> result = thread.get()
 
         :param identificativo_soggetto: Codice fiscale del soggetto a cui è resa disponibile la copia del FIR cartaceo (required)
         :type identificativo_soggetto: str
         :param identificativo: Identificativo della copia del FIR cartaceo per cui vengono richieste le informazioni di dettaglio (required)
         :type identificativo: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(CopiaCartaceaResult, status_code(int), headers(HTTPHeaderDict))
+        """
 
-        _param = self._copia_cartacea_conferma_identificativo_soggetto_identificativo_get_serialize(
-            identificativo_soggetto=identificativo_soggetto,
-            identificativo=identificativo,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "CopiaCartaceaResult",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def copia_cartacea_conferma_identificativo_soggetto_identificativo_get_without_preload_content(
-        self,
-        identificativo_soggetto: Annotated[StrictStr, Field(description="Codice fiscale del soggetto a cui è resa disponibile la copia del FIR cartaceo")],
-        identificativo: Annotated[StrictStr, Field(description="Identificativo della copia del FIR cartaceo per cui vengono richieste le informazioni di dettaglio")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'identificativo_soggetto',
+            'identificativo'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """Dettaglio copia FIR cartaceo disponibile
-
-        Restituisce il dettaglio dei dati di caricamento della copia del FIR cartaceo caricata dal trasportatore.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>
-
-        :param identificativo_soggetto: Codice fiscale del soggetto a cui è resa disponibile la copia del FIR cartaceo (required)
-        :type identificativo_soggetto: str
-        :param identificativo: Identificativo della copia del FIR cartaceo per cui vengono richieste le informazioni di dettaglio (required)
-        :type identificativo: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._copia_cartacea_conferma_identificativo_soggetto_identificativo_get_serialize(
-            identificativo_soggetto=identificativo_soggetto,
-            identificativo=identificativo,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "CopiaCartaceaResult",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method copia_cartacea_conferma_identificativo_soggetto_identificativo_get" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    def _copia_cartacea_conferma_identificativo_soggetto_identificativo_get_serialize(
-        self,
-        identificativo_soggetto,
-        identificativo,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if identificativo_soggetto is not None:
-            _path_params['identificativo_soggetto'] = identificativo_soggetto
-        if identificativo is not None:
-            _path_params['identificativo'] = identificativo
+        _path_params = {}
+        if _params['identificativo_soggetto'] is not None:
+            _path_params['identificativo_soggetto'] = _params['identificativo_soggetto']
+
+        if _params['identificativo'] is not None:
+            _path_params['identificativo'] = _params['identificativo']
+
+
         # process the query parameters
+        _query_params = []
         # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
+        _form_params = []
+        _files = {}
         # process the body parameter
-
-
+        _body_params = None
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
-
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='GET',
-            resource_path='/copia-cartacea/conferma/{identificativo_soggetto}/{identificativo}',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {
+            '200': "CopiaCartaceaResult",
+            '403': None,
+            '404': None,
+            '429': None,
+            '500': "ProblemDetails",
+        }
+
+        return self.api_client.call_api(
+            '/copia-cartacea/conferma/{identificativo_soggetto}/{identificativo}', 'GET',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def copia_cartacea_conferma_identificativo_soggetto_put(self, identificativo_soggetto : Annotated[StrictStr, Field(..., description="Codice fiscale del soggetto per il quale si conferma la copia del FIR cartaceo")], copia_cartacea_conferma_model : Annotated[CopiaCartaceaConfermaModel, Field(..., description="Struttura dati contenente l'identificativo della copia del FIR cartaceo e l'eventuale identificativo dell'unità locale a cui associare la conferma")], **kwargs) -> None:  # noqa: E501
+        """Conferma copia FIR cartaceo disponibile  # noqa: E501
 
+        Pone in stato \"confermata\" la copia del FIR cartaceo specificata associandola all'unità locale specificata.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre un codice di stato 422) anche in ambiente di produzione.</i><hr/>  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def copia_cartacea_conferma_identificativo_soggetto_put(
-        self,
-        identificativo_soggetto: Annotated[StrictStr, Field(description="Codice fiscale del soggetto per il quale si conferma la copia del FIR cartaceo")],
-        copia_cartacea_conferma_model: Annotated[CopiaCartaceaConfermaModel, Field(description="Struttura dati contenente l'identificativo della copia del FIR cartaceo e l'eventuale identificativo dell'unità locale a cui associare la conferma")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> None:
-        """Conferma copia FIR cartaceo disponibile
-
-        Pone in stato \"confermata\" la copia del FIR cartaceo specificata associandola all'unità locale specificata.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre un codice di stato 422) anche in ambiente di produzione.</i><hr/>
+        >>> thread = api.copia_cartacea_conferma_identificativo_soggetto_put(identificativo_soggetto, copia_cartacea_conferma_model, async_req=True)
+        >>> result = thread.get()
 
         :param identificativo_soggetto: Codice fiscale del soggetto per il quale si conferma la copia del FIR cartaceo (required)
         :type identificativo_soggetto: str
         :param copia_cartacea_conferma_model: Struttura dati contenente l'identificativo della copia del FIR cartaceo e l'eventuale identificativo dell'unità locale a cui associare la conferma (required)
         :type copia_cartacea_conferma_model: CopiaCartaceaConfermaModel
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: None
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the copia_cartacea_conferma_identificativo_soggetto_put_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.copia_cartacea_conferma_identificativo_soggetto_put_with_http_info(identificativo_soggetto, copia_cartacea_conferma_model, **kwargs)  # noqa: E501
 
-        _param = self._copia_cartacea_conferma_identificativo_soggetto_put_serialize(
-            identificativo_soggetto=identificativo_soggetto,
-            copia_cartacea_conferma_model=copia_cartacea_conferma_model,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def copia_cartacea_conferma_identificativo_soggetto_put_with_http_info(self, identificativo_soggetto : Annotated[StrictStr, Field(..., description="Codice fiscale del soggetto per il quale si conferma la copia del FIR cartaceo")], copia_cartacea_conferma_model : Annotated[CopiaCartaceaConfermaModel, Field(..., description="Struttura dati contenente l'identificativo della copia del FIR cartaceo e l'eventuale identificativo dell'unità locale a cui associare la conferma")], **kwargs) -> ApiResponse:  # noqa: E501
+        """Conferma copia FIR cartaceo disponibile  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '204': None,
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Pone in stato \"confermata\" la copia del FIR cartaceo specificata associandola all'unità locale specificata.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre un codice di stato 422) anche in ambiente di produzione.</i><hr/>  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def copia_cartacea_conferma_identificativo_soggetto_put_with_http_info(
-        self,
-        identificativo_soggetto: Annotated[StrictStr, Field(description="Codice fiscale del soggetto per il quale si conferma la copia del FIR cartaceo")],
-        copia_cartacea_conferma_model: Annotated[CopiaCartaceaConfermaModel, Field(description="Struttura dati contenente l'identificativo della copia del FIR cartaceo e l'eventuale identificativo dell'unità locale a cui associare la conferma")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[None]:
-        """Conferma copia FIR cartaceo disponibile
-
-        Pone in stato \"confermata\" la copia del FIR cartaceo specificata associandola all'unità locale specificata.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre un codice di stato 422) anche in ambiente di produzione.</i><hr/>
+        >>> thread = api.copia_cartacea_conferma_identificativo_soggetto_put_with_http_info(identificativo_soggetto, copia_cartacea_conferma_model, async_req=True)
+        >>> result = thread.get()
 
         :param identificativo_soggetto: Codice fiscale del soggetto per il quale si conferma la copia del FIR cartaceo (required)
         :type identificativo_soggetto: str
         :param copia_cartacea_conferma_model: Struttura dati contenente l'identificativo della copia del FIR cartaceo e l'eventuale identificativo dell'unità locale a cui associare la conferma (required)
         :type copia_cartacea_conferma_model: CopiaCartaceaConfermaModel
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: None
+        """
 
-        _param = self._copia_cartacea_conferma_identificativo_soggetto_put_serialize(
-            identificativo_soggetto=identificativo_soggetto,
-            copia_cartacea_conferma_model=copia_cartacea_conferma_model,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '204': None,
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def copia_cartacea_conferma_identificativo_soggetto_put_without_preload_content(
-        self,
-        identificativo_soggetto: Annotated[StrictStr, Field(description="Codice fiscale del soggetto per il quale si conferma la copia del FIR cartaceo")],
-        copia_cartacea_conferma_model: Annotated[CopiaCartaceaConfermaModel, Field(description="Struttura dati contenente l'identificativo della copia del FIR cartaceo e l'eventuale identificativo dell'unità locale a cui associare la conferma")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'identificativo_soggetto',
+            'copia_cartacea_conferma_model'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """Conferma copia FIR cartaceo disponibile
-
-        Pone in stato \"confermata\" la copia del FIR cartaceo specificata associandola all'unità locale specificata.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre un codice di stato 422) anche in ambiente di produzione.</i><hr/>
-
-        :param identificativo_soggetto: Codice fiscale del soggetto per il quale si conferma la copia del FIR cartaceo (required)
-        :type identificativo_soggetto: str
-        :param copia_cartacea_conferma_model: Struttura dati contenente l'identificativo della copia del FIR cartaceo e l'eventuale identificativo dell'unità locale a cui associare la conferma (required)
-        :type copia_cartacea_conferma_model: CopiaCartaceaConfermaModel
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._copia_cartacea_conferma_identificativo_soggetto_put_serialize(
-            identificativo_soggetto=identificativo_soggetto,
-            copia_cartacea_conferma_model=copia_cartacea_conferma_model,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '204': None,
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method copia_cartacea_conferma_identificativo_soggetto_put" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    def _copia_cartacea_conferma_identificativo_soggetto_put_serialize(
-        self,
-        identificativo_soggetto,
-        copia_cartacea_conferma_model,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if identificativo_soggetto is not None:
-            _path_params['identificativo_soggetto'] = identificativo_soggetto
-        # process the query parameters
-        # process the header parameters
-        # process the form parameters
-        # process the body parameter
-        if copia_cartacea_conferma_model is not None:
-            _body_params = copia_cartacea_conferma_model
+        _path_params = {}
+        if _params['identificativo_soggetto'] is not None:
+            _path_params['identificativo_soggetto'] = _params['identificativo_soggetto']
 
+
+        # process the query parameters
+        _query_params = []
+        # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
+        # process the form parameters
+        _form_params = []
+        _files = {}
+        # process the body parameter
+        _body_params = None
+        if _params['copia_cartacea_conferma_model'] is not None:
+            _body_params = _params['copia_cartacea_conferma_model']
 
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/problem+json'
-                ]
-            )
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/problem+json'])  # noqa: E501
 
         # set the HTTP header `Content-Type`
-        if _content_type:
-            _header_params['Content-Type'] = _content_type
-        else:
-            _default_content_type = (
-                self.api_client.select_header_content_type(
-                    [
-                        'application/json'
-                    ]
+        _content_types_list = _params.get('_content_type',
+            self.api_client.select_header_content_type(
+                ['application/json']))
+        if _content_types_list:
+                _header_params['Content-Type'] = _content_types_list
+
+        # authentication setting
+        _auth_settings = ['Bearer']  # noqa: E501
+
+        _response_types_map = {}
+
+        return self.api_client.call_api(
+            '/copia-cartacea/conferma/{identificativo_soggetto}', 'PUT',
+            _path_params,
+            _query_params,
+            _header_params,
+            body=_body_params,
+            post_params=_form_params,
+            files=_files,
+            response_types_map=_response_types_map,
+            auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
+            collection_formats=_collection_formats,
+            _request_auth=_params.get('_request_auth'))
+
+    @validate_arguments
+    def copia_cartacea_transazione_id_result_get(self, transazione_id : Annotated[StrictStr, Field(..., description="Id della richiesta")], **kwargs) -> EsitoCopiaCartaceaModel:  # noqa: E501
+        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /{transazioneId}/result - Esito transazione  # noqa: E501
+
+        Ottiene l'esito dell'elaborazione di una richiesta asincrona.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+
+        >>> thread = api.copia_cartacea_transazione_id_result_get(transazione_id, async_req=True)
+        >>> result = thread.get()
+
+        :param transazione_id: Id della richiesta (required)
+        :type transazione_id: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
+        :return: Returns the result object.
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: EsitoCopiaCartaceaModel
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the copia_cartacea_transazione_id_result_get_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.copia_cartacea_transazione_id_result_get_with_http_info(transazione_id, **kwargs)  # noqa: E501
+
+    @validate_arguments
+    def copia_cartacea_transazione_id_result_get_with_http_info(self, transazione_id : Annotated[StrictStr, Field(..., description="Id della richiesta")], **kwargs) -> ApiResponse:  # noqa: E501
+        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /{transazioneId}/result - Esito transazione  # noqa: E501
+
+        Ottiene l'esito dell'elaborazione di una richiesta asincrona.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+
+        >>> thread = api.copia_cartacea_transazione_id_result_get_with_http_info(transazione_id, async_req=True)
+        >>> result = thread.get()
+
+        :param transazione_id: Id della richiesta (required)
+        :type transazione_id: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
+        :type _request_auth: dict, optional
+        :type _content_type: string, optional: force content-type for the request
+        :return: Returns the result object.
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(EsitoCopiaCartaceaModel, status_code(int), headers(HTTPHeaderDict))
+        """
+
+        warnings.warn("GET /copia-cartacea/{transazione_id}/result is deprecated.", DeprecationWarning)
+
+        _params = locals()
+
+        _all_params = [
+            'transazione_id'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
+            ]
+        )
+
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method copia_cartacea_transazione_id_result_get" % _key
                 )
-            )
-            if _default_content_type is not None:
-                _header_params['Content-Type'] = _default_content_type
+            _params[_key] = _val
+        del _params['kwargs']
 
-        # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
-
-        return self.api_client.param_serialize(
-            method='PUT',
-            resource_path='/copia-cartacea/conferma/{identificativo_soggetto}',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
-            body=_body_params,
-            post_params=_form_params,
-            files=_files,
-            auth_settings=_auth_settings,
-            collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
-
-
-
-
-    @validate_call
-    def copia_cartacea_transazione_id_result_get(
-        self,
-        transazione_id: Annotated[StrictStr, Field(description="Id della richiesta")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> EsitoCopiaCartaceaModel:
-        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /{transazioneId}/result - Esito transazione
-
-        Ottiene l'esito dell'elaborazione di una richiesta asincrona.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>
-
-        :param transazione_id: Id della richiesta (required)
-        :type transazione_id: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-        warnings.warn("GET /copia-cartacea/{transazione_id}/result is deprecated.", DeprecationWarning)
-
-        _param = self._copia_cartacea_transazione_id_result_get_serialize(
-            transazione_id=transazione_id,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
-
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "EsitoCopiaCartaceaModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
-
-
-    @validate_call
-    def copia_cartacea_transazione_id_result_get_with_http_info(
-        self,
-        transazione_id: Annotated[StrictStr, Field(description="Id della richiesta")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[EsitoCopiaCartaceaModel]:
-        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /{transazioneId}/result - Esito transazione
-
-        Ottiene l'esito dell'elaborazione di una richiesta asincrona.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>
-
-        :param transazione_id: Id della richiesta (required)
-        :type transazione_id: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-        warnings.warn("GET /copia-cartacea/{transazione_id}/result is deprecated.", DeprecationWarning)
-
-        _param = self._copia_cartacea_transazione_id_result_get_serialize(
-            transazione_id=transazione_id,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
-
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "EsitoCopiaCartaceaModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def copia_cartacea_transazione_id_result_get_without_preload_content(
-        self,
-        transazione_id: Annotated[StrictStr, Field(description="Id della richiesta")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /{transazioneId}/result - Esito transazione
-
-        Ottiene l'esito dell'elaborazione di una richiesta asincrona.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>
-
-        :param transazione_id: Id della richiesta (required)
-        :type transazione_id: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-        warnings.warn("GET /copia-cartacea/{transazione_id}/result is deprecated.", DeprecationWarning)
-
-        _param = self._copia_cartacea_transazione_id_result_get_serialize(
-            transazione_id=transazione_id,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
-
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "EsitoCopiaCartaceaModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
-
-
-    def _copia_cartacea_transazione_id_result_get_serialize(
-        self,
-        transazione_id,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if transazione_id is not None:
-            _path_params['transazione_id'] = transazione_id
+        _path_params = {}
+        if _params['transazione_id'] is not None:
+            _path_params['transazione_id'] = _params['transazione_id']
+
+
         # process the query parameters
+        _query_params = []
         # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
+        _form_params = []
+        _files = {}
         # process the body parameter
-
-
+        _body_params = None
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
-
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='GET',
-            resource_path='/copia-cartacea/{transazione_id}/result',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {
+            '200': "EsitoCopiaCartaceaModel",
+            '400': "ProblemDetails",
+            '403': None,
+            '404': None,
+            '429': None,
+            '500': "ProblemDetails",
+        }
+
+        return self.api_client.call_api(
+            '/copia-cartacea/{transazione_id}/result', 'GET',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def copia_cartacea_transazione_id_status_get(self, transazione_id : Annotated[StrictStr, Field(..., description="Id della richiesta")], **kwargs) -> None:  # noqa: E501
+        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /{transazioneId}/status - Stato transazione  # noqa: E501
 
+        Ottiene lo stato di elaborazione di una richiesta di vidimazione FIR.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def copia_cartacea_transazione_id_status_get(
-        self,
-        transazione_id: Annotated[StrictStr, Field(description="Id della richiesta")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> None:
-        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /{transazioneId}/status - Stato transazione
-
-        Ottiene lo stato di elaborazione di una richiesta di vidimazione FIR.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>
+        >>> thread = api.copia_cartacea_transazione_id_status_get(transazione_id, async_req=True)
+        >>> result = thread.get()
 
         :param transazione_id: Id della richiesta (required)
         :type transazione_id: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
+        :return: Returns the result object.
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: None
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the copia_cartacea_transazione_id_status_get_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.copia_cartacea_transazione_id_status_get_with_http_info(transazione_id, **kwargs)  # noqa: E501
+
+    @validate_arguments
+    def copia_cartacea_transazione_id_status_get_with_http_info(self, transazione_id : Annotated[StrictStr, Field(..., description="Id della richiesta")], **kwargs) -> ApiResponse:  # noqa: E501
+        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /{transazioneId}/status - Stato transazione  # noqa: E501
+
+        Ottiene lo stato di elaborazione di una richiesta di vidimazione FIR.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+
+        >>> thread = api.copia_cartacea_transazione_id_status_get_with_http_info(transazione_id, async_req=True)
+        >>> result = thread.get()
+
+        :param transazione_id: Id della richiesta (required)
+        :type transazione_id: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: None
+        """
+
         warnings.warn("GET /copia-cartacea/{transazione_id}/status is deprecated.", DeprecationWarning)
 
-        _param = self._copia_cartacea_transazione_id_status_get_serialize(
-            transazione_id=transazione_id,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': None,
-            '303': None,
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
-
-
-    @validate_call
-    def copia_cartacea_transazione_id_status_get_with_http_info(
-        self,
-        transazione_id: Annotated[StrictStr, Field(description="Id della richiesta")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'transazione_id'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[None]:
-        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /{transazioneId}/status - Stato transazione
-
-        Ottiene lo stato di elaborazione di una richiesta di vidimazione FIR.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>
-
-        :param transazione_id: Id della richiesta (required)
-        :type transazione_id: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-        warnings.warn("GET /copia-cartacea/{transazione_id}/status is deprecated.", DeprecationWarning)
-
-        _param = self._copia_cartacea_transazione_id_status_get_serialize(
-            transazione_id=transazione_id,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': None,
-            '303': None,
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method copia_cartacea_transazione_id_status_get" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    @validate_call
-    def copia_cartacea_transazione_id_status_get_without_preload_content(
-        self,
-        transazione_id: Annotated[StrictStr, Field(description="Id della richiesta")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /{transazioneId}/status - Stato transazione
-
-        Ottiene lo stato di elaborazione di una richiesta di vidimazione FIR.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>
-
-        :param transazione_id: Id della richiesta (required)
-        :type transazione_id: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-        warnings.warn("GET /copia-cartacea/{transazione_id}/status is deprecated.", DeprecationWarning)
-
-        _param = self._copia_cartacea_transazione_id_status_get_serialize(
-            transazione_id=transazione_id,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
-
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': None,
-            '303': None,
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
-
-
-    def _copia_cartacea_transazione_id_status_get_serialize(
-        self,
-        transazione_id,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if transazione_id is not None:
-            _path_params['transazione_id'] = transazione_id
+        _path_params = {}
+        if _params['transazione_id'] is not None:
+            _path_params['transazione_id'] = _params['transazione_id']
+
+
         # process the query parameters
+        _query_params = []
         # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
+        _form_params = []
+        _files = {}
         # process the body parameter
-
-
+        _body_params = None
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/problem+json'
-                ]
-            )
-
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/problem+json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='GET',
-            resource_path='/copia-cartacea/{transazione_id}/status',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {}
+
+        return self.api_client.call_api(
+            '/copia-cartacea/{transazione_id}/status', 'GET',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
-
-
+            _request_auth=_params.get('_request_auth'))

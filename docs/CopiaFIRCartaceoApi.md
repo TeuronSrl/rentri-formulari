@@ -27,8 +27,9 @@ Ottiene la lista delle copie dei FIR cartacei caricate dall'unità locale del tr
 ### Example
 
 * Bearer (JWT) Authentication (Bearer):
-
 ```python
+import time
+import os
 import rentri_formulari
 from rentri_formulari.models.copia_cartacea_result import CopiaCartaceaResult
 from rentri_formulari.rest import ApiException
@@ -73,7 +74,6 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 ### Parameters
 
-
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **num_iscr_sito** | **str**| Numero iscrizione unità locale del trasportatore che ha caricato le copie dei FIR cartacei             Per recuperare il numero iscrizione unità locale consultare l&#39;operazione \&quot;Elenco Unità Locali iscritte\&quot; nell&#39;area riservata Operatori dove è presente la voce \&quot;Numero iscrizione unità locale\&quot; | 
@@ -96,7 +96,6 @@ Name | Type | Description  | Notes
  - **Accept**: application/json, application/problem+json
 
 ### HTTP response details
-
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | OK |  * Paging-PageCount - Numero totale di pagine. <br>  * Paging-Page - Numero di pagina. <br>  * Paging-PageSize - Dimensione della pagina. <br>  * Paging-TotalRecordCount - Numero totale di record. <br>  |
@@ -117,8 +116,9 @@ Elimina il caricamento della copia del FIR cartaceo. L'operazione è possibile s
 ### Example
 
 * Bearer (JWT) Authentication (Bearer):
-
 ```python
+import time
+import os
 import rentri_formulari
 from rentri_formulari.rest import ApiException
 from pprint import pprint
@@ -157,7 +157,6 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 ### Parameters
 
-
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **num_iscr_sito** | **str**| Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo.             Per recuperare il numero iscrizione unità locale consultare l&#39;operazione \&quot;Elenco Unità Locali iscritte\&quot; nell&#39;area riservata Operatori dove è presente la voce \&quot;Numero iscrizione unità locale\&quot; | 
@@ -177,7 +176,6 @@ void (empty response body)
  - **Accept**: application/problem+json
 
 ### HTTP response details
-
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **204** | No Content |  -  |
@@ -199,8 +197,9 @@ Restituisce il file contenente la copia del FIR cartaceo caricata.<hr/><i>Serviz
 ### Example
 
 * Bearer (JWT) Authentication (Bearer):
-
 ```python
+import time
+import os
 import rentri_formulari
 from rentri_formulari.models.downloadable_base_response import DownloadableBaseResponse
 from rentri_formulari.rest import ApiException
@@ -242,7 +241,6 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 ### Parameters
 
-
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **num_iscr_sito** | **str**| Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo.             Per recuperare il numero iscrizione unità locale consultare l&#39;operazione \&quot;Elenco Unità Locali iscritte\&quot; nell&#39;area riservata Operatori dove è presente la voce \&quot;Numero iscrizione unità locale\&quot; | 
@@ -262,7 +260,6 @@ Name | Type | Description  | Notes
  - **Accept**: application/json, application/problem+json
 
 ### HTTP response details
-
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | OK |  -  |
@@ -283,8 +280,9 @@ Recupera le informazioni di dettaglio del caricamento della copia del FIR cartac
 ### Example
 
 * Bearer (JWT) Authentication (Bearer):
-
 ```python
+import time
+import os
 import rentri_formulari
 from rentri_formulari.models.copia_cartacea_result import CopiaCartaceaResult
 from rentri_formulari.rest import ApiException
@@ -326,7 +324,6 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 ### Parameters
 
-
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **num_iscr_sito** | **str**| Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo             Per recuperare il numero iscrizione unità locale consultare l&#39;operazione \&quot;Elenco Unità Locali iscritte\&quot; nell&#39;area riservata Operatori dove è presente la voce \&quot;Numero iscrizione unità locale\&quot; | 
@@ -346,7 +343,6 @@ Name | Type | Description  | Notes
  - **Accept**: application/json, application/problem+json
 
 ### HTTP response details
-
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | OK |  -  |
@@ -368,8 +364,9 @@ Acquisisce la richiesta di restituzione della copia del FIR cartaceo che consent
 ### Example
 
 * Bearer (JWT) Authentication (Bearer):
-
 ```python
+import time
+import os
 import rentri_formulari
 from rentri_formulari.models.copia_cartacea_model import CopiaCartaceaModel
 from rentri_formulari.models.transazione_model import TransazioneModel
@@ -413,7 +410,6 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 ### Parameters
 
-
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **num_iscr_sito** | **str**| Numero iscrizione unità locale del trasportatore che carica la copia del FIR cartaceo. Per recuperare il numero iscrizione unità locale consultare l&#39;operazione \&quot;Elenco Unità Locali iscritte\&quot; nell&#39;area riservata Operatori dove è presente la voce \&quot;Numero iscrizione unità locale\&quot;. | 
@@ -434,7 +430,6 @@ Name | Type | Description  | Notes
  - **Accept**: application/json, application/problem+json
 
 ### HTTP response details
-
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | OK |  -  |
@@ -456,8 +451,9 @@ Ottiene la lista delle copie dei FIR cartacei, disponibili per la conferma o gi�
 ### Example
 
 * Bearer (JWT) Authentication (Bearer):
-
 ```python
+import time
+import os
 import rentri_formulari
 from rentri_formulari.models.copia_cartacea_result import CopiaCartaceaResult
 from rentri_formulari.rest import ApiException
@@ -505,7 +501,6 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 ### Parameters
 
-
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **identificativo_soggetto** | **str**| Codice fiscale del soggetto per cui richiedere l&#39;elenco delle copie dei FIR cartacei disponibili | 
@@ -531,7 +526,6 @@ Name | Type | Description  | Notes
  - **Accept**: application/json, application/problem+json
 
 ### HTTP response details
-
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | OK |  * Paging-PageCount - Numero totale di pagine. <br>  * Paging-Page - Numero di pagina. <br>  * Paging-PageSize - Dimensione della pagina. <br>  * Paging-TotalRecordCount - Numero totale di record. <br>  |
@@ -552,8 +546,9 @@ Restituisce il documento della copia del FIR cartaceo specificata caricata dal t
 ### Example
 
 * Bearer (JWT) Authentication (Bearer):
-
 ```python
+import time
+import os
 import rentri_formulari
 from rentri_formulari.models.downloadable_base_response import DownloadableBaseResponse
 from rentri_formulari.rest import ApiException
@@ -595,7 +590,6 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 ### Parameters
 
-
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **identificativo_soggetto** | **str**| Codice fiscale del soggetto per il quale si richiede il documento della copia del FIR cartaceo | 
@@ -615,7 +609,6 @@ Name | Type | Description  | Notes
  - **Accept**: application/json, application/problem+json
 
 ### HTTP response details
-
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | OK |  -  |
@@ -636,8 +629,9 @@ Restituisce il dettaglio dei dati di caricamento della copia del FIR cartaceo ca
 ### Example
 
 * Bearer (JWT) Authentication (Bearer):
-
 ```python
+import time
+import os
 import rentri_formulari
 from rentri_formulari.models.copia_cartacea_result import CopiaCartaceaResult
 from rentri_formulari.rest import ApiException
@@ -679,7 +673,6 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 ### Parameters
 
-
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **identificativo_soggetto** | **str**| Codice fiscale del soggetto a cui è resa disponibile la copia del FIR cartaceo | 
@@ -699,7 +692,6 @@ Name | Type | Description  | Notes
  - **Accept**: application/json, application/problem+json
 
 ### HTTP response details
-
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | OK |  -  |
@@ -720,8 +712,9 @@ Pone in stato \"confermata\" la copia del FIR cartaceo specificata associandola 
 ### Example
 
 * Bearer (JWT) Authentication (Bearer):
-
 ```python
+import time
+import os
 import rentri_formulari
 from rentri_formulari.models.copia_cartacea_conferma_model import CopiaCartaceaConfermaModel
 from rentri_formulari.rest import ApiException
@@ -761,7 +754,6 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 ### Parameters
 
-
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **identificativo_soggetto** | **str**| Codice fiscale del soggetto per il quale si conferma la copia del FIR cartaceo | 
@@ -781,7 +773,6 @@ void (empty response body)
  - **Accept**: application/problem+json
 
 ### HTTP response details
-
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **204** | No Content |  -  |
@@ -803,8 +794,9 @@ Ottiene l'esito dell'elaborazione di una richiesta asincrona.<hr/><i>Servizio ri
 ### Example
 
 * Bearer (JWT) Authentication (Bearer):
-
 ```python
+import time
+import os
 import rentri_formulari
 from rentri_formulari.models.esito_copia_cartacea_model import EsitoCopiaCartaceaModel
 from rentri_formulari.rest import ApiException
@@ -845,7 +837,6 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 ### Parameters
 
-
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **transazione_id** | **str**| Id della richiesta | 
@@ -864,7 +855,6 @@ Name | Type | Description  | Notes
  - **Accept**: application/json, application/problem+json
 
 ### HTTP response details
-
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | Esito dell&#39;elaborazione con eventuali errori. |  -  |
@@ -886,8 +876,9 @@ Ottiene lo stato di elaborazione di una richiesta di vidimazione FIR.<hr/><i>Ser
 ### Example
 
 * Bearer (JWT) Authentication (Bearer):
-
 ```python
+import time
+import os
 import rentri_formulari
 from rentri_formulari.rest import ApiException
 from pprint import pprint
@@ -925,7 +916,6 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 ### Parameters
 
-
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **transazione_id** | **str**| Id della richiesta | 
@@ -944,7 +934,6 @@ void (empty response body)
  - **Accept**: application/problem+json
 
 ### HTTP response details
-
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | Richiesta non ancora elaborata. |  -  |

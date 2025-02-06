@@ -15,7 +15,7 @@
 
 import unittest
 
-from rentri_formulari.api.default_api import DefaultApi
+from rentri_formulari.api.default_api import DefaultApi  # noqa: E501
 
 
 class TestDefaultApi(unittest.TestCase):
@@ -25,26 +25,26 @@ class TestDefaultApi(unittest.TestCase):
         self.api = DefaultApi()
 
     def tearDown(self) -> None:
-        pass
+        self.api.api_client.close()
 
     def test_status_get(self) -> None:
         """Test case for status_get
 
-        Stato API
+        Stato API  # noqa: E501
         """
         pass
 
     def test_transazione_id_result_get(self) -> None:
         """Test case for transazione_id_result_get
 
-        Esito transazione
+        Esito transazione  # noqa: E501
         """
         pass
 
     def test_transazione_id_status_get(self) -> None:
         """Test case for transazione_id_status_get
 
-        Stato transazione
+        Stato transazione  # noqa: E501
         """
         pass
 

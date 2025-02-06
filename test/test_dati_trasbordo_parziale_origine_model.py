@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.dati_trasbordo_parziale_origine_model import DatiTrasbordoParzialeOrigineModel
+from rentri_formulari.models.dati_trasbordo_parziale_origine_model import DatiTrasbordoParzialeOrigineModel  # noqa: E501
 
 class TestDatiTrasbordoParzialeOrigineModel(unittest.TestCase):
     """DatiTrasbordoParzialeOrigineModel unit test stubs"""
@@ -28,15 +29,15 @@ class TestDatiTrasbordoParzialeOrigineModel(unittest.TestCase):
 
     def make_instance(self, include_optional) -> DatiTrasbordoParzialeOrigineModel:
         """Test DatiTrasbordoParzialeOrigineModel
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `DatiTrasbordoParzialeOrigineModel`
         """
-        model = DatiTrasbordoParzialeOrigineModel()
+        model = DatiTrasbordoParzialeOrigineModel()  # noqa: E501
         if include_optional:
             return DatiTrasbordoParzialeOrigineModel(
-                numero_fir_origine = 'WPQZYQ ) ._),,#_**&,\"%\"* - *- !\'# 1757701929816286488291663/.$\'\"&(_#+% #\"&%-/*- )!./ !),+#/)B0',
+                numero_fir_origine = 'WPQZYQ ) ._),,#_**&,\"%\"* - *- !'# 1757701929816286488291663/.$'\"&(_#+% #\"&%-/*- )!./ !),+#/)B0',
                 produttore_originario = rentri_formulari.models.dati_produttore_originario_model.DatiProduttoreOriginarioModel(
                     nazione_id = '', 
                     denominazione = '0', 
@@ -45,7 +46,7 @@ class TestDatiTrasbordoParzialeOrigineModel(unittest.TestCase):
             )
         else:
             return DatiTrasbordoParzialeOrigineModel(
-                numero_fir_origine = 'WPQZYQ ) ._),,#_**&,\"%\"* - *- !\'# 1757701929816286488291663/.$\'\"&(_#+% #\"&%-/*- )!./ !),+#/)B0',
+                numero_fir_origine = 'WPQZYQ ) ._),,#_**&,\"%\"* - *- !'# 1757701929816286488291663/.$'\"&(_#+% #\"&%-/*- )!./ !),+#/)B0',
                 produttore_originario = rentri_formulari.models.dati_produttore_originario_model.DatiProduttoreOriginarioModel(
                     nazione_id = '', 
                     denominazione = '0', 

@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **num_iscr_sito** | **str** |  | [optional] 
@@ -19,7 +18,7 @@ json = "{}"
 # create an instance of IntermediarioItemResult from a JSON string
 intermediario_item_result_instance = IntermediarioItemResult.from_json(json)
 # print the JSON string representation of the object
-print(IntermediarioItemResult.to_json())
+print IntermediarioItemResult.to_json()
 
 # convert the object into a dict
 intermediario_item_result_dict = intermediario_item_result_instance.to_dict()

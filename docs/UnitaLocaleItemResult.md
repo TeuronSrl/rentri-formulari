@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **num_iscr_sito** | **str** |  | [optional] 
@@ -24,7 +23,7 @@ json = "{}"
 # create an instance of UnitaLocaleItemResult from a JSON string
 unita_locale_item_result_instance = UnitaLocaleItemResult.from_json(json)
 # print the JSON string representation of the object
-print(UnitaLocaleItemResult.to_json())
+print UnitaLocaleItemResult.to_json()
 
 # convert the object into a dict
 unita_locale_item_result_dict = unita_locale_item_result_instance.to_dict()

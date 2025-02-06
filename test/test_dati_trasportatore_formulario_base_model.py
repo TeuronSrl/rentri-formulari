@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.dati_trasportatore_formulario_base_model import DatiTrasportatoreFormularioBaseModel
+from rentri_formulari.models.dati_trasportatore_formulario_base_model import DatiTrasportatoreFormularioBaseModel  # noqa: E501
 
 class TestDatiTrasportatoreFormularioBaseModel(unittest.TestCase):
     """DatiTrasportatoreFormularioBaseModel unit test stubs"""
@@ -28,12 +29,12 @@ class TestDatiTrasportatoreFormularioBaseModel(unittest.TestCase):
 
     def make_instance(self, include_optional) -> DatiTrasportatoreFormularioBaseModel:
         """Test DatiTrasportatoreFormularioBaseModel
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `DatiTrasportatoreFormularioBaseModel`
         """
-        model = DatiTrasportatoreFormularioBaseModel()
+        model = DatiTrasportatoreFormularioBaseModel()  # noqa: E501
         if include_optional:
             return DatiTrasportatoreFormularioBaseModel(
                 tipo_trasporto = 'Terrestre',

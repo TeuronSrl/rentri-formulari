@@ -15,7 +15,7 @@
 
 import unittest
 
-from rentri_formulari.api.formulario_digitale_api import FormularioDigitaleApi
+from rentri_formulari.api.formulario_digitale_api import FormularioDigitaleApi  # noqa: E501
 
 
 class TestFormularioDigitaleApi(unittest.TestCase):
@@ -25,201 +25,201 @@ class TestFormularioDigitaleApi(unittest.TestCase):
         self.api = FormularioDigitaleApi()
 
     def tearDown(self) -> None:
-        pass
+        self.api.api_client.close()
 
     def test_count_get(self) -> None:
         """Test case for count_get
 
-        Conteggio formulari
+        Conteggio formulari  # noqa: E501
         """
         pass
 
     def test_numero_fir_accettazione_post(self) -> None:
         """Test case for numero_fir_accettazione_post
 
-        🔁[ASYNC] Accettazione FIR
+        🔁[ASYNC] Accettazione FIR  # noqa: E501
         """
         pass
 
     def test_numero_fir_acquisizione_firma_post(self) -> None:
         """Test case for numero_fir_acquisizione_firma_post
 
-        🔁[ASYNC] Imposta dati firma
+        🔁[ASYNC] Imposta dati firma  # noqa: E501
         """
         pass
 
     def test_numero_fir_acquisizione_num_iscr_sito_post(self) -> None:
         """Test case for numero_fir_acquisizione_num_iscr_sito_post
 
-        ⚠️[DEPRECATO] - utilizzare /{numeroFIR}/acquisizione-visibilita/{numIscrSito} - Acquisizione visibilità FIR
+        ⚠️[DEPRECATO] - utilizzare /{numeroFIR}/acquisizione-visibilita/{numIscrSito} - Acquisizione visibilità FIR  # noqa: E501
         """
         pass
 
     def test_numero_fir_acquisizione_visibilita_num_iscr_sito_post(self) -> None:
         """Test case for numero_fir_acquisizione_visibilita_num_iscr_sito_post
 
-        Acquisizione visibilità FIR
+        Acquisizione visibilità FIR  # noqa: E501
         """
         pass
 
     def test_numero_fir_allegato_post(self) -> None:
         """Test case for numero_fir_allegato_post
 
-        🔁[ASYNC] Aggiunge allegato
+        🔁[ASYNC] Aggiunge allegato  # noqa: E501
         """
         pass
 
     def test_numero_fir_annotazione_post(self) -> None:
         """Test case for numero_fir_annotazione_post
 
-        🔁[ASYNC] Aggiunge annotazione
+        🔁[ASYNC] Aggiunge annotazione  # noqa: E501
         """
         pass
 
     def test_numero_fir_annulla_post(self) -> None:
         """Test case for numero_fir_annulla_post
 
-        🔁[ASYNC] Annullamento FIR
+        🔁[ASYNC] Annullamento FIR  # noqa: E501
         """
         pass
 
     def test_numero_fir_azioni_get(self) -> None:
         """Test case for numero_fir_azioni_get
 
-        Operazioni disponibili
+        Operazioni disponibili  # noqa: E501
         """
         pass
 
     def test_numero_fir_destinatario_post(self) -> None:
         """Test case for numero_fir_destinatario_post
 
-        🔁[ASYNC] Aggiunge nuovo destinatario
+        🔁[ASYNC] Aggiunge nuovo destinatario  # noqa: E501
         """
         pass
 
     def test_numero_fir_get(self) -> None:
         """Test case for numero_fir_get
 
-        Dettaglio FIR
+        Dettaglio FIR  # noqa: E501
         """
         pass
 
     def test_numero_fir_hash_post(self) -> None:
         """Test case for numero_fir_hash_post
 
-        🔁[ASYNC] Calcolo del codice hash da firmare
+        🔁[ASYNC] Calcolo del codice hash da firmare  # noqa: E501
         """
         pass
 
     def test_numero_fir_pdf_get(self) -> None:
         """Test case for numero_fir_pdf_get
 
-        Stampa PDF del FIR
+        Stampa PDF del FIR  # noqa: E501
         """
         pass
 
     def test_numero_fir_put(self) -> None:
         """Test case for numero_fir_put
 
-        🔁[ASYNC] Modifica FIR
+        🔁[ASYNC] Modifica FIR  # noqa: E501
         """
         pass
 
     def test_numero_fir_quantita_post(self) -> None:
         """Test case for numero_fir_quantita_post
 
-        🔁[ASYNC] Imposta quantità
+        🔁[ASYNC] Imposta quantità  # noqa: E501
         """
         pass
 
     def test_numero_fir_reset_post(self) -> None:
         """Test case for numero_fir_reset_post
 
-        🔁[ASYNC] Reset stato
+        🔁[ASYNC] Reset stato  # noqa: E501
         """
         pass
 
     def test_numero_fir_respingi_post(self) -> None:
         """Test case for numero_fir_respingi_post
 
-        ⚠️[DEPRECATO] - utilizzare /{numeroFIR}/rilascio-visibilita/{numIscrSito} - Rilascio visibilità FIR
+        ⚠️[DEPRECATO] - utilizzare /{numeroFIR}/rilascio-visibilita/{numIscrSito} - Rilascio visibilità FIR  # noqa: E501
         """
         pass
 
     def test_numero_fir_rilascio_visibilita_num_iscr_sito_post(self) -> None:
         """Test case for numero_fir_rilascio_visibilita_num_iscr_sito_post
 
-        Rilascio visibilità FIR
+        Rilascio visibilità FIR  # noqa: E501
         """
         pass
 
     def test_numero_fir_sosta_tecnica_post(self) -> None:
         """Test case for numero_fir_sosta_tecnica_post
 
-        🔁[ASYNC] Aggiunge sosta tecnica
+        🔁[ASYNC] Aggiunge sosta tecnica  # noqa: E501
         """
         pass
 
     def test_numero_fir_stato_get(self) -> None:
         """Test case for numero_fir_stato_get
 
-        Stato FIR
+        Stato FIR  # noqa: E501
         """
         pass
 
     def test_numero_fir_tipo_trasporto_get(self) -> None:
         """Test case for numero_fir_tipo_trasporto_get
 
-        Tipo trasporto FIR
+        Tipo trasporto FIR  # noqa: E501
         """
         pass
 
     def test_numero_fir_trasbordo_parziale_post(self) -> None:
         """Test case for numero_fir_trasbordo_parziale_post
 
-        🔁[ASYNC] Aggiunge trasbordo praziale
+        🔁[ASYNC] Aggiunge trasbordo praziale  # noqa: E501
         """
         pass
 
     def test_numero_fir_trasbordo_totale_post(self) -> None:
         """Test case for numero_fir_trasbordo_totale_post
 
-        🔁[ASYNC] Aggiunge trasbordo totale
+        🔁[ASYNC] Aggiunge trasbordo totale  # noqa: E501
         """
         pass
 
     def test_numero_fir_trasporto_post(self) -> None:
         """Test case for numero_fir_trasporto_post
 
-        🔁[ASYNC] Aggiunge dati trasporto
+        🔁[ASYNC] Aggiunge dati trasporto  # noqa: E501
         """
         pass
 
     def test_numero_fir_xfir_get(self) -> None:
         """Test case for numero_fir_xfir_get
 
-        Download xFIR
+        Download xFIR  # noqa: E501
         """
         pass
 
     def test_root_get(self) -> None:
         """Test case for root_get
 
-        Elenco formulari
+        Elenco formulari  # noqa: E501
         """
         pass
 
     def test_root_post(self) -> None:
         """Test case for root_post
 
-        🔁[ASYNC] Crea FIR
+        🔁[ASYNC] Crea FIR  # noqa: E501
         """
         pass
 
     def test_xfir_valida_post(self) -> None:
         """Test case for xfir_valida_post
 
-        🔁[ASYNC] Validazione xFIR
+        🔁[ASYNC] Validazione xFIR  # noqa: E501
         """
         pass
 

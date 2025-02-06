@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.nuovo_formulario_model import NuovoFormularioModel
+from rentri_formulari.models.nuovo_formulario_model import NuovoFormularioModel  # noqa: E501
 
 class TestNuovoFormularioModel(unittest.TestCase):
     """NuovoFormularioModel unit test stubs"""
@@ -28,17 +29,17 @@ class TestNuovoFormularioModel(unittest.TestCase):
 
     def make_instance(self, include_optional) -> NuovoFormularioModel:
         """Test NuovoFormularioModel
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `NuovoFormularioModel`
         """
-        model = NuovoFormularioModel()
+        model = NuovoFormularioModel()  # noqa: E501
         if include_optional:
             return NuovoFormularioModel(
                 num_iscr_sito = 'OP0480ZGC880015-CM02170',
                 dati_partenza = rentri_formulari.models.dati_partenza_model.DatiPartenzaModel(
-                    numero_fir = 'WPQZYQ ) ._),,#_**&,\"%\"* - *- !\'# 1757701929816286488291663/.$\'\"&(_#+% #\"&%-/*- )!./ !),+#/)B', 
+                    numero_fir = 'WPQZYQ ) ._),,#_**&,\"%\"* - *- !'# 1757701929816286488291663/.$'\"&(_#+% #\"&%-/*- )!./ !),+#/)B', 
                     produttore = null, 
                     destinatario = null, 
                     trasportatori = [
@@ -60,7 +61,7 @@ class TestNuovoFormularioModel(unittest.TestCase):
             return NuovoFormularioModel(
                 num_iscr_sito = 'OP0480ZGC880015-CM02170',
                 dati_partenza = rentri_formulari.models.dati_partenza_model.DatiPartenzaModel(
-                    numero_fir = 'WPQZYQ ) ._),,#_**&,\"%\"* - *- !\'# 1757701929816286488291663/.$\'\"&(_#+% #\"&%-/*- )!./ !),+#/)B', 
+                    numero_fir = 'WPQZYQ ) ._),,#_**&,\"%\"* - *- !'# 1757701929816286488291663/.$'\"&(_#+% #\"&%-/*- )!./ !),+#/)B', 
                     produttore = null, 
                     destinatario = null, 
                     trasportatori = [

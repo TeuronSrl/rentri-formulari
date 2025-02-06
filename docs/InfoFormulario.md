@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **versione** | **int** |  | [optional] 
@@ -18,7 +17,7 @@ json = "{}"
 # create an instance of InfoFormulario from a JSON string
 info_formulario_instance = InfoFormulario.from_json(json)
 # print the JSON string representation of the object
-print(InfoFormulario.to_json())
+print InfoFormulario.to_json()
 
 # convert the object into a dict
 info_formulario_dict = info_formulario_instance.to_dict()

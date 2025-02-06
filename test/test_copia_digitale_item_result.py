@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.copia_digitale_item_result import CopiaDigitaleItemResult
+from rentri_formulari.models.copia_digitale_item_result import CopiaDigitaleItemResult  # noqa: E501
 
 class TestCopiaDigitaleItemResult(unittest.TestCase):
     """CopiaDigitaleItemResult unit test stubs"""
@@ -28,12 +29,12 @@ class TestCopiaDigitaleItemResult(unittest.TestCase):
 
     def make_instance(self, include_optional) -> CopiaDigitaleItemResult:
         """Test CopiaDigitaleItemResult
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `CopiaDigitaleItemResult`
         """
-        model = CopiaDigitaleItemResult()
+        model = CopiaDigitaleItemResult()  # noqa: E501
         if include_optional:
             return CopiaDigitaleItemResult(
                 identificativo = '',

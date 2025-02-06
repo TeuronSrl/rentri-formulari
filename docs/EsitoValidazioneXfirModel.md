@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **esito** | [**EsitoValidaXfirModel**](EsitoValidaXfirModel.md) | Esito | [optional] 
@@ -21,7 +20,7 @@ json = "{}"
 # create an instance of EsitoValidazioneXfirModel from a JSON string
 esito_validazione_xfir_model_instance = EsitoValidazioneXfirModel.from_json(json)
 # print the JSON string representation of the object
-print(EsitoValidazioneXfirModel.to_json())
+print EsitoValidazioneXfirModel.to_json()
 
 # convert the object into a dict
 esito_validazione_xfir_model_dict = esito_validazione_xfir_model_instance.to_dict()

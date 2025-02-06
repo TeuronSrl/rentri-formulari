@@ -3,7 +3,6 @@
 Dati destinatario
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **autorizzazione** | [**AutorizzazioneModel**](AutorizzazioneModel.md) | Autorizzazione.  Il valore è sempre necessario tranne quando l&#39;unità locale del destinatario coincide con quella del produttore ed il rifiuto è stato prodotto fuori dall&#39;unità locale. | [optional] 
@@ -20,7 +19,7 @@ json = "{}"
 # create an instance of DatiDestinatarioFormularioBaseModel from a JSON string
 dati_destinatario_formulario_base_model_instance = DatiDestinatarioFormularioBaseModel.from_json(json)
 # print the JSON string representation of the object
-print(DatiDestinatarioFormularioBaseModel.to_json())
+print DatiDestinatarioFormularioBaseModel.to_json()
 
 # convert the object into a dict
 dati_destinatario_formulario_base_model_dict = dati_destinatario_formulario_base_model_instance.to_dict()

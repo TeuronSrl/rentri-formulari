@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.firma_model import FirmaModel
+from rentri_formulari.models.firma_model import FirmaModel  # noqa: E501
 
 class TestFirmaModel(unittest.TestCase):
     """FirmaModel unit test stubs"""
@@ -28,12 +29,12 @@ class TestFirmaModel(unittest.TestCase):
 
     def make_instance(self, include_optional) -> FirmaModel:
         """Test FirmaModel
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `FirmaModel`
         """
-        model = FirmaModel()
+        model = FirmaModel()  # noqa: E501
         if include_optional:
             return FirmaModel(
                 certificato = '0',

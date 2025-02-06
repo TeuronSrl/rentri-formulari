@@ -3,7 +3,6 @@
 Dati produttore
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **luogo_produzione** | [**IndirizzoModel**](IndirizzoModel.md) | Luogo di produzione se diverso da indirizzo | [optional] 
@@ -21,7 +20,7 @@ json = "{}"
 # create an instance of DatiProduttoreFormularioBaseModel from a JSON string
 dati_produttore_formulario_base_model_instance = DatiProduttoreFormularioBaseModel.from_json(json)
 # print the JSON string representation of the object
-print(DatiProduttoreFormularioBaseModel.to_json())
+print DatiProduttoreFormularioBaseModel.to_json()
 
 # convert the object into a dict
 dati_produttore_formulario_base_model_dict = dati_produttore_formulario_base_model_instance.to_dict()

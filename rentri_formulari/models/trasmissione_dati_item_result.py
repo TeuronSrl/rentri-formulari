@@ -19,18 +19,16 @@ import re  # noqa: F401
 import json
 
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict, Field, StrictFloat, StrictInt, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional, Union
+from typing import Optional, Union
+from pydantic import BaseModel, Field, StrictFloat, StrictInt, StrictStr
 from rentri_formulari.models.stati_trasmissione_dati import StatiTrasmissioneDati
 from rentri_formulari.models.tipo_trasmissione import TipoTrasmissione
 from rentri_formulari.models.unita_misura import UnitaMisura
-from typing import Optional, Set
-from typing_extensions import Self
 
 class TrasmissioneDatiItemResult(BaseModel):
     """
     TrasmissioneDatiItemResult
-    """ # noqa: E501
+    """
     identificativo: Optional[StrictStr] = None
     numero_fir: Optional[StrictStr] = None
     user_name: Optional[StrictStr] = None
@@ -41,99 +39,84 @@ class TrasmissioneDatiItemResult(BaseModel):
     rifiuto_unita_misura: Optional[UnitaMisura] = Field(default=None, description="<p>Valori ammessi:<ul style=\"margin:0\"><li><i>kg</i> - Chilogrammi</li><li><i>l</i> - Litri</li></ul></p>")
     tipo: Optional[TipoTrasmissione] = None
     stato: Optional[StatiTrasmissioneDati] = None
-    __properties: ClassVar[List[str]] = ["identificativo", "numero_fir", "user_name", "data_trasmissione", "data_emissione", "codice_eer", "rifiuto_quantita", "rifiuto_unita_misura", "tipo", "stato"]
+    __properties = ["identificativo", "numero_fir", "user_name", "data_trasmissione", "data_emissione", "codice_eer", "rifiuto_quantita", "rifiuto_unita_misura", "tipo", "stato"]
 
-    model_config = ConfigDict(
-        populate_by_name=True,
-        validate_assignment=True,
-        protected_namespaces=(),
-    )
-
+    class Config:
+        """Pydantic configuration"""
+        allow_population_by_field_name = True
+        validate_assignment = True
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""
-        return pprint.pformat(self.model_dump(by_alias=True))
+        return pprint.pformat(self.dict(by_alias=True))
 
     def to_json(self) -> str:
         """Returns the JSON representation of the model using alias"""
-        # TODO: pydantic v2: use .model_dump_json(by_alias=True, exclude_unset=True) instead
         return json.dumps(self.to_dict())
 
     @classmethod
-    def from_json(cls, json_str: str) -> Optional[Self]:
+    def from_json(cls, json_str: str) -> TrasmissioneDatiItemResult:
         """Create an instance of TrasmissioneDatiItemResult from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
-    def to_dict(self) -> Dict[str, Any]:
-        """Return the dictionary representation of the model using alias.
-
-        This has the following differences from calling pydantic's
-        `self.model_dump(by_alias=True)`:
-
-        * `None` is only added to the output dict for nullable fields that
-          were set at model initialization. Other fields with value `None`
-          are ignored.
-        """
-        excluded_fields: Set[str] = set([
-        ])
-
-        _dict = self.model_dump(
-            by_alias=True,
-            exclude=excluded_fields,
-            exclude_none=True,
-        )
+    def to_dict(self):
+        """Returns the dictionary representation of the model using alias"""
+        _dict = self.dict(by_alias=True,
+                          exclude={
+                          },
+                          exclude_none=True)
         # set to None if identificativo (nullable) is None
-        # and model_fields_set contains the field
-        if self.identificativo is None and "identificativo" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.identificativo is None and "identificativo" in self.__fields_set__:
             _dict['identificativo'] = None
 
         # set to None if numero_fir (nullable) is None
-        # and model_fields_set contains the field
-        if self.numero_fir is None and "numero_fir" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.numero_fir is None and "numero_fir" in self.__fields_set__:
             _dict['numero_fir'] = None
 
         # set to None if user_name (nullable) is None
-        # and model_fields_set contains the field
-        if self.user_name is None and "user_name" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.user_name is None and "user_name" in self.__fields_set__:
             _dict['user_name'] = None
 
         # set to None if data_trasmissione (nullable) is None
-        # and model_fields_set contains the field
-        if self.data_trasmissione is None and "data_trasmissione" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.data_trasmissione is None and "data_trasmissione" in self.__fields_set__:
             _dict['data_trasmissione'] = None
 
         # set to None if data_emissione (nullable) is None
-        # and model_fields_set contains the field
-        if self.data_emissione is None and "data_emissione" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.data_emissione is None and "data_emissione" in self.__fields_set__:
             _dict['data_emissione'] = None
 
         # set to None if codice_eer (nullable) is None
-        # and model_fields_set contains the field
-        if self.codice_eer is None and "codice_eer" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.codice_eer is None and "codice_eer" in self.__fields_set__:
             _dict['codice_eer'] = None
 
         # set to None if rifiuto_quantita (nullable) is None
-        # and model_fields_set contains the field
-        if self.rifiuto_quantita is None and "rifiuto_quantita" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.rifiuto_quantita is None and "rifiuto_quantita" in self.__fields_set__:
             _dict['rifiuto_quantita'] = None
 
         # set to None if rifiuto_unita_misura (nullable) is None
-        # and model_fields_set contains the field
-        if self.rifiuto_unita_misura is None and "rifiuto_unita_misura" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.rifiuto_unita_misura is None and "rifiuto_unita_misura" in self.__fields_set__:
             _dict['rifiuto_unita_misura'] = None
 
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
+    def from_dict(cls, obj: dict) -> TrasmissioneDatiItemResult:
         """Create an instance of TrasmissioneDatiItemResult from a dict"""
         if obj is None:
             return None
 
         if not isinstance(obj, dict):
-            return cls.model_validate(obj)
+            return TrasmissioneDatiItemResult.parse_obj(obj)
 
-        _obj = cls.model_validate({
+        _obj = TrasmissioneDatiItemResult.parse_obj({
             "identificativo": obj.get("identificativo"),
             "numero_fir": obj.get("numero_fir"),
             "user_name": obj.get("user_name"),

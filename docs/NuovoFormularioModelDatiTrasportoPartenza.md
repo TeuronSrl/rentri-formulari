@@ -3,7 +3,6 @@
 Dati del trasporto iniziale
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **conducente** | [**ConducenteModel**](ConducenteModel.md) | Conducente | 
@@ -28,7 +27,7 @@ json = "{}"
 # create an instance of NuovoFormularioModelDatiTrasportoPartenza from a JSON string
 nuovo_formulario_model_dati_trasporto_partenza_instance = NuovoFormularioModelDatiTrasportoPartenza.from_json(json)
 # print the JSON string representation of the object
-print(NuovoFormularioModelDatiTrasportoPartenza.to_json())
+print NuovoFormularioModelDatiTrasportoPartenza.to_json()
 
 # convert the object into a dict
 nuovo_formulario_model_dati_trasporto_partenza_dict = nuovo_formulario_model_dati_trasporto_partenza_instance.to_dict()

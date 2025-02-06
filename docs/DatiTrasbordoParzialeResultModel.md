@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **trasportatore** | [**DatiTrasportatoreModel**](DatiTrasportatoreModel.md) |  | 
@@ -23,7 +22,7 @@ json = "{}"
 # create an instance of DatiTrasbordoParzialeResultModel from a JSON string
 dati_trasbordo_parziale_result_model_instance = DatiTrasbordoParzialeResultModel.from_json(json)
 # print the JSON string representation of the object
-print(DatiTrasbordoParzialeResultModel.to_json())
+print DatiTrasbordoParzialeResultModel.to_json()
 
 # convert the object into a dict
 dati_trasbordo_parziale_result_model_dict = dati_trasbordo_parziale_result_model_instance.to_dict()

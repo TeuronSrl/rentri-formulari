@@ -3,7 +3,6 @@
 Dati accettazione
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **tipo_accettazione** | [**TipiAccettazione**](TipiAccettazione.md) | Tipo accettazione&lt;p&gt;Valori ammessi:&lt;ul style&#x3D;\&quot;margin:0\&quot;&gt;&lt;li&gt;&lt;i&gt;A&lt;/i&gt; - Accettato per intero&lt;/li&gt;&lt;li&gt;&lt;i&gt;P&lt;/i&gt; - Accettato parzialmente&lt;/li&gt;&lt;li&gt;&lt;i&gt;R&lt;/i&gt; - Respinto&lt;/li&gt;&lt;/ul&gt;&lt;/p&gt; | 
@@ -23,7 +22,7 @@ json = "{}"
 # create an instance of DatiAccettazioneModel from a JSON string
 dati_accettazione_model_instance = DatiAccettazioneModel.from_json(json)
 # print the JSON string representation of the object
-print(DatiAccettazioneModel.to_json())
+print DatiAccettazioneModel.to_json()
 
 # convert the object into a dict
 dati_accettazione_model_dict = dati_accettazione_model_instance.to_dict()

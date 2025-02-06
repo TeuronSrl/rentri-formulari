@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **numero_fir** | **str** |  | 
@@ -25,7 +24,7 @@ json = "{}"
 # create an instance of DatiTrasmissionePartenzaModel from a JSON string
 dati_trasmissione_partenza_model_instance = DatiTrasmissionePartenzaModel.from_json(json)
 # print the JSON string representation of the object
-print(DatiTrasmissionePartenzaModel.to_json())
+print DatiTrasmissionePartenzaModel.to_json()
 
 # convert the object into a dict
 dati_trasmissione_partenza_model_dict = dati_trasmissione_partenza_model_instance.to_dict()

@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **num_iscr_sito** | **str** |  | 
@@ -19,7 +18,7 @@ json = "{}"
 # create an instance of CopiaDigitaleModel from a JSON string
 copia_digitale_model_instance = CopiaDigitaleModel.from_json(json)
 # print the JSON string representation of the object
-print(CopiaDigitaleModel.to_json())
+print CopiaDigitaleModel.to_json()
 
 # convert the object into a dict
 copia_digitale_model_dict = copia_digitale_model_instance.to_dict()

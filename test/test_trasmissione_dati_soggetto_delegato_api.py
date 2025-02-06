@@ -15,7 +15,7 @@
 
 import unittest
 
-from rentri_formulari.api.trasmissione_dati_soggetto_delegato_api import TrasmissioneDatiSoggettoDelegatoApi
+from rentri_formulari.api.trasmissione_dati_soggetto_delegato_api import TrasmissioneDatiSoggettoDelegatoApi  # noqa: E501
 
 
 class TestTrasmissioneDatiSoggettoDelegatoApi(unittest.TestCase):
@@ -25,40 +25,40 @@ class TestTrasmissioneDatiSoggettoDelegatoApi(unittest.TestCase):
         self.api = TrasmissioneDatiSoggettoDelegatoApi()
 
     def tearDown(self) -> None:
-        pass
+        self.api.api_client.close()
 
     def test_trasmissioni_soggetto_delegato_num_iscr_sito_get(self) -> None:
         """Test case for trasmissioni_soggetto_delegato_num_iscr_sito_get
 
-        Trasmissioni effettuate
+        Trasmissioni effettuate  # noqa: E501
         """
         pass
 
     def test_trasmissioni_soggetto_delegato_num_iscr_sito_identificativo_annulla_delete(self) -> None:
         """Test case for trasmissioni_soggetto_delegato_num_iscr_sito_identificativo_annulla_delete
 
-        Annulla trasmissione di dati del FIR digitale
+        Annulla trasmissione di dati del FIR digitale  # noqa: E501
         """
         pass
 
     def test_trasmissioni_soggetto_delegato_num_iscr_sito_identificativo_get(self) -> None:
         """Test case for trasmissioni_soggetto_delegato_num_iscr_sito_identificativo_get
 
-        Dettaglio trasmissione
+        Dettaglio trasmissione  # noqa: E501
         """
         pass
 
     def test_trasmissioni_soggetto_delegato_num_iscr_sito_numero_fir_estrai_post(self) -> None:
         """Test case for trasmissioni_soggetto_delegato_num_iscr_sito_numero_fir_estrai_post
 
-        🔁[ASYNC] Estrazione dati per FIR digitale
+        🔁[ASYNC] Estrazione dati per FIR digitale  # noqa: E501
         """
         pass
 
     def test_trasmissioni_soggetto_delegato_num_iscr_sito_post(self) -> None:
         """Test case for trasmissioni_soggetto_delegato_num_iscr_sito_post
 
-        Trasmette i dati del FIR digitale
+        Trasmette i dati del FIR digitale  # noqa: E501
         """
         pass
 

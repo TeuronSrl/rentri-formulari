@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **codice_fiscale** | **str** | Codice fiscale del soggetto a cui viene resa disponibile la copia del FIR cartaceo | [optional] 
@@ -20,7 +19,7 @@ json = "{}"
 # create an instance of CopiaCartaceaRuoloResult from a JSON string
 copia_cartacea_ruolo_result_instance = CopiaCartaceaRuoloResult.from_json(json)
 # print the JSON string representation of the object
-print(CopiaCartaceaRuoloResult.to_json())
+print CopiaCartaceaRuoloResult.to_json()
 
 # convert the object into a dict
 copia_cartacea_ruolo_result_dict = copia_cartacea_ruolo_result_instance.to_dict()

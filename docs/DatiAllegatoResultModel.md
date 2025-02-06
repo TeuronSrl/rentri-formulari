@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **dati_firma** | [**DatiFirmaResult**](DatiFirmaResult.md) |  | [optional] 
@@ -22,7 +21,7 @@ json = "{}"
 # create an instance of DatiAllegatoResultModel from a JSON string
 dati_allegato_result_model_instance = DatiAllegatoResultModel.from_json(json)
 # print the JSON string representation of the object
-print(DatiAllegatoResultModel.to_json())
+print DatiAllegatoResultModel.to_json()
 
 # convert the object into a dict
 dati_allegato_result_model_dict = dati_allegato_result_model_instance.to_dict()

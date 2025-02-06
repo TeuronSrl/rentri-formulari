@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.trasportatore_item_result import TrasportatoreItemResult
+from rentri_formulari.models.trasportatore_item_result import TrasportatoreItemResult  # noqa: E501
 
 class TestTrasportatoreItemResult(unittest.TestCase):
     """TrasportatoreItemResult unit test stubs"""
@@ -28,12 +29,12 @@ class TestTrasportatoreItemResult(unittest.TestCase):
 
     def make_instance(self, include_optional) -> TrasportatoreItemResult:
         """Test TrasportatoreItemResult
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `TrasportatoreItemResult`
         """
-        model = TrasportatoreItemResult()
+        model = TrasportatoreItemResult()  # noqa: E501
         if include_optional:
             return TrasportatoreItemResult(
                 num_iscr_sito = '',

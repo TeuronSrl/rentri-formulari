@@ -18,173 +18,154 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional
+
+from typing import List, Optional
+from pydantic import BaseModel, Field, StrictBool, StrictStr, conlist
 from rentri_formulari.models.controllo_firme_result import ControlloFirmeResult
 from rentri_formulari.models.controllo_formato_result import ControlloFormatoResult
 from rentri_formulari.models.controllo_schema_result import ControlloSchemaResult
 from rentri_formulari.models.controllo_vidimazione_result import ControlloVidimazioneResult
 from rentri_formulari.models.dettaglio_formulario import DettaglioFormulario
-from typing import Optional, Set
-from typing_extensions import Self
 
 class ValidazioneXfirResult(BaseModel):
     """
     ValidazioneXfirResult
-    """ # noqa: E501
+    """
     formulario: Optional[DettaglioFormulario] = None
     numero_fir: Optional[StrictStr] = None
     formulario_presente_in_rentri: Optional[StrictBool] = None
     formulario_aggiornato_in_rentri: Optional[StrictBool] = None
-    formato: Optional[List[ControlloFormatoResult]] = None
-    var_schema: Optional[List[ControlloSchemaResult]] = Field(default=None, alias="schema")
-    firme: Optional[List[ControlloFirmeResult]] = None
-    vidimazione: Optional[List[ControlloVidimazioneResult]] = None
+    formato: Optional[conlist(ControlloFormatoResult)] = None
+    var_schema: Optional[conlist(ControlloSchemaResult)] = Field(default=None, alias="schema")
+    firme: Optional[conlist(ControlloFirmeResult)] = None
+    vidimazione: Optional[conlist(ControlloVidimazioneResult)] = None
     codice_fiscale_soggetto: Optional[StrictStr] = None
     valido: Optional[StrictBool] = None
-    __properties: ClassVar[List[str]] = ["formulario", "numero_fir", "formulario_presente_in_rentri", "formulario_aggiornato_in_rentri", "formato", "schema", "firme", "vidimazione", "codice_fiscale_soggetto", "valido"]
+    __properties = ["formulario", "numero_fir", "formulario_presente_in_rentri", "formulario_aggiornato_in_rentri", "formato", "schema", "firme", "vidimazione", "codice_fiscale_soggetto", "valido"]
 
-    model_config = ConfigDict(
-        populate_by_name=True,
-        validate_assignment=True,
-        protected_namespaces=(),
-    )
-
+    class Config:
+        """Pydantic configuration"""
+        allow_population_by_field_name = True
+        validate_assignment = True
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""
-        return pprint.pformat(self.model_dump(by_alias=True))
+        return pprint.pformat(self.dict(by_alias=True))
 
     def to_json(self) -> str:
         """Returns the JSON representation of the model using alias"""
-        # TODO: pydantic v2: use .model_dump_json(by_alias=True, exclude_unset=True) instead
         return json.dumps(self.to_dict())
 
     @classmethod
-    def from_json(cls, json_str: str) -> Optional[Self]:
+    def from_json(cls, json_str: str) -> ValidazioneXfirResult:
         """Create an instance of ValidazioneXfirResult from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
-    def to_dict(self) -> Dict[str, Any]:
-        """Return the dictionary representation of the model using alias.
-
-        This has the following differences from calling pydantic's
-        `self.model_dump(by_alias=True)`:
-
-        * `None` is only added to the output dict for nullable fields that
-          were set at model initialization. Other fields with value `None`
-          are ignored.
-        * OpenAPI `readOnly` fields are excluded.
-        * OpenAPI `readOnly` fields are excluded.
-        * OpenAPI `readOnly` fields are excluded.
-        """
-        excluded_fields: Set[str] = set([
-            "numero_fir",
-            "codice_fiscale_soggetto",
-            "valido",
-        ])
-
-        _dict = self.model_dump(
-            by_alias=True,
-            exclude=excluded_fields,
-            exclude_none=True,
-        )
+    def to_dict(self):
+        """Returns the dictionary representation of the model using alias"""
+        _dict = self.dict(by_alias=True,
+                          exclude={
+                            "numero_fir",
+                            "codice_fiscale_soggetto",
+                            "valido",
+                          },
+                          exclude_none=True)
         # override the default output from pydantic by calling `to_dict()` of formulario
         if self.formulario:
             _dict['formulario'] = self.formulario.to_dict()
         # override the default output from pydantic by calling `to_dict()` of each item in formato (list)
         _items = []
         if self.formato:
-            for _item_formato in self.formato:
-                if _item_formato:
-                    _items.append(_item_formato.to_dict())
+            for _item in self.formato:
+                if _item:
+                    _items.append(_item.to_dict())
             _dict['formato'] = _items
         # override the default output from pydantic by calling `to_dict()` of each item in var_schema (list)
         _items = []
         if self.var_schema:
-            for _item_var_schema in self.var_schema:
-                if _item_var_schema:
-                    _items.append(_item_var_schema.to_dict())
+            for _item in self.var_schema:
+                if _item:
+                    _items.append(_item.to_dict())
             _dict['schema'] = _items
         # override the default output from pydantic by calling `to_dict()` of each item in firme (list)
         _items = []
         if self.firme:
-            for _item_firme in self.firme:
-                if _item_firme:
-                    _items.append(_item_firme.to_dict())
+            for _item in self.firme:
+                if _item:
+                    _items.append(_item.to_dict())
             _dict['firme'] = _items
         # override the default output from pydantic by calling `to_dict()` of each item in vidimazione (list)
         _items = []
         if self.vidimazione:
-            for _item_vidimazione in self.vidimazione:
-                if _item_vidimazione:
-                    _items.append(_item_vidimazione.to_dict())
+            for _item in self.vidimazione:
+                if _item:
+                    _items.append(_item.to_dict())
             _dict['vidimazione'] = _items
         # set to None if formulario (nullable) is None
-        # and model_fields_set contains the field
-        if self.formulario is None and "formulario" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.formulario is None and "formulario" in self.__fields_set__:
             _dict['formulario'] = None
 
         # set to None if numero_fir (nullable) is None
-        # and model_fields_set contains the field
-        if self.numero_fir is None and "numero_fir" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.numero_fir is None and "numero_fir" in self.__fields_set__:
             _dict['numero_fir'] = None
 
         # set to None if formulario_presente_in_rentri (nullable) is None
-        # and model_fields_set contains the field
-        if self.formulario_presente_in_rentri is None and "formulario_presente_in_rentri" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.formulario_presente_in_rentri is None and "formulario_presente_in_rentri" in self.__fields_set__:
             _dict['formulario_presente_in_rentri'] = None
 
         # set to None if formulario_aggiornato_in_rentri (nullable) is None
-        # and model_fields_set contains the field
-        if self.formulario_aggiornato_in_rentri is None and "formulario_aggiornato_in_rentri" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.formulario_aggiornato_in_rentri is None and "formulario_aggiornato_in_rentri" in self.__fields_set__:
             _dict['formulario_aggiornato_in_rentri'] = None
 
         # set to None if formato (nullable) is None
-        # and model_fields_set contains the field
-        if self.formato is None and "formato" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.formato is None and "formato" in self.__fields_set__:
             _dict['formato'] = None
 
         # set to None if var_schema (nullable) is None
-        # and model_fields_set contains the field
-        if self.var_schema is None and "var_schema" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.var_schema is None and "var_schema" in self.__fields_set__:
             _dict['schema'] = None
 
         # set to None if firme (nullable) is None
-        # and model_fields_set contains the field
-        if self.firme is None and "firme" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.firme is None and "firme" in self.__fields_set__:
             _dict['firme'] = None
 
         # set to None if vidimazione (nullable) is None
-        # and model_fields_set contains the field
-        if self.vidimazione is None and "vidimazione" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.vidimazione is None and "vidimazione" in self.__fields_set__:
             _dict['vidimazione'] = None
 
         # set to None if codice_fiscale_soggetto (nullable) is None
-        # and model_fields_set contains the field
-        if self.codice_fiscale_soggetto is None and "codice_fiscale_soggetto" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.codice_fiscale_soggetto is None and "codice_fiscale_soggetto" in self.__fields_set__:
             _dict['codice_fiscale_soggetto'] = None
 
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
+    def from_dict(cls, obj: dict) -> ValidazioneXfirResult:
         """Create an instance of ValidazioneXfirResult from a dict"""
         if obj is None:
             return None
 
         if not isinstance(obj, dict):
-            return cls.model_validate(obj)
+            return ValidazioneXfirResult.parse_obj(obj)
 
-        _obj = cls.model_validate({
-            "formulario": DettaglioFormulario.from_dict(obj["formulario"]) if obj.get("formulario") is not None else None,
+        _obj = ValidazioneXfirResult.parse_obj({
+            "formulario": DettaglioFormulario.from_dict(obj.get("formulario")) if obj.get("formulario") is not None else None,
             "numero_fir": obj.get("numero_fir"),
             "formulario_presente_in_rentri": obj.get("formulario_presente_in_rentri"),
             "formulario_aggiornato_in_rentri": obj.get("formulario_aggiornato_in_rentri"),
-            "formato": [ControlloFormatoResult.from_dict(_item) for _item in obj["formato"]] if obj.get("formato") is not None else None,
-            "schema": [ControlloSchemaResult.from_dict(_item) for _item in obj["schema"]] if obj.get("schema") is not None else None,
-            "firme": [ControlloFirmeResult.from_dict(_item) for _item in obj["firme"]] if obj.get("firme") is not None else None,
-            "vidimazione": [ControlloVidimazioneResult.from_dict(_item) for _item in obj["vidimazione"]] if obj.get("vidimazione") is not None else None,
+            "formato": [ControlloFormatoResult.from_dict(_item) for _item in obj.get("formato")] if obj.get("formato") is not None else None,
+            "var_schema": [ControlloSchemaResult.from_dict(_item) for _item in obj.get("schema")] if obj.get("schema") is not None else None,
+            "firme": [ControlloFirmeResult.from_dict(_item) for _item in obj.get("firme")] if obj.get("firme") is not None else None,
+            "vidimazione": [ControlloVidimazioneResult.from_dict(_item) for _item in obj.get("vidimazione")] if obj.get("vidimazione") is not None else None,
             "codice_fiscale_soggetto": obj.get("codice_fiscale_soggetto"),
             "valido": obj.get("valido")
         })

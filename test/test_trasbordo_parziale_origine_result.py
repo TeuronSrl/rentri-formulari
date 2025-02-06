@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.trasbordo_parziale_origine_result import TrasbordoParzialeOrigineResult
+from rentri_formulari.models.trasbordo_parziale_origine_result import TrasbordoParzialeOrigineResult  # noqa: E501
 
 class TestTrasbordoParzialeOrigineResult(unittest.TestCase):
     """TrasbordoParzialeOrigineResult unit test stubs"""
@@ -28,12 +29,12 @@ class TestTrasbordoParzialeOrigineResult(unittest.TestCase):
 
     def make_instance(self, include_optional) -> TrasbordoParzialeOrigineResult:
         """Test TrasbordoParzialeOrigineResult
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `TrasbordoParzialeOrigineResult`
         """
-        model = TrasbordoParzialeOrigineResult()
+        model = TrasbordoParzialeOrigineResult()  # noqa: E501
         if include_optional:
             return TrasbordoParzialeOrigineResult(
                 numero_fir_origine = '',

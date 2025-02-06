@@ -12,15 +12,20 @@
     Do not edit the class manually.
 """  # noqa: E501
 
-import warnings
-from pydantic import validate_call, Field, StrictFloat, StrictStr, StrictInt
-from typing import Any, Dict, List, Optional, Tuple, Union
-from typing_extensions import Annotated
 
-from datetime import datetime
-from pydantic import Field, StrictInt, StrictStr, field_validator
-from typing import Any, List, Optional
+import re  # noqa: F401
+import io
+import warnings
+
+from pydantic import validate_arguments, ValidationError
+
 from typing_extensions import Annotated
+from datetime import datetime
+
+from pydantic import Field, StrictStr, conint, conlist, constr, validator
+
+from typing import Any, List, Optional
+
 from rentri_formulari.models.azioni_result import AzioniResult
 from rentri_formulari.models.dati_accettazione_model import DatiAccettazioneModel
 from rentri_formulari.models.dati_allegato_model import DatiAllegatoModel
@@ -43,9 +48,12 @@ from rentri_formulari.models.tipo_trasporto_result import TipoTrasportoResult
 from rentri_formulari.models.transazione_model import TransazioneModel
 from rentri_formulari.models.valida_xfir_model import ValidaXfirModel
 
-from rentri_formulari.api_client import ApiClient, RequestSerialized
+from rentri_formulari.api_client import ApiClient
 from rentri_formulari.api_response import ApiResponse
-from rentri_formulari.rest import RESTResponseType
+from rentri_formulari.exceptions import (  # noqa: F401
+    ApiTypeError,
+    ApiValueError
+)
 
 
 class FormularioDigitaleApi:
@@ -60,35 +68,16 @@ class FormularioDigitaleApi:
             api_client = ApiClient.get_default()
         self.api_client = api_client
 
+    @validate_arguments
+    def count_get(self, num_iscr_sito : Annotated[StrictStr, Field(..., description="Numero iscrizione unità locale rilasciato all'iscrizione per il quale si richiedono i formulari")], numero_fir : Annotated[Optional[StrictStr], Field(description="Numero del FIR")] = None, data_creazione_da : Annotated[Optional[datetime], Field(description="Data di creazione a partire dalla quale si richiedono i formulari (formato ISO 8601 UTC)")] = None, data_creazione_a : Annotated[Optional[datetime], Field(description="Data massima di creazione per la quale si richiedono i formulari (formato ISO 8601 UTC)")] = None, data_emissione_da : Annotated[Optional[datetime], Field(description="Data di emissione a partire dalla quale si richiedono i formulari (formato ISO 8601 UTC)")] = None, data_emissione_a : Annotated[Optional[datetime], Field(description="Data massima di emissione entro la quale si richiedono i formulari (formato ISO 8601 UTC)")] = None, codice_eer : Annotated[Optional[constr(strict=True, max_length=8)], Field(description="Codice EER")] = None, tipo_ricerca : Optional[Any] = None, stati : Optional[conlist(StrictStr)] = None, **kwargs) -> int:  # noqa: E501
+        """Conteggio formulari  # noqa: E501
 
-    @validate_call
-    def count_get(
-        self,
-        num_iscr_sito: Annotated[StrictStr, Field(description="Numero iscrizione unità locale rilasciato all'iscrizione per il quale si richiedono i formulari")],
-        numero_fir: Annotated[Optional[StrictStr], Field(description="Numero del FIR")] = None,
-        data_creazione_da: Annotated[Optional[datetime], Field(description="Data di creazione a partire dalla quale si richiedono i formulari (formato ISO 8601 UTC)")] = None,
-        data_creazione_a: Annotated[Optional[datetime], Field(description="Data massima di creazione per la quale si richiedono i formulari (formato ISO 8601 UTC)")] = None,
-        data_emissione_da: Annotated[Optional[datetime], Field(description="Data di emissione a partire dalla quale si richiedono i formulari (formato ISO 8601 UTC)")] = None,
-        data_emissione_a: Annotated[Optional[datetime], Field(description="Data massima di emissione entro la quale si richiedono i formulari (formato ISO 8601 UTC)")] = None,
-        codice_eer: Annotated[Optional[Annotated[str, Field(strict=True, max_length=8)]], Field(description="Codice EER")] = None,
-        tipo_ricerca: Optional[Any] = None,
-        stati: Optional[List[StrictStr]] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> int:
-        """Conteggio formulari
+        Ottiene il conteggio dei formulari digitali con visibilità per l'unità locale indicata e con i filtri specificati.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-        Ottiene il conteggio dei formulari digitali con visibilità per l'unità locale indicata e con i filtri specificati.
+        >>> thread = api.count_get(num_iscr_sito, numero_fir, data_creazione_da, data_creazione_a, data_emissione_da, data_emissione_a, codice_eer, tipo_ricerca, stati, async_req=True)
+        >>> result = thread.get()
 
         :param num_iscr_sito: Numero iscrizione unità locale rilasciato all'iscrizione per il quale si richiedono i formulari (required)
         :type num_iscr_sito: str
@@ -108,90 +97,33 @@ class FormularioDigitaleApi:
         :type tipo_ricerca: TipoRicerca
         :param stati:
         :type stati: List[str]
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: int
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the count_get_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.count_get_with_http_info(num_iscr_sito, numero_fir, data_creazione_da, data_creazione_a, data_emissione_da, data_emissione_a, codice_eer, tipo_ricerca, stati, **kwargs)  # noqa: E501
 
-        _param = self._count_get_serialize(
-            num_iscr_sito=num_iscr_sito,
-            numero_fir=numero_fir,
-            data_creazione_da=data_creazione_da,
-            data_creazione_a=data_creazione_a,
-            data_emissione_da=data_emissione_da,
-            data_emissione_a=data_emissione_a,
-            codice_eer=codice_eer,
-            tipo_ricerca=tipo_ricerca,
-            stati=stati,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def count_get_with_http_info(self, num_iscr_sito : Annotated[StrictStr, Field(..., description="Numero iscrizione unità locale rilasciato all'iscrizione per il quale si richiedono i formulari")], numero_fir : Annotated[Optional[StrictStr], Field(description="Numero del FIR")] = None, data_creazione_da : Annotated[Optional[datetime], Field(description="Data di creazione a partire dalla quale si richiedono i formulari (formato ISO 8601 UTC)")] = None, data_creazione_a : Annotated[Optional[datetime], Field(description="Data massima di creazione per la quale si richiedono i formulari (formato ISO 8601 UTC)")] = None, data_emissione_da : Annotated[Optional[datetime], Field(description="Data di emissione a partire dalla quale si richiedono i formulari (formato ISO 8601 UTC)")] = None, data_emissione_a : Annotated[Optional[datetime], Field(description="Data massima di emissione entro la quale si richiedono i formulari (formato ISO 8601 UTC)")] = None, codice_eer : Annotated[Optional[constr(strict=True, max_length=8)], Field(description="Codice EER")] = None, tipo_ricerca : Optional[Any] = None, stati : Optional[conlist(StrictStr)] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        """Conteggio formulari  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "int",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Ottiene il conteggio dei formulari digitali con visibilità per l'unità locale indicata e con i filtri specificati.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def count_get_with_http_info(
-        self,
-        num_iscr_sito: Annotated[StrictStr, Field(description="Numero iscrizione unità locale rilasciato all'iscrizione per il quale si richiedono i formulari")],
-        numero_fir: Annotated[Optional[StrictStr], Field(description="Numero del FIR")] = None,
-        data_creazione_da: Annotated[Optional[datetime], Field(description="Data di creazione a partire dalla quale si richiedono i formulari (formato ISO 8601 UTC)")] = None,
-        data_creazione_a: Annotated[Optional[datetime], Field(description="Data massima di creazione per la quale si richiedono i formulari (formato ISO 8601 UTC)")] = None,
-        data_emissione_da: Annotated[Optional[datetime], Field(description="Data di emissione a partire dalla quale si richiedono i formulari (formato ISO 8601 UTC)")] = None,
-        data_emissione_a: Annotated[Optional[datetime], Field(description="Data massima di emissione entro la quale si richiedono i formulari (formato ISO 8601 UTC)")] = None,
-        codice_eer: Annotated[Optional[Annotated[str, Field(strict=True, max_length=8)]], Field(description="Codice EER")] = None,
-        tipo_ricerca: Optional[Any] = None,
-        stati: Optional[List[StrictStr]] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[int]:
-        """Conteggio formulari
-
-        Ottiene il conteggio dei formulari digitali con visibilità per l'unità locale indicata e con i filtri specificati.
+        >>> thread = api.count_get_with_http_info(num_iscr_sito, numero_fir, data_creazione_da, data_creazione_a, data_emissione_da, data_emissione_a, codice_eer, tipo_ricerca, stati, async_req=True)
+        >>> result = thread.get()
 
         :param num_iscr_sito: Numero iscrizione unità locale rilasciato all'iscrizione per il quale si richiedono i formulari (required)
         :type num_iscr_sito: str
@@ -211,327 +143,162 @@ class FormularioDigitaleApi:
         :type tipo_ricerca: TipoRicerca
         :param stati:
         :type stati: List[str]
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(int, status_code(int), headers(HTTPHeaderDict))
+        """
 
-        _param = self._count_get_serialize(
-            num_iscr_sito=num_iscr_sito,
-            numero_fir=numero_fir,
-            data_creazione_da=data_creazione_da,
-            data_creazione_a=data_creazione_a,
-            data_emissione_da=data_emissione_da,
-            data_emissione_a=data_emissione_a,
-            codice_eer=codice_eer,
-            tipo_ricerca=tipo_ricerca,
-            stati=stati,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
+        _params = locals()
+
+        _all_params = [
+            'num_iscr_sito',
+            'numero_fir',
+            'data_creazione_da',
+            'data_creazione_a',
+            'data_emissione_da',
+            'data_emissione_a',
+            'codice_eer',
+            'tipo_ricerca',
+            'stati'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
+            ]
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method count_get" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
+
+        _collection_formats = {}
+
+        # process the path parameters
+        _path_params = {}
+
+        # process the query parameters
+        _query_params = []
+        if _params.get('num_iscr_sito') is not None:  # noqa: E501
+            _query_params.append(('num_iscr_sito', _params['num_iscr_sito']))
+
+        if _params.get('numero_fir') is not None:  # noqa: E501
+            _query_params.append(('numero_fir', _params['numero_fir']))
+
+        if _params.get('data_creazione_da') is not None:  # noqa: E501
+            if isinstance(_params['data_creazione_da'], datetime):
+                _query_params.append(('data_creazione_da', _params['data_creazione_da'].strftime(self.api_client.configuration.datetime_format)))
+            else:
+                _query_params.append(('data_creazione_da', _params['data_creazione_da']))
+
+        if _params.get('data_creazione_a') is not None:  # noqa: E501
+            if isinstance(_params['data_creazione_a'], datetime):
+                _query_params.append(('data_creazione_a', _params['data_creazione_a'].strftime(self.api_client.configuration.datetime_format)))
+            else:
+                _query_params.append(('data_creazione_a', _params['data_creazione_a']))
+
+        if _params.get('data_emissione_da') is not None:  # noqa: E501
+            if isinstance(_params['data_emissione_da'], datetime):
+                _query_params.append(('data_emissione_da', _params['data_emissione_da'].strftime(self.api_client.configuration.datetime_format)))
+            else:
+                _query_params.append(('data_emissione_da', _params['data_emissione_da']))
+
+        if _params.get('data_emissione_a') is not None:  # noqa: E501
+            if isinstance(_params['data_emissione_a'], datetime):
+                _query_params.append(('data_emissione_a', _params['data_emissione_a'].strftime(self.api_client.configuration.datetime_format)))
+            else:
+                _query_params.append(('data_emissione_a', _params['data_emissione_a']))
+
+        if _params.get('codice_eer') is not None:  # noqa: E501
+            _query_params.append(('codice_eer', _params['codice_eer']))
+
+        if _params.get('tipo_ricerca') is not None:  # noqa: E501
+            _query_params.append(('tipo_ricerca', _params['tipo_ricerca'].value))
+
+        if _params.get('stati') is not None:  # noqa: E501
+            _query_params.append(('stati', _params['stati']))
+            _collection_formats['stati'] = 'multi'
+
+        # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
+        # process the form parameters
+        _form_params = []
+        _files = {}
+        # process the body parameter
+        _body_params = None
+        # set the HTTP header `Accept`
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
+
+        # authentication setting
+        _auth_settings = ['Bearer']  # noqa: E501
+
+        _response_types_map = {
             '200': "int",
             '403': None,
             '404': None,
             '429': None,
             '500': "ProblemDetails",
         }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
 
-
-    @validate_call
-    def count_get_without_preload_content(
-        self,
-        num_iscr_sito: Annotated[StrictStr, Field(description="Numero iscrizione unità locale rilasciato all'iscrizione per il quale si richiedono i formulari")],
-        numero_fir: Annotated[Optional[StrictStr], Field(description="Numero del FIR")] = None,
-        data_creazione_da: Annotated[Optional[datetime], Field(description="Data di creazione a partire dalla quale si richiedono i formulari (formato ISO 8601 UTC)")] = None,
-        data_creazione_a: Annotated[Optional[datetime], Field(description="Data massima di creazione per la quale si richiedono i formulari (formato ISO 8601 UTC)")] = None,
-        data_emissione_da: Annotated[Optional[datetime], Field(description="Data di emissione a partire dalla quale si richiedono i formulari (formato ISO 8601 UTC)")] = None,
-        data_emissione_a: Annotated[Optional[datetime], Field(description="Data massima di emissione entro la quale si richiedono i formulari (formato ISO 8601 UTC)")] = None,
-        codice_eer: Annotated[Optional[Annotated[str, Field(strict=True, max_length=8)]], Field(description="Codice EER")] = None,
-        tipo_ricerca: Optional[Any] = None,
-        stati: Optional[List[StrictStr]] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """Conteggio formulari
-
-        Ottiene il conteggio dei formulari digitali con visibilità per l'unità locale indicata e con i filtri specificati.
-
-        :param num_iscr_sito: Numero iscrizione unità locale rilasciato all'iscrizione per il quale si richiedono i formulari (required)
-        :type num_iscr_sito: str
-        :param numero_fir: Numero del FIR
-        :type numero_fir: str
-        :param data_creazione_da: Data di creazione a partire dalla quale si richiedono i formulari (formato ISO 8601 UTC)
-        :type data_creazione_da: datetime
-        :param data_creazione_a: Data massima di creazione per la quale si richiedono i formulari (formato ISO 8601 UTC)
-        :type data_creazione_a: datetime
-        :param data_emissione_da: Data di emissione a partire dalla quale si richiedono i formulari (formato ISO 8601 UTC)
-        :type data_emissione_da: datetime
-        :param data_emissione_a: Data massima di emissione entro la quale si richiedono i formulari (formato ISO 8601 UTC)
-        :type data_emissione_a: datetime
-        :param codice_eer: Codice EER
-        :type codice_eer: str
-        :param tipo_ricerca:
-        :type tipo_ricerca: TipoRicerca
-        :param stati:
-        :type stati: List[str]
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._count_get_serialize(
-            num_iscr_sito=num_iscr_sito,
-            numero_fir=numero_fir,
-            data_creazione_da=data_creazione_da,
-            data_creazione_a=data_creazione_a,
-            data_emissione_da=data_emissione_da,
-            data_emissione_a=data_emissione_a,
-            codice_eer=codice_eer,
-            tipo_ricerca=tipo_ricerca,
-            stati=stati,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
-
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "int",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
-
-
-    def _count_get_serialize(
-        self,
-        num_iscr_sito,
-        numero_fir,
-        data_creazione_da,
-        data_creazione_a,
-        data_emissione_da,
-        data_emissione_a,
-        codice_eer,
-        tipo_ricerca,
-        stati,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-            'stati': 'multi',
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
-
-        # process the path parameters
-        # process the query parameters
-        if num_iscr_sito is not None:
-            
-            _query_params.append(('num_iscr_sito', num_iscr_sito))
-            
-        if numero_fir is not None:
-            
-            _query_params.append(('numero_fir', numero_fir))
-            
-        if data_creazione_da is not None:
-            if isinstance(data_creazione_da, datetime):
-                _query_params.append(
-                    (
-                        'data_creazione_da',
-                        data_creazione_da.strftime(
-                            self.api_client.configuration.datetime_format
-                        )
-                    )
-                )
-            else:
-                _query_params.append(('data_creazione_da', data_creazione_da))
-            
-        if data_creazione_a is not None:
-            if isinstance(data_creazione_a, datetime):
-                _query_params.append(
-                    (
-                        'data_creazione_a',
-                        data_creazione_a.strftime(
-                            self.api_client.configuration.datetime_format
-                        )
-                    )
-                )
-            else:
-                _query_params.append(('data_creazione_a', data_creazione_a))
-            
-        if data_emissione_da is not None:
-            if isinstance(data_emissione_da, datetime):
-                _query_params.append(
-                    (
-                        'data_emissione_da',
-                        data_emissione_da.strftime(
-                            self.api_client.configuration.datetime_format
-                        )
-                    )
-                )
-            else:
-                _query_params.append(('data_emissione_da', data_emissione_da))
-            
-        if data_emissione_a is not None:
-            if isinstance(data_emissione_a, datetime):
-                _query_params.append(
-                    (
-                        'data_emissione_a',
-                        data_emissione_a.strftime(
-                            self.api_client.configuration.datetime_format
-                        )
-                    )
-                )
-            else:
-                _query_params.append(('data_emissione_a', data_emissione_a))
-            
-        if codice_eer is not None:
-            
-            _query_params.append(('codice_eer', codice_eer))
-            
-        if tipo_ricerca is not None:
-            
-            _query_params.append(('tipo_ricerca', tipo_ricerca.value))
-            
-        if stati is not None:
-            
-            _query_params.append(('stati', stati))
-            
-        # process the header parameters
-        # process the form parameters
-        # process the body parameter
-
-
-        # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
-
-
-        # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
-
-        return self.api_client.param_serialize(
-            method='GET',
-            resource_path='/count',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        return self.api_client.call_api(
+            '/count', 'GET',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def numero_fir_accettazione_post(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero FIR del formulario")], dati_accettazione_model : Annotated[DatiAccettazioneModel, Field(..., description="Dati di accettazione del rifiuto")], x_reply_to : Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None, **kwargs) -> TransazioneModel:  # noqa: E501
+        """🔁[ASYNC] Accettazione FIR  # noqa: E501
 
+        Acquisisce la richiesta di aggiunta dei dati di accettazione del rifiuto da parte del destinatario per il FIR specificato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_accettazione_post(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario")],
-        dati_accettazione_model: Annotated[DatiAccettazioneModel, Field(description="Dati di accettazione del rifiuto")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> TransazioneModel:
-        """🔁[ASYNC] Accettazione FIR
-
-        Acquisisce la richiesta di aggiunta dei dati di accettazione del rifiuto da parte del destinatario per il FIR specificato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.numero_fir_accettazione_post(numero_fir, dati_accettazione_model, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: Numero FIR del formulario (required)
         :type numero_fir: str
@@ -539,79 +306,33 @@ class FormularioDigitaleApi:
         :type dati_accettazione_model: DatiAccettazioneModel
         :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
         :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: TransazioneModel
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the numero_fir_accettazione_post_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.numero_fir_accettazione_post_with_http_info(numero_fir, dati_accettazione_model, x_reply_to, **kwargs)  # noqa: E501
 
-        _param = self._numero_fir_accettazione_post_serialize(
-            numero_fir=numero_fir,
-            dati_accettazione_model=dati_accettazione_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def numero_fir_accettazione_post_with_http_info(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero FIR del formulario")], dati_accettazione_model : Annotated[DatiAccettazioneModel, Field(..., description="Dati di accettazione del rifiuto")], x_reply_to : Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        """🔁[ASYNC] Accettazione FIR  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Acquisisce la richiesta di aggiunta dei dati di accettazione del rifiuto da parte del destinatario per il FIR specificato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_accettazione_post_with_http_info(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario")],
-        dati_accettazione_model: Annotated[DatiAccettazioneModel, Field(description="Dati di accettazione del rifiuto")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[TransazioneModel]:
-        """🔁[ASYNC] Accettazione FIR
-
-        Acquisisce la richiesta di aggiunta dei dati di accettazione del rifiuto da parte del destinatario per il FIR specificato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.numero_fir_accettazione_post_with_http_info(numero_fir, dati_accettazione_model, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: Numero FIR del formulario (required)
         :type numero_fir: str
@@ -619,239 +340,133 @@ class FormularioDigitaleApi:
         :type dati_accettazione_model: DatiAccettazioneModel
         :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
         :type x_reply_to: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(TransazioneModel, status_code(int), headers(HTTPHeaderDict))
+        """
 
-        _param = self._numero_fir_accettazione_post_serialize(
-            numero_fir=numero_fir,
-            dati_accettazione_model=dati_accettazione_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def numero_fir_accettazione_post_without_preload_content(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario")],
-        dati_accettazione_model: Annotated[DatiAccettazioneModel, Field(description="Dati di accettazione del rifiuto")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'numero_fir',
+            'dati_accettazione_model',
+            'x_reply_to'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """🔁[ASYNC] Accettazione FIR
-
-        Acquisisce la richiesta di aggiunta dei dati di accettazione del rifiuto da parte del destinatario per il FIR specificato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
-
-        :param numero_fir: Numero FIR del formulario (required)
-        :type numero_fir: str
-        :param dati_accettazione_model: Dati di accettazione del rifiuto (required)
-        :type dati_accettazione_model: DatiAccettazioneModel
-        :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
-        :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._numero_fir_accettazione_post_serialize(
-            numero_fir=numero_fir,
-            dati_accettazione_model=dati_accettazione_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method numero_fir_accettazione_post" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    def _numero_fir_accettazione_post_serialize(
-        self,
-        numero_fir,
-        dati_accettazione_model,
-        x_reply_to,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if numero_fir is not None:
-            _path_params['numero_fir'] = numero_fir
-        # process the query parameters
-        # process the header parameters
-        if x_reply_to is not None:
-            _header_params['X-ReplyTo'] = x_reply_to
-        # process the form parameters
-        # process the body parameter
-        if dati_accettazione_model is not None:
-            _body_params = dati_accettazione_model
+        _path_params = {}
+        if _params['numero_fir'] is not None:
+            _path_params['numero_fir'] = _params['numero_fir']
 
+
+        # process the query parameters
+        _query_params = []
+        # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
+        if _params['x_reply_to'] is not None:
+            _header_params['X-ReplyTo'] = _params['x_reply_to']
+
+        # process the form parameters
+        _form_params = []
+        _files = {}
+        # process the body parameter
+        _body_params = None
+        if _params['dati_accettazione_model'] is not None:
+            _body_params = _params['dati_accettazione_model']
 
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
 
         # set the HTTP header `Content-Type`
-        if _content_type:
-            _header_params['Content-Type'] = _content_type
-        else:
-            _default_content_type = (
-                self.api_client.select_header_content_type(
-                    [
-                        'application/json'
-                    ]
-                )
-            )
-            if _default_content_type is not None:
-                _header_params['Content-Type'] = _default_content_type
+        _content_types_list = _params.get('_content_type',
+            self.api_client.select_header_content_type(
+                ['application/json']))
+        if _content_types_list:
+                _header_params['Content-Type'] = _content_types_list
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='POST',
-            resource_path='/{numero_fir}/accettazione',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {
+            '202': "TransazioneModel",
+            '400': "ProblemDetails",
+            '403': None,
+            '404': None,
+            '429': None,
+            '500': "ProblemDetails",
+        }
+
+        return self.api_client.call_api(
+            '/{numero_fir}/accettazione', 'POST',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def numero_fir_acquisizione_firma_post(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero FIR del formulario a cui si aggiunge la firma")], firma_model : Annotated[FirmaModel, Field(..., description="Dati necessari per aggiungere la firma al formulario")], x_reply_to : Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None, **kwargs) -> TransazioneModel:  # noqa: E501
+        """🔁[ASYNC] Imposta dati firma  # noqa: E501
 
+        Acquisisce la richiesta di aggiunta dei dati per completare l'apposizione della firma digitale del soggetto indicato nel file xFIR.  Stati del formulario ammessi: <ul><li>FirmaProduttoreTrasportatoreIniziale</li><li>FirmaProduttore</li><li>FirmaTrasportatoreIniziale</li><li>FirmaTrasportatoreSuccessivo</li><li>FirmaAccettazione</li><li>FirmaAnnotazione</li><li>FirmaAllegato</li><li>FirmaAnnullamento</li><li>FirmaTrasbordoParziale</li><li>FirmaTrasbordoTotale</li><li>FirmaSostaTecnica</li><li>FirmaDestinatarioSuccessivo</li><li>FirmaAccettazioneSuccessiva</li></ul> Il valore della proprietà <i>Token</i> deve coincidere con il valore restituito dalla precedente invocazione all'endpoint <i>POST /{numero_fir}/hash</i> che ha determinato il passaggio allo stato corrente del formulario. L'operazione può essere eseguita da un'utenza che abbia visibilità su (o coincida con) il soggetto tra quelli indicati nel formulario coinvolto nell'operazione di firma.  L'art. 7 c.3 del D.M. 59/2023 prevede che il FIR sia sottoscritto da parte degli operatori coinvolti nelle diverse fasi del trasporto,  per cui se il certificato di firma è intestato ad una persona giuridica (cioè è un \"sigillo\") deve riferirsi al soggetto firmatario,  mentre se il certificato di firma è intestato ad una persona fisica, deve coincidere con il codice fiscale di un utente incaricato per il soggetto firmatario. Esclusivamente in ambiente DEMO, se il certificato firmatario non viene riconosciuto come valido secondo la regola qui descritta, il sistema produrrà un avviso non bloccante. In ambiente di produzione il controllo sarà bloccante.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_acquisizione_firma_post(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario a cui si aggiunge la firma")],
-        firma_model: Annotated[FirmaModel, Field(description="Dati necessari per aggiungere la firma al formulario")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> TransazioneModel:
-        """🔁[ASYNC] Imposta dati firma
-
-        Acquisisce la richiesta di aggiunta dei dati per completare l'apposizione della firma digitale del soggetto indicato nel file xFIR.  Stati del formulario ammessi: <ul><li>FirmaProduttoreTrasportatoreIniziale</li><li>FirmaProduttore</li><li>FirmaTrasportatoreIniziale</li><li>FirmaTrasportatoreSuccessivo</li><li>FirmaAccettazione</li><li>FirmaAnnotazione</li><li>FirmaAllegato</li><li>FirmaAnnullamento</li><li>FirmaTrasbordoParziale</li><li>FirmaTrasbordoTotale</li><li>FirmaSostaTecnica</li><li>FirmaDestinatarioSuccessivo</li><li>FirmaAccettazioneSuccessiva</li></ul> Il valore della proprietà <i>Token</i> deve coincidere con il valore restituito dalla precedente invocazione all'endpoint <i>POST /{numero_fir}/hash</i> che ha determinato il passaggio allo stato corrente del formulario. L'operazione può essere eseguita da un'utenza che abbia visibilità su (o coincida con) il soggetto tra quelli indicati nel formulario coinvolto nell'operazione di firma.  L'art. 7 c.3 del D.M. 59/2023 prevede che il FIR sia sottoscritto da parte degli operatori coinvolti nelle diverse fasi del trasporto,  per cui se il certificato di firma è intestato ad una persona giuridica (cioè è un \"sigillo\") deve riferirsi al soggetto firmatario,  mentre se il certificato di firma è intestato ad una persona fisica, deve coincidere con il codice fiscale di un utente incaricato per il soggetto firmatario. Esclusivamente in ambiente DEMO, se il certificato firmatario non viene riconosciuto come valido secondo la regola qui descritta, il sistema produrrà un avviso non bloccante. In ambiente di produzione il controllo sarà bloccante.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.numero_fir_acquisizione_firma_post(numero_fir, firma_model, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: Numero FIR del formulario a cui si aggiunge la firma (required)
         :type numero_fir: str
@@ -859,79 +474,33 @@ class FormularioDigitaleApi:
         :type firma_model: FirmaModel
         :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
         :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: TransazioneModel
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the numero_fir_acquisizione_firma_post_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.numero_fir_acquisizione_firma_post_with_http_info(numero_fir, firma_model, x_reply_to, **kwargs)  # noqa: E501
 
-        _param = self._numero_fir_acquisizione_firma_post_serialize(
-            numero_fir=numero_fir,
-            firma_model=firma_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def numero_fir_acquisizione_firma_post_with_http_info(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero FIR del formulario a cui si aggiunge la firma")], firma_model : Annotated[FirmaModel, Field(..., description="Dati necessari per aggiungere la firma al formulario")], x_reply_to : Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        """🔁[ASYNC] Imposta dati firma  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Acquisisce la richiesta di aggiunta dei dati per completare l'apposizione della firma digitale del soggetto indicato nel file xFIR.  Stati del formulario ammessi: <ul><li>FirmaProduttoreTrasportatoreIniziale</li><li>FirmaProduttore</li><li>FirmaTrasportatoreIniziale</li><li>FirmaTrasportatoreSuccessivo</li><li>FirmaAccettazione</li><li>FirmaAnnotazione</li><li>FirmaAllegato</li><li>FirmaAnnullamento</li><li>FirmaTrasbordoParziale</li><li>FirmaTrasbordoTotale</li><li>FirmaSostaTecnica</li><li>FirmaDestinatarioSuccessivo</li><li>FirmaAccettazioneSuccessiva</li></ul> Il valore della proprietà <i>Token</i> deve coincidere con il valore restituito dalla precedente invocazione all'endpoint <i>POST /{numero_fir}/hash</i> che ha determinato il passaggio allo stato corrente del formulario. L'operazione può essere eseguita da un'utenza che abbia visibilità su (o coincida con) il soggetto tra quelli indicati nel formulario coinvolto nell'operazione di firma.  L'art. 7 c.3 del D.M. 59/2023 prevede che il FIR sia sottoscritto da parte degli operatori coinvolti nelle diverse fasi del trasporto,  per cui se il certificato di firma è intestato ad una persona giuridica (cioè è un \"sigillo\") deve riferirsi al soggetto firmatario,  mentre se il certificato di firma è intestato ad una persona fisica, deve coincidere con il codice fiscale di un utente incaricato per il soggetto firmatario. Esclusivamente in ambiente DEMO, se il certificato firmatario non viene riconosciuto come valido secondo la regola qui descritta, il sistema produrrà un avviso non bloccante. In ambiente di produzione il controllo sarà bloccante.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_acquisizione_firma_post_with_http_info(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario a cui si aggiunge la firma")],
-        firma_model: Annotated[FirmaModel, Field(description="Dati necessari per aggiungere la firma al formulario")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[TransazioneModel]:
-        """🔁[ASYNC] Imposta dati firma
-
-        Acquisisce la richiesta di aggiunta dei dati per completare l'apposizione della firma digitale del soggetto indicato nel file xFIR.  Stati del formulario ammessi: <ul><li>FirmaProduttoreTrasportatoreIniziale</li><li>FirmaProduttore</li><li>FirmaTrasportatoreIniziale</li><li>FirmaTrasportatoreSuccessivo</li><li>FirmaAccettazione</li><li>FirmaAnnotazione</li><li>FirmaAllegato</li><li>FirmaAnnullamento</li><li>FirmaTrasbordoParziale</li><li>FirmaTrasbordoTotale</li><li>FirmaSostaTecnica</li><li>FirmaDestinatarioSuccessivo</li><li>FirmaAccettazioneSuccessiva</li></ul> Il valore della proprietà <i>Token</i> deve coincidere con il valore restituito dalla precedente invocazione all'endpoint <i>POST /{numero_fir}/hash</i> che ha determinato il passaggio allo stato corrente del formulario. L'operazione può essere eseguita da un'utenza che abbia visibilità su (o coincida con) il soggetto tra quelli indicati nel formulario coinvolto nell'operazione di firma.  L'art. 7 c.3 del D.M. 59/2023 prevede che il FIR sia sottoscritto da parte degli operatori coinvolti nelle diverse fasi del trasporto,  per cui se il certificato di firma è intestato ad una persona giuridica (cioè è un \"sigillo\") deve riferirsi al soggetto firmatario,  mentre se il certificato di firma è intestato ad una persona fisica, deve coincidere con il codice fiscale di un utente incaricato per il soggetto firmatario. Esclusivamente in ambiente DEMO, se il certificato firmatario non viene riconosciuto come valido secondo la regola qui descritta, il sistema produrrà un avviso non bloccante. In ambiente di produzione il controllo sarà bloccante.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.numero_fir_acquisizione_firma_post_with_http_info(numero_fir, firma_model, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: Numero FIR del formulario a cui si aggiunge la firma (required)
         :type numero_fir: str
@@ -939,824 +508,427 @@ class FormularioDigitaleApi:
         :type firma_model: FirmaModel
         :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
         :type x_reply_to: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(TransazioneModel, status_code(int), headers(HTTPHeaderDict))
+        """
 
-        _param = self._numero_fir_acquisizione_firma_post_serialize(
-            numero_fir=numero_fir,
-            firma_model=firma_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def numero_fir_acquisizione_firma_post_without_preload_content(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario a cui si aggiunge la firma")],
-        firma_model: Annotated[FirmaModel, Field(description="Dati necessari per aggiungere la firma al formulario")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'numero_fir',
+            'firma_model',
+            'x_reply_to'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """🔁[ASYNC] Imposta dati firma
-
-        Acquisisce la richiesta di aggiunta dei dati per completare l'apposizione della firma digitale del soggetto indicato nel file xFIR.  Stati del formulario ammessi: <ul><li>FirmaProduttoreTrasportatoreIniziale</li><li>FirmaProduttore</li><li>FirmaTrasportatoreIniziale</li><li>FirmaTrasportatoreSuccessivo</li><li>FirmaAccettazione</li><li>FirmaAnnotazione</li><li>FirmaAllegato</li><li>FirmaAnnullamento</li><li>FirmaTrasbordoParziale</li><li>FirmaTrasbordoTotale</li><li>FirmaSostaTecnica</li><li>FirmaDestinatarioSuccessivo</li><li>FirmaAccettazioneSuccessiva</li></ul> Il valore della proprietà <i>Token</i> deve coincidere con il valore restituito dalla precedente invocazione all'endpoint <i>POST /{numero_fir}/hash</i> che ha determinato il passaggio allo stato corrente del formulario. L'operazione può essere eseguita da un'utenza che abbia visibilità su (o coincida con) il soggetto tra quelli indicati nel formulario coinvolto nell'operazione di firma.  L'art. 7 c.3 del D.M. 59/2023 prevede che il FIR sia sottoscritto da parte degli operatori coinvolti nelle diverse fasi del trasporto,  per cui se il certificato di firma è intestato ad una persona giuridica (cioè è un \"sigillo\") deve riferirsi al soggetto firmatario,  mentre se il certificato di firma è intestato ad una persona fisica, deve coincidere con il codice fiscale di un utente incaricato per il soggetto firmatario. Esclusivamente in ambiente DEMO, se il certificato firmatario non viene riconosciuto come valido secondo la regola qui descritta, il sistema produrrà un avviso non bloccante. In ambiente di produzione il controllo sarà bloccante.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
-
-        :param numero_fir: Numero FIR del formulario a cui si aggiunge la firma (required)
-        :type numero_fir: str
-        :param firma_model: Dati necessari per aggiungere la firma al formulario (required)
-        :type firma_model: FirmaModel
-        :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
-        :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._numero_fir_acquisizione_firma_post_serialize(
-            numero_fir=numero_fir,
-            firma_model=firma_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method numero_fir_acquisizione_firma_post" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    def _numero_fir_acquisizione_firma_post_serialize(
-        self,
-        numero_fir,
-        firma_model,
-        x_reply_to,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if numero_fir is not None:
-            _path_params['numero_fir'] = numero_fir
-        # process the query parameters
-        # process the header parameters
-        if x_reply_to is not None:
-            _header_params['X-ReplyTo'] = x_reply_to
-        # process the form parameters
-        # process the body parameter
-        if firma_model is not None:
-            _body_params = firma_model
+        _path_params = {}
+        if _params['numero_fir'] is not None:
+            _path_params['numero_fir'] = _params['numero_fir']
 
+
+        # process the query parameters
+        _query_params = []
+        # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
+        if _params['x_reply_to'] is not None:
+            _header_params['X-ReplyTo'] = _params['x_reply_to']
+
+        # process the form parameters
+        _form_params = []
+        _files = {}
+        # process the body parameter
+        _body_params = None
+        if _params['firma_model'] is not None:
+            _body_params = _params['firma_model']
 
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
 
         # set the HTTP header `Content-Type`
-        if _content_type:
-            _header_params['Content-Type'] = _content_type
-        else:
-            _default_content_type = (
-                self.api_client.select_header_content_type(
-                    [
-                        'application/json'
-                    ]
+        _content_types_list = _params.get('_content_type',
+            self.api_client.select_header_content_type(
+                ['application/json']))
+        if _content_types_list:
+                _header_params['Content-Type'] = _content_types_list
+
+        # authentication setting
+        _auth_settings = ['Bearer']  # noqa: E501
+
+        _response_types_map = {
+            '202': "TransazioneModel",
+            '400': "ProblemDetails",
+            '403': None,
+            '404': None,
+            '429': None,
+            '500': "ProblemDetails",
+        }
+
+        return self.api_client.call_api(
+            '/{numero_fir}/acquisizione-firma', 'POST',
+            _path_params,
+            _query_params,
+            _header_params,
+            body=_body_params,
+            post_params=_form_params,
+            files=_files,
+            response_types_map=_response_types_map,
+            auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
+            collection_formats=_collection_formats,
+            _request_auth=_params.get('_request_auth'))
+
+    @validate_arguments
+    def numero_fir_acquisizione_num_iscr_sito_post(self, numero_fir : constr(strict=True), num_iscr_sito : constr(strict=True), **kwargs) -> None:  # noqa: E501
+        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /{numeroFIR}/acquisizione-visibilita/{numIscrSito} - Acquisizione visibilità FIR  # noqa: E501
+
+        Acquisisce la visibilità in ricerca sull'unità locale specificata di un FIR digitale creato da terzi. L'operazione consente di rendere visibile il FIR digitale in ricerca per una specifica unità locale. Il numero iscrizione unità locale indicata deve essere riconducibile ad uno dei soggetti presenti nel FIR.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+
+        >>> thread = api.numero_fir_acquisizione_num_iscr_sito_post(numero_fir, num_iscr_sito, async_req=True)
+        >>> result = thread.get()
+
+        :param numero_fir: (required)
+        :type numero_fir: str
+        :param num_iscr_sito: (required)
+        :type num_iscr_sito: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
+        :return: Returns the result object.
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: None
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the numero_fir_acquisizione_num_iscr_sito_post_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.numero_fir_acquisizione_num_iscr_sito_post_with_http_info(numero_fir, num_iscr_sito, **kwargs)  # noqa: E501
+
+    @validate_arguments
+    def numero_fir_acquisizione_num_iscr_sito_post_with_http_info(self, numero_fir : constr(strict=True), num_iscr_sito : constr(strict=True), **kwargs) -> ApiResponse:  # noqa: E501
+        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /{numeroFIR}/acquisizione-visibilita/{numIscrSito} - Acquisizione visibilità FIR  # noqa: E501
+
+        Acquisisce la visibilità in ricerca sull'unità locale specificata di un FIR digitale creato da terzi. L'operazione consente di rendere visibile il FIR digitale in ricerca per una specifica unità locale. Il numero iscrizione unità locale indicata deve essere riconducibile ad uno dei soggetti presenti nel FIR.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+
+        >>> thread = api.numero_fir_acquisizione_num_iscr_sito_post_with_http_info(numero_fir, num_iscr_sito, async_req=True)
+        >>> result = thread.get()
+
+        :param numero_fir: (required)
+        :type numero_fir: str
+        :param num_iscr_sito: (required)
+        :type num_iscr_sito: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
+        :type _request_auth: dict, optional
+        :type _content_type: string, optional: force content-type for the request
+        :return: Returns the result object.
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: None
+        """
+
+        warnings.warn("POST /{numero_fir}/acquisizione/{num_iscr_sito} is deprecated.", DeprecationWarning)
+
+        _params = locals()
+
+        _all_params = [
+            'numero_fir',
+            'num_iscr_sito'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
+            ]
+        )
+
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method numero_fir_acquisizione_num_iscr_sito_post" % _key
                 )
-            )
-            if _default_content_type is not None:
-                _header_params['Content-Type'] = _default_content_type
+            _params[_key] = _val
+        del _params['kwargs']
 
-        # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
-
-        return self.api_client.param_serialize(
-            method='POST',
-            resource_path='/{numero_fir}/acquisizione-firma',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
-            body=_body_params,
-            post_params=_form_params,
-            files=_files,
-            auth_settings=_auth_settings,
-            collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
-
-
-
-
-    @validate_call
-    def numero_fir_acquisizione_num_iscr_sito_post(
-        self,
-        numero_fir: Annotated[str, Field(strict=True)],
-        num_iscr_sito: Annotated[str, Field(strict=True)],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> None:
-        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /{numeroFIR}/acquisizione-visibilita/{numIscrSito} - Acquisizione visibilità FIR
-
-        Acquisisce la visibilità in ricerca sull'unità locale specificata di un FIR digitale creato da terzi. L'operazione consente di rendere visibile il FIR digitale in ricerca per una specifica unità locale. Il numero iscrizione unità locale indicata deve essere riconducibile ad uno dei soggetti presenti nel FIR.
-
-        :param numero_fir: (required)
-        :type numero_fir: str
-        :param num_iscr_sito: (required)
-        :type num_iscr_sito: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-        warnings.warn("POST /{numero_fir}/acquisizione/{num_iscr_sito} is deprecated.", DeprecationWarning)
-
-        _param = self._numero_fir_acquisizione_num_iscr_sito_post_serialize(
-            numero_fir=numero_fir,
-            num_iscr_sito=num_iscr_sito,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
-
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': None,
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
-
-
-    @validate_call
-    def numero_fir_acquisizione_num_iscr_sito_post_with_http_info(
-        self,
-        numero_fir: Annotated[str, Field(strict=True)],
-        num_iscr_sito: Annotated[str, Field(strict=True)],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[None]:
-        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /{numeroFIR}/acquisizione-visibilita/{numIscrSito} - Acquisizione visibilità FIR
-
-        Acquisisce la visibilità in ricerca sull'unità locale specificata di un FIR digitale creato da terzi. L'operazione consente di rendere visibile il FIR digitale in ricerca per una specifica unità locale. Il numero iscrizione unità locale indicata deve essere riconducibile ad uno dei soggetti presenti nel FIR.
-
-        :param numero_fir: (required)
-        :type numero_fir: str
-        :param num_iscr_sito: (required)
-        :type num_iscr_sito: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-        warnings.warn("POST /{numero_fir}/acquisizione/{num_iscr_sito} is deprecated.", DeprecationWarning)
-
-        _param = self._numero_fir_acquisizione_num_iscr_sito_post_serialize(
-            numero_fir=numero_fir,
-            num_iscr_sito=num_iscr_sito,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
-
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': None,
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def numero_fir_acquisizione_num_iscr_sito_post_without_preload_content(
-        self,
-        numero_fir: Annotated[str, Field(strict=True)],
-        num_iscr_sito: Annotated[str, Field(strict=True)],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /{numeroFIR}/acquisizione-visibilita/{numIscrSito} - Acquisizione visibilità FIR
-
-        Acquisisce la visibilità in ricerca sull'unità locale specificata di un FIR digitale creato da terzi. L'operazione consente di rendere visibile il FIR digitale in ricerca per una specifica unità locale. Il numero iscrizione unità locale indicata deve essere riconducibile ad uno dei soggetti presenti nel FIR.
-
-        :param numero_fir: (required)
-        :type numero_fir: str
-        :param num_iscr_sito: (required)
-        :type num_iscr_sito: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-        warnings.warn("POST /{numero_fir}/acquisizione/{num_iscr_sito} is deprecated.", DeprecationWarning)
-
-        _param = self._numero_fir_acquisizione_num_iscr_sito_post_serialize(
-            numero_fir=numero_fir,
-            num_iscr_sito=num_iscr_sito,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
-
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': None,
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
-
-
-    def _numero_fir_acquisizione_num_iscr_sito_post_serialize(
-        self,
-        numero_fir,
-        num_iscr_sito,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if numero_fir is not None:
-            _path_params['numero_fir'] = numero_fir
-        if num_iscr_sito is not None:
-            _path_params['num_iscr_sito'] = num_iscr_sito
+        _path_params = {}
+        if _params['numero_fir'] is not None:
+            _path_params['numero_fir'] = _params['numero_fir']
+
+        if _params['num_iscr_sito'] is not None:
+            _path_params['num_iscr_sito'] = _params['num_iscr_sito']
+
+
         # process the query parameters
+        _query_params = []
         # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
+        _form_params = []
+        _files = {}
         # process the body parameter
-
-
+        _body_params = None
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/problem+json'
-                ]
-            )
-
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/problem+json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='POST',
-            resource_path='/{numero_fir}/acquisizione/{num_iscr_sito}',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {}
+
+        return self.api_client.call_api(
+            '/{numero_fir}/acquisizione/{num_iscr_sito}', 'POST',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def numero_fir_acquisizione_visibilita_num_iscr_sito_post(self, numero_fir : constr(strict=True), num_iscr_sito : constr(strict=True), **kwargs) -> None:  # noqa: E501
+        """Acquisizione visibilità FIR  # noqa: E501
 
+        Acquisisce la visibilità in ricerca sull'unità locale specificata di un FIR digitale creato da terzi. L'operazione consente di rendere visibile il FIR digitale in ricerca per una specifica unità locale. Il numero iscrizione unità locale indicata deve essere riconducibile ad uno dei soggetti presenti nel FIR.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_acquisizione_visibilita_num_iscr_sito_post(
-        self,
-        numero_fir: Annotated[str, Field(strict=True)],
-        num_iscr_sito: Annotated[str, Field(strict=True)],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> None:
-        """Acquisizione visibilità FIR
-
-        Acquisisce la visibilità in ricerca sull'unità locale specificata di un FIR digitale creato da terzi. L'operazione consente di rendere visibile il FIR digitale in ricerca per una specifica unità locale. Il numero iscrizione unità locale indicata deve essere riconducibile ad uno dei soggetti presenti nel FIR.
+        >>> thread = api.numero_fir_acquisizione_visibilita_num_iscr_sito_post(numero_fir, num_iscr_sito, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: (required)
         :type numero_fir: str
         :param num_iscr_sito: (required)
         :type num_iscr_sito: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: None
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the numero_fir_acquisizione_visibilita_num_iscr_sito_post_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.numero_fir_acquisizione_visibilita_num_iscr_sito_post_with_http_info(numero_fir, num_iscr_sito, **kwargs)  # noqa: E501
 
-        _param = self._numero_fir_acquisizione_visibilita_num_iscr_sito_post_serialize(
-            numero_fir=numero_fir,
-            num_iscr_sito=num_iscr_sito,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def numero_fir_acquisizione_visibilita_num_iscr_sito_post_with_http_info(self, numero_fir : constr(strict=True), num_iscr_sito : constr(strict=True), **kwargs) -> ApiResponse:  # noqa: E501
+        """Acquisizione visibilità FIR  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': None,
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Acquisisce la visibilità in ricerca sull'unità locale specificata di un FIR digitale creato da terzi. L'operazione consente di rendere visibile il FIR digitale in ricerca per una specifica unità locale. Il numero iscrizione unità locale indicata deve essere riconducibile ad uno dei soggetti presenti nel FIR.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_acquisizione_visibilita_num_iscr_sito_post_with_http_info(
-        self,
-        numero_fir: Annotated[str, Field(strict=True)],
-        num_iscr_sito: Annotated[str, Field(strict=True)],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[None]:
-        """Acquisizione visibilità FIR
-
-        Acquisisce la visibilità in ricerca sull'unità locale specificata di un FIR digitale creato da terzi. L'operazione consente di rendere visibile il FIR digitale in ricerca per una specifica unità locale. Il numero iscrizione unità locale indicata deve essere riconducibile ad uno dei soggetti presenti nel FIR.
+        >>> thread = api.numero_fir_acquisizione_visibilita_num_iscr_sito_post_with_http_info(numero_fir, num_iscr_sito, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: (required)
         :type numero_fir: str
         :param num_iscr_sito: (required)
         :type num_iscr_sito: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: None
+        """
 
-        _param = self._numero_fir_acquisizione_visibilita_num_iscr_sito_post_serialize(
-            numero_fir=numero_fir,
-            num_iscr_sito=num_iscr_sito,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': None,
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def numero_fir_acquisizione_visibilita_num_iscr_sito_post_without_preload_content(
-        self,
-        numero_fir: Annotated[str, Field(strict=True)],
-        num_iscr_sito: Annotated[str, Field(strict=True)],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'numero_fir',
+            'num_iscr_sito'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """Acquisizione visibilità FIR
-
-        Acquisisce la visibilità in ricerca sull'unità locale specificata di un FIR digitale creato da terzi. L'operazione consente di rendere visibile il FIR digitale in ricerca per una specifica unità locale. Il numero iscrizione unità locale indicata deve essere riconducibile ad uno dei soggetti presenti nel FIR.
-
-        :param numero_fir: (required)
-        :type numero_fir: str
-        :param num_iscr_sito: (required)
-        :type num_iscr_sito: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._numero_fir_acquisizione_visibilita_num_iscr_sito_post_serialize(
-            numero_fir=numero_fir,
-            num_iscr_sito=num_iscr_sito,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': None,
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method numero_fir_acquisizione_visibilita_num_iscr_sito_post" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    def _numero_fir_acquisizione_visibilita_num_iscr_sito_post_serialize(
-        self,
-        numero_fir,
-        num_iscr_sito,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if numero_fir is not None:
-            _path_params['numero_fir'] = numero_fir
-        if num_iscr_sito is not None:
-            _path_params['num_iscr_sito'] = num_iscr_sito
+        _path_params = {}
+        if _params['numero_fir'] is not None:
+            _path_params['numero_fir'] = _params['numero_fir']
+
+        if _params['num_iscr_sito'] is not None:
+            _path_params['num_iscr_sito'] = _params['num_iscr_sito']
+
+
         # process the query parameters
+        _query_params = []
         # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
+        _form_params = []
+        _files = {}
         # process the body parameter
-
-
+        _body_params = None
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/problem+json'
-                ]
-            )
-
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/problem+json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='POST',
-            resource_path='/{numero_fir}/acquisizione-visibilita/{num_iscr_sito}',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {}
+
+        return self.api_client.call_api(
+            '/{numero_fir}/acquisizione-visibilita/{num_iscr_sito}', 'POST',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def numero_fir_allegato_post(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero FIR del formulario")], dati_allegato_model : Annotated[DatiAllegatoModel, Field(..., description="Insieme delle informazioni riguardanti l'allegato da aggiungere al formulario")], x_reply_to : Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None, **kwargs) -> TransazioneModel:  # noqa: E501
+        """🔁[ASYNC] Aggiunge allegato  # noqa: E501
 
+        Acquisisce la richiesta di aggiunta di un allegato al formulario digitale specificato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_allegato_post(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario")],
-        dati_allegato_model: Annotated[DatiAllegatoModel, Field(description="Insieme delle informazioni riguardanti l'allegato da aggiungere al formulario")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> TransazioneModel:
-        """🔁[ASYNC] Aggiunge allegato
-
-        Acquisisce la richiesta di aggiunta di un allegato al formulario digitale specificato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.numero_fir_allegato_post(numero_fir, dati_allegato_model, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: Numero FIR del formulario (required)
         :type numero_fir: str
@@ -1764,79 +936,33 @@ class FormularioDigitaleApi:
         :type dati_allegato_model: DatiAllegatoModel
         :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
         :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: TransazioneModel
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the numero_fir_allegato_post_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.numero_fir_allegato_post_with_http_info(numero_fir, dati_allegato_model, x_reply_to, **kwargs)  # noqa: E501
 
-        _param = self._numero_fir_allegato_post_serialize(
-            numero_fir=numero_fir,
-            dati_allegato_model=dati_allegato_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def numero_fir_allegato_post_with_http_info(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero FIR del formulario")], dati_allegato_model : Annotated[DatiAllegatoModel, Field(..., description="Insieme delle informazioni riguardanti l'allegato da aggiungere al formulario")], x_reply_to : Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        """🔁[ASYNC] Aggiunge allegato  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Acquisisce la richiesta di aggiunta di un allegato al formulario digitale specificato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_allegato_post_with_http_info(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario")],
-        dati_allegato_model: Annotated[DatiAllegatoModel, Field(description="Insieme delle informazioni riguardanti l'allegato da aggiungere al formulario")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[TransazioneModel]:
-        """🔁[ASYNC] Aggiunge allegato
-
-        Acquisisce la richiesta di aggiunta di un allegato al formulario digitale specificato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.numero_fir_allegato_post_with_http_info(numero_fir, dati_allegato_model, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: Numero FIR del formulario (required)
         :type numero_fir: str
@@ -1844,239 +970,133 @@ class FormularioDigitaleApi:
         :type dati_allegato_model: DatiAllegatoModel
         :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
         :type x_reply_to: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(TransazioneModel, status_code(int), headers(HTTPHeaderDict))
+        """
 
-        _param = self._numero_fir_allegato_post_serialize(
-            numero_fir=numero_fir,
-            dati_allegato_model=dati_allegato_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def numero_fir_allegato_post_without_preload_content(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario")],
-        dati_allegato_model: Annotated[DatiAllegatoModel, Field(description="Insieme delle informazioni riguardanti l'allegato da aggiungere al formulario")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'numero_fir',
+            'dati_allegato_model',
+            'x_reply_to'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """🔁[ASYNC] Aggiunge allegato
-
-        Acquisisce la richiesta di aggiunta di un allegato al formulario digitale specificato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
-
-        :param numero_fir: Numero FIR del formulario (required)
-        :type numero_fir: str
-        :param dati_allegato_model: Insieme delle informazioni riguardanti l'allegato da aggiungere al formulario (required)
-        :type dati_allegato_model: DatiAllegatoModel
-        :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
-        :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._numero_fir_allegato_post_serialize(
-            numero_fir=numero_fir,
-            dati_allegato_model=dati_allegato_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method numero_fir_allegato_post" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    def _numero_fir_allegato_post_serialize(
-        self,
-        numero_fir,
-        dati_allegato_model,
-        x_reply_to,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if numero_fir is not None:
-            _path_params['numero_fir'] = numero_fir
-        # process the query parameters
-        # process the header parameters
-        if x_reply_to is not None:
-            _header_params['X-ReplyTo'] = x_reply_to
-        # process the form parameters
-        # process the body parameter
-        if dati_allegato_model is not None:
-            _body_params = dati_allegato_model
+        _path_params = {}
+        if _params['numero_fir'] is not None:
+            _path_params['numero_fir'] = _params['numero_fir']
 
+
+        # process the query parameters
+        _query_params = []
+        # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
+        if _params['x_reply_to'] is not None:
+            _header_params['X-ReplyTo'] = _params['x_reply_to']
+
+        # process the form parameters
+        _form_params = []
+        _files = {}
+        # process the body parameter
+        _body_params = None
+        if _params['dati_allegato_model'] is not None:
+            _body_params = _params['dati_allegato_model']
 
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
 
         # set the HTTP header `Content-Type`
-        if _content_type:
-            _header_params['Content-Type'] = _content_type
-        else:
-            _default_content_type = (
-                self.api_client.select_header_content_type(
-                    [
-                        'application/json'
-                    ]
-                )
-            )
-            if _default_content_type is not None:
-                _header_params['Content-Type'] = _default_content_type
+        _content_types_list = _params.get('_content_type',
+            self.api_client.select_header_content_type(
+                ['application/json']))
+        if _content_types_list:
+                _header_params['Content-Type'] = _content_types_list
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='POST',
-            resource_path='/{numero_fir}/allegato',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {
+            '202': "TransazioneModel",
+            '400': "ProblemDetails",
+            '403': None,
+            '404': None,
+            '429': None,
+            '500': "ProblemDetails",
+        }
+
+        return self.api_client.call_api(
+            '/{numero_fir}/allegato', 'POST',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def numero_fir_annotazione_post(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero FIR del formulario")], dati_annotazione_model : Annotated[DatiAnnotazioneModel, Field(..., description="Insieme delle informazioni riguardanti l'allegato da aggiungere al formulario")], x_reply_to : Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None, **kwargs) -> TransazioneModel:  # noqa: E501
+        """🔁[ASYNC] Aggiunge annotazione  # noqa: E501
 
+        Acquisisce la richiesta di aggiunta di un'annotazione da allegare al formulario digitale specificato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_annotazione_post(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario")],
-        dati_annotazione_model: Annotated[DatiAnnotazioneModel, Field(description="Insieme delle informazioni riguardanti l'allegato da aggiungere al formulario")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> TransazioneModel:
-        """🔁[ASYNC] Aggiunge annotazione
-
-        Acquisisce la richiesta di aggiunta di un'annotazione da allegare al formulario digitale specificato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.numero_fir_annotazione_post(numero_fir, dati_annotazione_model, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: Numero FIR del formulario (required)
         :type numero_fir: str
@@ -2084,79 +1104,33 @@ class FormularioDigitaleApi:
         :type dati_annotazione_model: DatiAnnotazioneModel
         :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
         :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: TransazioneModel
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the numero_fir_annotazione_post_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.numero_fir_annotazione_post_with_http_info(numero_fir, dati_annotazione_model, x_reply_to, **kwargs)  # noqa: E501
 
-        _param = self._numero_fir_annotazione_post_serialize(
-            numero_fir=numero_fir,
-            dati_annotazione_model=dati_annotazione_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def numero_fir_annotazione_post_with_http_info(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero FIR del formulario")], dati_annotazione_model : Annotated[DatiAnnotazioneModel, Field(..., description="Insieme delle informazioni riguardanti l'allegato da aggiungere al formulario")], x_reply_to : Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        """🔁[ASYNC] Aggiunge annotazione  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Acquisisce la richiesta di aggiunta di un'annotazione da allegare al formulario digitale specificato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_annotazione_post_with_http_info(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario")],
-        dati_annotazione_model: Annotated[DatiAnnotazioneModel, Field(description="Insieme delle informazioni riguardanti l'allegato da aggiungere al formulario")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[TransazioneModel]:
-        """🔁[ASYNC] Aggiunge annotazione
-
-        Acquisisce la richiesta di aggiunta di un'annotazione da allegare al formulario digitale specificato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.numero_fir_annotazione_post_with_http_info(numero_fir, dati_annotazione_model, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: Numero FIR del formulario (required)
         :type numero_fir: str
@@ -2164,239 +1138,133 @@ class FormularioDigitaleApi:
         :type dati_annotazione_model: DatiAnnotazioneModel
         :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
         :type x_reply_to: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(TransazioneModel, status_code(int), headers(HTTPHeaderDict))
+        """
 
-        _param = self._numero_fir_annotazione_post_serialize(
-            numero_fir=numero_fir,
-            dati_annotazione_model=dati_annotazione_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def numero_fir_annotazione_post_without_preload_content(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario")],
-        dati_annotazione_model: Annotated[DatiAnnotazioneModel, Field(description="Insieme delle informazioni riguardanti l'allegato da aggiungere al formulario")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'numero_fir',
+            'dati_annotazione_model',
+            'x_reply_to'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """🔁[ASYNC] Aggiunge annotazione
-
-        Acquisisce la richiesta di aggiunta di un'annotazione da allegare al formulario digitale specificato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
-
-        :param numero_fir: Numero FIR del formulario (required)
-        :type numero_fir: str
-        :param dati_annotazione_model: Insieme delle informazioni riguardanti l'allegato da aggiungere al formulario (required)
-        :type dati_annotazione_model: DatiAnnotazioneModel
-        :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
-        :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._numero_fir_annotazione_post_serialize(
-            numero_fir=numero_fir,
-            dati_annotazione_model=dati_annotazione_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method numero_fir_annotazione_post" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    def _numero_fir_annotazione_post_serialize(
-        self,
-        numero_fir,
-        dati_annotazione_model,
-        x_reply_to,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if numero_fir is not None:
-            _path_params['numero_fir'] = numero_fir
-        # process the query parameters
-        # process the header parameters
-        if x_reply_to is not None:
-            _header_params['X-ReplyTo'] = x_reply_to
-        # process the form parameters
-        # process the body parameter
-        if dati_annotazione_model is not None:
-            _body_params = dati_annotazione_model
+        _path_params = {}
+        if _params['numero_fir'] is not None:
+            _path_params['numero_fir'] = _params['numero_fir']
 
+
+        # process the query parameters
+        _query_params = []
+        # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
+        if _params['x_reply_to'] is not None:
+            _header_params['X-ReplyTo'] = _params['x_reply_to']
+
+        # process the form parameters
+        _form_params = []
+        _files = {}
+        # process the body parameter
+        _body_params = None
+        if _params['dati_annotazione_model'] is not None:
+            _body_params = _params['dati_annotazione_model']
 
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
 
         # set the HTTP header `Content-Type`
-        if _content_type:
-            _header_params['Content-Type'] = _content_type
-        else:
-            _default_content_type = (
-                self.api_client.select_header_content_type(
-                    [
-                        'application/json'
-                    ]
-                )
-            )
-            if _default_content_type is not None:
-                _header_params['Content-Type'] = _default_content_type
+        _content_types_list = _params.get('_content_type',
+            self.api_client.select_header_content_type(
+                ['application/json']))
+        if _content_types_list:
+                _header_params['Content-Type'] = _content_types_list
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='POST',
-            resource_path='/{numero_fir}/annotazione',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {
+            '202': "TransazioneModel",
+            '400': "ProblemDetails",
+            '403': None,
+            '404': None,
+            '429': None,
+            '500': "ProblemDetails",
+        }
+
+        return self.api_client.call_api(
+            '/{numero_fir}/annotazione', 'POST',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def numero_fir_annulla_post(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero FIR del formulario")], dati_annullamento_model : Annotated[DatiAnnullamentoModel, Field(..., description="Insieme delle informazioni riguardanti l'allegato da aggiungere al formulario")], x_reply_to : Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None, **kwargs) -> TransazioneModel:  # noqa: E501
+        """🔁[ASYNC] Annullamento FIR  # noqa: E501
 
+        Acquisisce la richiesta di annullamento del FIR specificato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito. L'annullamento può essere richiesto solo se il formulario non risulta già essere firmato sia dal produttore che dal trasportatore.  L'operazione di annullamento provvede ad annullare anche la vidimazione del numero FIR corrispondente, e pertanto può essere richiesta solo dal soggetto a cui è stato vidimato il numero FIR. <br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_annulla_post(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario")],
-        dati_annullamento_model: Annotated[DatiAnnullamentoModel, Field(description="Insieme delle informazioni riguardanti l'allegato da aggiungere al formulario")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> TransazioneModel:
-        """🔁[ASYNC] Annullamento FIR
-
-        Acquisisce la richiesta di annullamento del FIR specificato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito. L'annullamento può essere richiesto solo se il formulario non risulta già essere firmato sia dal produttore che dal trasportatore.  L'operazione di annullamento provvede ad annullare anche la vidimazione del numero FIR corrispondente, e pertanto può essere richiesta solo dal soggetto a cui è stato vidimato il numero FIR. <br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.numero_fir_annulla_post(numero_fir, dati_annullamento_model, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: Numero FIR del formulario (required)
         :type numero_fir: str
@@ -2404,79 +1272,33 @@ class FormularioDigitaleApi:
         :type dati_annullamento_model: DatiAnnullamentoModel
         :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
         :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: TransazioneModel
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the numero_fir_annulla_post_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.numero_fir_annulla_post_with_http_info(numero_fir, dati_annullamento_model, x_reply_to, **kwargs)  # noqa: E501
 
-        _param = self._numero_fir_annulla_post_serialize(
-            numero_fir=numero_fir,
-            dati_annullamento_model=dati_annullamento_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def numero_fir_annulla_post_with_http_info(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero FIR del formulario")], dati_annullamento_model : Annotated[DatiAnnullamentoModel, Field(..., description="Insieme delle informazioni riguardanti l'allegato da aggiungere al formulario")], x_reply_to : Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        """🔁[ASYNC] Annullamento FIR  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Acquisisce la richiesta di annullamento del FIR specificato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito. L'annullamento può essere richiesto solo se il formulario non risulta già essere firmato sia dal produttore che dal trasportatore.  L'operazione di annullamento provvede ad annullare anche la vidimazione del numero FIR corrispondente, e pertanto può essere richiesta solo dal soggetto a cui è stato vidimato il numero FIR. <br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_annulla_post_with_http_info(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario")],
-        dati_annullamento_model: Annotated[DatiAnnullamentoModel, Field(description="Insieme delle informazioni riguardanti l'allegato da aggiungere al formulario")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[TransazioneModel]:
-        """🔁[ASYNC] Annullamento FIR
-
-        Acquisisce la richiesta di annullamento del FIR specificato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito. L'annullamento può essere richiesto solo se il formulario non risulta già essere firmato sia dal produttore che dal trasportatore.  L'operazione di annullamento provvede ad annullare anche la vidimazione del numero FIR corrispondente, e pertanto può essere richiesta solo dal soggetto a cui è stato vidimato il numero FIR. <br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.numero_fir_annulla_post_with_http_info(numero_fir, dati_annullamento_model, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: Numero FIR del formulario (required)
         :type numero_fir: str
@@ -2484,239 +1306,133 @@ class FormularioDigitaleApi:
         :type dati_annullamento_model: DatiAnnullamentoModel
         :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
         :type x_reply_to: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(TransazioneModel, status_code(int), headers(HTTPHeaderDict))
+        """
 
-        _param = self._numero_fir_annulla_post_serialize(
-            numero_fir=numero_fir,
-            dati_annullamento_model=dati_annullamento_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def numero_fir_annulla_post_without_preload_content(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario")],
-        dati_annullamento_model: Annotated[DatiAnnullamentoModel, Field(description="Insieme delle informazioni riguardanti l'allegato da aggiungere al formulario")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'numero_fir',
+            'dati_annullamento_model',
+            'x_reply_to'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """🔁[ASYNC] Annullamento FIR
-
-        Acquisisce la richiesta di annullamento del FIR specificato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito. L'annullamento può essere richiesto solo se il formulario non risulta già essere firmato sia dal produttore che dal trasportatore.  L'operazione di annullamento provvede ad annullare anche la vidimazione del numero FIR corrispondente, e pertanto può essere richiesta solo dal soggetto a cui è stato vidimato il numero FIR. <br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
-
-        :param numero_fir: Numero FIR del formulario (required)
-        :type numero_fir: str
-        :param dati_annullamento_model: Insieme delle informazioni riguardanti l'allegato da aggiungere al formulario (required)
-        :type dati_annullamento_model: DatiAnnullamentoModel
-        :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
-        :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._numero_fir_annulla_post_serialize(
-            numero_fir=numero_fir,
-            dati_annullamento_model=dati_annullamento_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method numero_fir_annulla_post" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    def _numero_fir_annulla_post_serialize(
-        self,
-        numero_fir,
-        dati_annullamento_model,
-        x_reply_to,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if numero_fir is not None:
-            _path_params['numero_fir'] = numero_fir
-        # process the query parameters
-        # process the header parameters
-        if x_reply_to is not None:
-            _header_params['X-ReplyTo'] = x_reply_to
-        # process the form parameters
-        # process the body parameter
-        if dati_annullamento_model is not None:
-            _body_params = dati_annullamento_model
+        _path_params = {}
+        if _params['numero_fir'] is not None:
+            _path_params['numero_fir'] = _params['numero_fir']
 
+
+        # process the query parameters
+        _query_params = []
+        # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
+        if _params['x_reply_to'] is not None:
+            _header_params['X-ReplyTo'] = _params['x_reply_to']
+
+        # process the form parameters
+        _form_params = []
+        _files = {}
+        # process the body parameter
+        _body_params = None
+        if _params['dati_annullamento_model'] is not None:
+            _body_params = _params['dati_annullamento_model']
 
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
 
         # set the HTTP header `Content-Type`
-        if _content_type:
-            _header_params['Content-Type'] = _content_type
-        else:
-            _default_content_type = (
-                self.api_client.select_header_content_type(
-                    [
-                        'application/json'
-                    ]
-                )
-            )
-            if _default_content_type is not None:
-                _header_params['Content-Type'] = _default_content_type
+        _content_types_list = _params.get('_content_type',
+            self.api_client.select_header_content_type(
+                ['application/json']))
+        if _content_types_list:
+                _header_params['Content-Type'] = _content_types_list
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='POST',
-            resource_path='/{numero_fir}/annulla',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {
+            '202': "TransazioneModel",
+            '400': "ProblemDetails",
+            '403': None,
+            '404': None,
+            '429': None,
+            '500': "ProblemDetails",
+        }
+
+        return self.api_client.call_api(
+            '/{numero_fir}/annulla', 'POST',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def numero_fir_azioni_get(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero FIR del formulario")], identificativo_soggetto : Annotated[StrictStr, Field(..., description="Codice fiscale del soggetto per il quale si richiedono le azioni possibili")], num_iscr_sito : Optional[StrictStr] = None, **kwargs) -> AzioniResult:  # noqa: E501
+        """Operazioni disponibili  # noqa: E501
 
+        Restituisce l'elenco delle azioni che è possibile eseguire sul formulario indicato, in funzione dello stato in cui si trova. Per ogni azione che è possibile eseguire viene restituito l'elenco degli identificatvi dei soggetti che possono invocarla. L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) almeno uno dei soggetti coinvolti nel formulario.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_azioni_get(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario")],
-        identificativo_soggetto: Annotated[StrictStr, Field(description="Codice fiscale del soggetto per il quale si richiedono le azioni possibili")],
-        num_iscr_sito: Optional[StrictStr] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> AzioniResult:
-        """Operazioni disponibili
-
-        Restituisce l'elenco delle azioni che è possibile eseguire sul formulario indicato, in funzione dello stato in cui si trova. Per ogni azione che è possibile eseguire viene restituito l'elenco degli identificatvi dei soggetti che possono invocarla. L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) almeno uno dei soggetti coinvolti nel formulario.
+        >>> thread = api.numero_fir_azioni_get(numero_fir, identificativo_soggetto, num_iscr_sito, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: Numero FIR del formulario (required)
         :type numero_fir: str
@@ -2724,79 +1440,33 @@ class FormularioDigitaleApi:
         :type identificativo_soggetto: str
         :param num_iscr_sito: 
         :type num_iscr_sito: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: AzioniResult
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the numero_fir_azioni_get_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.numero_fir_azioni_get_with_http_info(numero_fir, identificativo_soggetto, num_iscr_sito, **kwargs)  # noqa: E501
 
-        _param = self._numero_fir_azioni_get_serialize(
-            numero_fir=numero_fir,
-            identificativo_soggetto=identificativo_soggetto,
-            num_iscr_sito=num_iscr_sito,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def numero_fir_azioni_get_with_http_info(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero FIR del formulario")], identificativo_soggetto : Annotated[StrictStr, Field(..., description="Codice fiscale del soggetto per il quale si richiedono le azioni possibili")], num_iscr_sito : Optional[StrictStr] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        """Operazioni disponibili  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "AzioniResult",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Restituisce l'elenco delle azioni che è possibile eseguire sul formulario indicato, in funzione dello stato in cui si trova. Per ogni azione che è possibile eseguire viene restituito l'elenco degli identificatvi dei soggetti che possono invocarla. L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) almeno uno dei soggetti coinvolti nel formulario.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_azioni_get_with_http_info(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario")],
-        identificativo_soggetto: Annotated[StrictStr, Field(description="Codice fiscale del soggetto per il quale si richiedono le azioni possibili")],
-        num_iscr_sito: Optional[StrictStr] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[AzioniResult]:
-        """Operazioni disponibili
-
-        Restituisce l'elenco delle azioni che è possibile eseguire sul formulario indicato, in funzione dello stato in cui si trova. Per ogni azione che è possibile eseguire viene restituito l'elenco degli identificatvi dei soggetti che possono invocarla. L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) almeno uno dei soggetti coinvolti nel formulario.
+        >>> thread = api.numero_fir_azioni_get_with_http_info(numero_fir, identificativo_soggetto, num_iscr_sito, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: Numero FIR del formulario (required)
         :type numero_fir: str
@@ -2804,39 +1474,91 @@ class FormularioDigitaleApi:
         :type identificativo_soggetto: str
         :param num_iscr_sito: 
         :type num_iscr_sito: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(AzioniResult, status_code(int), headers(HTTPHeaderDict))
+        """
 
-        _param = self._numero_fir_azioni_get_serialize(
-            numero_fir=numero_fir,
-            identificativo_soggetto=identificativo_soggetto,
-            num_iscr_sito=num_iscr_sito,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
+        _params = locals()
+
+        _all_params = [
+            'numero_fir',
+            'identificativo_soggetto',
+            'num_iscr_sito'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
+            ]
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method numero_fir_azioni_get" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
+
+        _collection_formats = {}
+
+        # process the path parameters
+        _path_params = {}
+        if _params['numero_fir'] is not None:
+            _path_params['numero_fir'] = _params['numero_fir']
+
+
+        # process the query parameters
+        _query_params = []
+        if _params.get('identificativo_soggetto') is not None:  # noqa: E501
+            _query_params.append(('identificativo_soggetto', _params['identificativo_soggetto']))
+
+        if _params.get('num_iscr_sito') is not None:  # noqa: E501
+            _query_params.append(('num_iscr_sito', _params['num_iscr_sito']))
+
+        # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
+        # process the form parameters
+        _form_params = []
+        _files = {}
+        # process the body parameter
+        _body_params = None
+        # set the HTTP header `Accept`
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
+
+        # authentication setting
+        _auth_settings = ['Bearer']  # noqa: E501
+
+        _response_types_map = {
             '200': "AzioniResult",
             '400': "ProblemDetails",
             '403': None,
@@ -2844,190 +1566,34 @@ class FormularioDigitaleApi:
             '429': None,
             '500': "ProblemDetails",
         }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
 
-
-    @validate_call
-    def numero_fir_azioni_get_without_preload_content(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario")],
-        identificativo_soggetto: Annotated[StrictStr, Field(description="Codice fiscale del soggetto per il quale si richiedono le azioni possibili")],
-        num_iscr_sito: Optional[StrictStr] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """Operazioni disponibili
-
-        Restituisce l'elenco delle azioni che è possibile eseguire sul formulario indicato, in funzione dello stato in cui si trova. Per ogni azione che è possibile eseguire viene restituito l'elenco degli identificatvi dei soggetti che possono invocarla. L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) almeno uno dei soggetti coinvolti nel formulario.
-
-        :param numero_fir: Numero FIR del formulario (required)
-        :type numero_fir: str
-        :param identificativo_soggetto: Codice fiscale del soggetto per il quale si richiedono le azioni possibili (required)
-        :type identificativo_soggetto: str
-        :param num_iscr_sito: 
-        :type num_iscr_sito: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._numero_fir_azioni_get_serialize(
-            numero_fir=numero_fir,
-            identificativo_soggetto=identificativo_soggetto,
-            num_iscr_sito=num_iscr_sito,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
-
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "AzioniResult",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
-
-
-    def _numero_fir_azioni_get_serialize(
-        self,
-        numero_fir,
-        identificativo_soggetto,
-        num_iscr_sito,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
-
-        # process the path parameters
-        if numero_fir is not None:
-            _path_params['numero_fir'] = numero_fir
-        # process the query parameters
-        if identificativo_soggetto is not None:
-            
-            _query_params.append(('identificativo_soggetto', identificativo_soggetto))
-            
-        if num_iscr_sito is not None:
-            
-            _query_params.append(('num_iscr_sito', num_iscr_sito))
-            
-        # process the header parameters
-        # process the form parameters
-        # process the body parameter
-
-
-        # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
-
-
-        # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
-
-        return self.api_client.param_serialize(
-            method='GET',
-            resource_path='/{numero_fir}/azioni',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        return self.api_client.call_api(
+            '/{numero_fir}/azioni', 'GET',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def numero_fir_destinatario_post(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero FIR del formulario a cui si aggiunge il nuovo destinatario")], numero_fir_destinatario_post_request : Annotated[NumeroFirDestinatarioPostRequest, Field(..., description="Informazioni sul nuovo destinatario da aggiungere")], x_reply_to : Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None, **kwargs) -> TransazioneModel:  # noqa: E501
+        """🔁[ASYNC] Aggiunge nuovo destinatario  # noqa: E501
 
+        Acquisisce la richiesta di aggiungta dei dati del nuovo destinatario per il rifiuto indicato nel formulario specificato, a seguito del respingimento o della parziale accettazione del rifiuto da parte del destinatrio precedente.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_destinatario_post(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario a cui si aggiunge il nuovo destinatario")],
-        numero_fir_destinatario_post_request: Annotated[NumeroFirDestinatarioPostRequest, Field(description="Informazioni sul nuovo destinatario da aggiungere")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> TransazioneModel:
-        """🔁[ASYNC] Aggiunge nuovo destinatario
-
-        Acquisisce la richiesta di aggiungta dei dati del nuovo destinatario per il rifiuto indicato nel formulario specificato, a seguito del respingimento o della parziale accettazione del rifiuto da parte del destinatrio precedente.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.numero_fir_destinatario_post(numero_fir, numero_fir_destinatario_post_request, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: Numero FIR del formulario a cui si aggiunge il nuovo destinatario (required)
         :type numero_fir: str
@@ -3035,79 +1601,33 @@ class FormularioDigitaleApi:
         :type numero_fir_destinatario_post_request: NumeroFirDestinatarioPostRequest
         :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
         :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: TransazioneModel
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the numero_fir_destinatario_post_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.numero_fir_destinatario_post_with_http_info(numero_fir, numero_fir_destinatario_post_request, x_reply_to, **kwargs)  # noqa: E501
 
-        _param = self._numero_fir_destinatario_post_serialize(
-            numero_fir=numero_fir,
-            numero_fir_destinatario_post_request=numero_fir_destinatario_post_request,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def numero_fir_destinatario_post_with_http_info(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero FIR del formulario a cui si aggiunge il nuovo destinatario")], numero_fir_destinatario_post_request : Annotated[NumeroFirDestinatarioPostRequest, Field(..., description="Informazioni sul nuovo destinatario da aggiungere")], x_reply_to : Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        """🔁[ASYNC] Aggiunge nuovo destinatario  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Acquisisce la richiesta di aggiungta dei dati del nuovo destinatario per il rifiuto indicato nel formulario specificato, a seguito del respingimento o della parziale accettazione del rifiuto da parte del destinatrio precedente.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_destinatario_post_with_http_info(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario a cui si aggiunge il nuovo destinatario")],
-        numero_fir_destinatario_post_request: Annotated[NumeroFirDestinatarioPostRequest, Field(description="Informazioni sul nuovo destinatario da aggiungere")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[TransazioneModel]:
-        """🔁[ASYNC] Aggiunge nuovo destinatario
-
-        Acquisisce la richiesta di aggiungta dei dati del nuovo destinatario per il rifiuto indicato nel formulario specificato, a seguito del respingimento o della parziale accettazione del rifiuto da parte del destinatrio precedente.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.numero_fir_destinatario_post_with_http_info(numero_fir, numero_fir_destinatario_post_request, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: Numero FIR del formulario a cui si aggiunge il nuovo destinatario (required)
         :type numero_fir: str
@@ -3115,271 +1635,243 @@ class FormularioDigitaleApi:
         :type numero_fir_destinatario_post_request: NumeroFirDestinatarioPostRequest
         :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
         :type x_reply_to: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(TransazioneModel, status_code(int), headers(HTTPHeaderDict))
+        """
 
-        _param = self._numero_fir_destinatario_post_serialize(
-            numero_fir=numero_fir,
-            numero_fir_destinatario_post_request=numero_fir_destinatario_post_request,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def numero_fir_destinatario_post_without_preload_content(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario a cui si aggiunge il nuovo destinatario")],
-        numero_fir_destinatario_post_request: Annotated[NumeroFirDestinatarioPostRequest, Field(description="Informazioni sul nuovo destinatario da aggiungere")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'numero_fir',
+            'numero_fir_destinatario_post_request',
+            'x_reply_to'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """🔁[ASYNC] Aggiunge nuovo destinatario
-
-        Acquisisce la richiesta di aggiungta dei dati del nuovo destinatario per il rifiuto indicato nel formulario specificato, a seguito del respingimento o della parziale accettazione del rifiuto da parte del destinatrio precedente.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
-
-        :param numero_fir: Numero FIR del formulario a cui si aggiunge il nuovo destinatario (required)
-        :type numero_fir: str
-        :param numero_fir_destinatario_post_request: Informazioni sul nuovo destinatario da aggiungere (required)
-        :type numero_fir_destinatario_post_request: NumeroFirDestinatarioPostRequest
-        :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
-        :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._numero_fir_destinatario_post_serialize(
-            numero_fir=numero_fir,
-            numero_fir_destinatario_post_request=numero_fir_destinatario_post_request,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method numero_fir_destinatario_post" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    def _numero_fir_destinatario_post_serialize(
-        self,
-        numero_fir,
-        numero_fir_destinatario_post_request,
-        x_reply_to,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if numero_fir is not None:
-            _path_params['numero_fir'] = numero_fir
-        # process the query parameters
-        # process the header parameters
-        if x_reply_to is not None:
-            _header_params['X-ReplyTo'] = x_reply_to
-        # process the form parameters
-        # process the body parameter
-        if numero_fir_destinatario_post_request is not None:
-            _body_params = numero_fir_destinatario_post_request
+        _path_params = {}
+        if _params['numero_fir'] is not None:
+            _path_params['numero_fir'] = _params['numero_fir']
 
+
+        # process the query parameters
+        _query_params = []
+        # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
+        if _params['x_reply_to'] is not None:
+            _header_params['X-ReplyTo'] = _params['x_reply_to']
+
+        # process the form parameters
+        _form_params = []
+        _files = {}
+        # process the body parameter
+        _body_params = None
+        if _params['numero_fir_destinatario_post_request'] is not None:
+            _body_params = _params['numero_fir_destinatario_post_request']
 
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
 
         # set the HTTP header `Content-Type`
-        if _content_type:
-            _header_params['Content-Type'] = _content_type
-        else:
-            _default_content_type = (
-                self.api_client.select_header_content_type(
-                    [
-                        'application/json'
-                    ]
-                )
-            )
-            if _default_content_type is not None:
-                _header_params['Content-Type'] = _default_content_type
+        _content_types_list = _params.get('_content_type',
+            self.api_client.select_header_content_type(
+                ['application/json']))
+        if _content_types_list:
+                _header_params['Content-Type'] = _content_types_list
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='POST',
-            resource_path='/{numero_fir}/destinatario',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {
+            '202': "TransazioneModel",
+            '400': "ProblemDetails",
+            '403': None,
+            '404': None,
+            '429': None,
+            '500': "ProblemDetails",
+        }
+
+        return self.api_client.call_api(
+            '/{numero_fir}/destinatario', 'POST',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def numero_fir_get(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero del FIR per il quale si richiede il dettaglio")], **kwargs) -> DettaglioFormulario:  # noqa: E501
+        """Dettaglio FIR  # noqa: E501
 
+        Restituisce i dati completi del formulario indicato.   L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) almeno uno dei soggetti coinvolti nel formulario.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_get(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero del FIR per il quale si richiede il dettaglio")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> DettaglioFormulario:
-        """Dettaglio FIR
-
-        Restituisce i dati completi del formulario indicato.   L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) almeno uno dei soggetti coinvolti nel formulario.
+        >>> thread = api.numero_fir_get(numero_fir, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: Numero del FIR per il quale si richiede il dettaglio (required)
         :type numero_fir: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
+        :return: Returns the result object.
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: DettaglioFormulario
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the numero_fir_get_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.numero_fir_get_with_http_info(numero_fir, **kwargs)  # noqa: E501
+
+    @validate_arguments
+    def numero_fir_get_with_http_info(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero del FIR per il quale si richiede il dettaglio")], **kwargs) -> ApiResponse:  # noqa: E501
+        """Dettaglio FIR  # noqa: E501
+
+        Restituisce i dati completi del formulario indicato.   L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) almeno uno dei soggetti coinvolti nel formulario.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+
+        >>> thread = api.numero_fir_get_with_http_info(numero_fir, async_req=True)
+        >>> result = thread.get()
+
+        :param numero_fir: Numero del FIR per il quale si richiede il dettaglio (required)
+        :type numero_fir: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(DettaglioFormulario, status_code(int), headers(HTTPHeaderDict))
+        """
 
-        _param = self._numero_fir_get_serialize(
-            numero_fir=numero_fir,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
+        _params = locals()
+
+        _all_params = [
+            'numero_fir'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
+            ]
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method numero_fir_get" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
+
+        _collection_formats = {}
+
+        # process the path parameters
+        _path_params = {}
+        if _params['numero_fir'] is not None:
+            _path_params['numero_fir'] = _params['numero_fir']
+
+
+        # process the query parameters
+        _query_params = []
+        # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
+        # process the form parameters
+        _form_params = []
+        _files = {}
+        # process the body parameter
+        _body_params = None
+        # set the HTTP header `Accept`
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
+
+        # authentication setting
+        _auth_settings = ['Bearer']  # noqa: E501
+
+        _response_types_map = {
             '200': "DettaglioFormulario",
             '400': "ProblemDetails",
             '403': None,
@@ -3387,244 +1879,34 @@ class FormularioDigitaleApi:
             '429': None,
             '500': "ProblemDetails",
         }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
 
-
-    @validate_call
-    def numero_fir_get_with_http_info(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero del FIR per il quale si richiede il dettaglio")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[DettaglioFormulario]:
-        """Dettaglio FIR
-
-        Restituisce i dati completi del formulario indicato.   L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) almeno uno dei soggetti coinvolti nel formulario.
-
-        :param numero_fir: Numero del FIR per il quale si richiede il dettaglio (required)
-        :type numero_fir: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._numero_fir_get_serialize(
-            numero_fir=numero_fir,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
-
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "DettaglioFormulario",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def numero_fir_get_without_preload_content(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero del FIR per il quale si richiede il dettaglio")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """Dettaglio FIR
-
-        Restituisce i dati completi del formulario indicato.   L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) almeno uno dei soggetti coinvolti nel formulario.
-
-        :param numero_fir: Numero del FIR per il quale si richiede il dettaglio (required)
-        :type numero_fir: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._numero_fir_get_serialize(
-            numero_fir=numero_fir,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
-
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "DettaglioFormulario",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
-
-
-    def _numero_fir_get_serialize(
-        self,
-        numero_fir,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
-
-        # process the path parameters
-        if numero_fir is not None:
-            _path_params['numero_fir'] = numero_fir
-        # process the query parameters
-        # process the header parameters
-        # process the form parameters
-        # process the body parameter
-
-
-        # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
-
-
-        # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
-
-        return self.api_client.param_serialize(
-            method='GET',
-            resource_path='/{numero_fir}',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        return self.api_client.call_api(
+            '/{numero_fir}', 'GET',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def numero_fir_hash_post(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero FIR del formulario a cui si aggiunge la firma")], dati_per_firma_model : Annotated[DatiPerFirmaModel, Field(..., description="Informazioni necessarie per il calcolo del codice hash da firmare")], x_reply_to : Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None, **kwargs) -> TransazioneModel:  # noqa: E501
+        """🔁[ASYNC] Calcolo del codice hash da firmare  # noqa: E501
 
+        Acquisisce la richiesta per il calcolo dell'impronta SHA256 da firmare per poter apporre la firma digitale sul formulario.  Il codice hash SHA256 prodotto da questa procedura dovrà essere firmato con la chiave privata associata al certificato indicato nel modello di input.  Per completare l'apposizione della firma al formulario digitale dovrà essere quindi successivamente invocato l'endpoint <i>POST /{numero_fir}/acquisizione-firma</i>  specificando nel modello di input:  <ul><li>lo stesso certificato incluso nell'invocazione di questo endpoint</li><li>la firma digitale calcolata con la chiave privata associata al certificato</li><li>il token ricevuto nell'esito di questa invocazione</li></ul> Il formulario deve essere in uno stato di attesa di firma, conseguente all'aggiunta di nuove informazioni.  L'art. 7 c.3 del D.M. 59/2023 prevede che il FIR sia sottoscritto da parte degli operatori coinvolti nelle diverse fasi del trasporto,  per cui se il certificato di firma è intestato ad una persona giuridica (cioè è un \"sigillo\") deve riferirsi al soggetto firmatario,  mentre se il certificato di firma è intestato ad una persona fisica, deve coincidere con il codice fiscale di un utente incaricato per il soggetto firmatario. Esclusivamente in ambiente DEMO, se il certificato firmatario non viene riconosciuto come valido secondo la regola qui descritta, il sistema produrrà un avviso non bloccante. In ambiente di produzione il controllo sarà bloccante.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_hash_post(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario a cui si aggiunge la firma")],
-        dati_per_firma_model: Annotated[DatiPerFirmaModel, Field(description="Informazioni necessarie per il calcolo del codice hash da firmare")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> TransazioneModel:
-        """🔁[ASYNC] Calcolo del codice hash da firmare
-
-        Acquisisce la richiesta per il calcolo dell'impronta SHA256 da firmare per poter apporre la firma digitale sul formulario.  Il codice hash SHA256 prodotto da questa procedura dovrà essere firmato con la chiave privata associata al certificato indicato nel modello di input.  Per completare l'apposizione della firma al formulario digitale dovrà essere quindi successivamente invocato l'endpoint <i>POST /{numero_fir}/acquisizione-firma</i>  specificando nel modello di input:  <ul><li>lo stesso certificato incluso nell'invocazione di questo endpoint</li><li>la firma digitale calcolata con la chiave privata associata al certificato</li><li>il token ricevuto nell'esito di questa invocazione</li></ul> Il formulario deve essere in uno stato di attesa di firma, conseguente all'aggiunta di nuove informazioni.  L'art. 7 c.3 del D.M. 59/2023 prevede che il FIR sia sottoscritto da parte degli operatori coinvolti nelle diverse fasi del trasporto,  per cui se il certificato di firma è intestato ad una persona giuridica (cioè è un \"sigillo\") deve riferirsi al soggetto firmatario,  mentre se il certificato di firma è intestato ad una persona fisica, deve coincidere con il codice fiscale di un utente incaricato per il soggetto firmatario. Esclusivamente in ambiente DEMO, se il certificato firmatario non viene riconosciuto come valido secondo la regola qui descritta, il sistema produrrà un avviso non bloccante. In ambiente di produzione il controllo sarà bloccante.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.numero_fir_hash_post(numero_fir, dati_per_firma_model, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: Numero FIR del formulario a cui si aggiunge la firma (required)
         :type numero_fir: str
@@ -3632,79 +1914,33 @@ class FormularioDigitaleApi:
         :type dati_per_firma_model: DatiPerFirmaModel
         :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
         :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: TransazioneModel
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the numero_fir_hash_post_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.numero_fir_hash_post_with_http_info(numero_fir, dati_per_firma_model, x_reply_to, **kwargs)  # noqa: E501
 
-        _param = self._numero_fir_hash_post_serialize(
-            numero_fir=numero_fir,
-            dati_per_firma_model=dati_per_firma_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def numero_fir_hash_post_with_http_info(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero FIR del formulario a cui si aggiunge la firma")], dati_per_firma_model : Annotated[DatiPerFirmaModel, Field(..., description="Informazioni necessarie per il calcolo del codice hash da firmare")], x_reply_to : Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        """🔁[ASYNC] Calcolo del codice hash da firmare  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Acquisisce la richiesta per il calcolo dell'impronta SHA256 da firmare per poter apporre la firma digitale sul formulario.  Il codice hash SHA256 prodotto da questa procedura dovrà essere firmato con la chiave privata associata al certificato indicato nel modello di input.  Per completare l'apposizione della firma al formulario digitale dovrà essere quindi successivamente invocato l'endpoint <i>POST /{numero_fir}/acquisizione-firma</i>  specificando nel modello di input:  <ul><li>lo stesso certificato incluso nell'invocazione di questo endpoint</li><li>la firma digitale calcolata con la chiave privata associata al certificato</li><li>il token ricevuto nell'esito di questa invocazione</li></ul> Il formulario deve essere in uno stato di attesa di firma, conseguente all'aggiunta di nuove informazioni.  L'art. 7 c.3 del D.M. 59/2023 prevede che il FIR sia sottoscritto da parte degli operatori coinvolti nelle diverse fasi del trasporto,  per cui se il certificato di firma è intestato ad una persona giuridica (cioè è un \"sigillo\") deve riferirsi al soggetto firmatario,  mentre se il certificato di firma è intestato ad una persona fisica, deve coincidere con il codice fiscale di un utente incaricato per il soggetto firmatario. Esclusivamente in ambiente DEMO, se il certificato firmatario non viene riconosciuto come valido secondo la regola qui descritta, il sistema produrrà un avviso non bloccante. In ambiente di produzione il controllo sarà bloccante.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_hash_post_with_http_info(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario a cui si aggiunge la firma")],
-        dati_per_firma_model: Annotated[DatiPerFirmaModel, Field(description="Informazioni necessarie per il calcolo del codice hash da firmare")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[TransazioneModel]:
-        """🔁[ASYNC] Calcolo del codice hash da firmare
-
-        Acquisisce la richiesta per il calcolo dell'impronta SHA256 da firmare per poter apporre la firma digitale sul formulario.  Il codice hash SHA256 prodotto da questa procedura dovrà essere firmato con la chiave privata associata al certificato indicato nel modello di input.  Per completare l'apposizione della firma al formulario digitale dovrà essere quindi successivamente invocato l'endpoint <i>POST /{numero_fir}/acquisizione-firma</i>  specificando nel modello di input:  <ul><li>lo stesso certificato incluso nell'invocazione di questo endpoint</li><li>la firma digitale calcolata con la chiave privata associata al certificato</li><li>il token ricevuto nell'esito di questa invocazione</li></ul> Il formulario deve essere in uno stato di attesa di firma, conseguente all'aggiunta di nuove informazioni.  L'art. 7 c.3 del D.M. 59/2023 prevede che il FIR sia sottoscritto da parte degli operatori coinvolti nelle diverse fasi del trasporto,  per cui se il certificato di firma è intestato ad una persona giuridica (cioè è un \"sigillo\") deve riferirsi al soggetto firmatario,  mentre se il certificato di firma è intestato ad una persona fisica, deve coincidere con il codice fiscale di un utente incaricato per il soggetto firmatario. Esclusivamente in ambiente DEMO, se il certificato firmatario non viene riconosciuto come valido secondo la regola qui descritta, il sistema produrrà un avviso non bloccante. In ambiente di produzione il controllo sarà bloccante.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.numero_fir_hash_post_with_http_info(numero_fir, dati_per_firma_model, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: Numero FIR del formulario a cui si aggiunge la firma (required)
         :type numero_fir: str
@@ -3712,513 +1948,277 @@ class FormularioDigitaleApi:
         :type dati_per_firma_model: DatiPerFirmaModel
         :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
         :type x_reply_to: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(TransazioneModel, status_code(int), headers(HTTPHeaderDict))
+        """
 
-        _param = self._numero_fir_hash_post_serialize(
-            numero_fir=numero_fir,
-            dati_per_firma_model=dati_per_firma_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def numero_fir_hash_post_without_preload_content(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario a cui si aggiunge la firma")],
-        dati_per_firma_model: Annotated[DatiPerFirmaModel, Field(description="Informazioni necessarie per il calcolo del codice hash da firmare")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'numero_fir',
+            'dati_per_firma_model',
+            'x_reply_to'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """🔁[ASYNC] Calcolo del codice hash da firmare
-
-        Acquisisce la richiesta per il calcolo dell'impronta SHA256 da firmare per poter apporre la firma digitale sul formulario.  Il codice hash SHA256 prodotto da questa procedura dovrà essere firmato con la chiave privata associata al certificato indicato nel modello di input.  Per completare l'apposizione della firma al formulario digitale dovrà essere quindi successivamente invocato l'endpoint <i>POST /{numero_fir}/acquisizione-firma</i>  specificando nel modello di input:  <ul><li>lo stesso certificato incluso nell'invocazione di questo endpoint</li><li>la firma digitale calcolata con la chiave privata associata al certificato</li><li>il token ricevuto nell'esito di questa invocazione</li></ul> Il formulario deve essere in uno stato di attesa di firma, conseguente all'aggiunta di nuove informazioni.  L'art. 7 c.3 del D.M. 59/2023 prevede che il FIR sia sottoscritto da parte degli operatori coinvolti nelle diverse fasi del trasporto,  per cui se il certificato di firma è intestato ad una persona giuridica (cioè è un \"sigillo\") deve riferirsi al soggetto firmatario,  mentre se il certificato di firma è intestato ad una persona fisica, deve coincidere con il codice fiscale di un utente incaricato per il soggetto firmatario. Esclusivamente in ambiente DEMO, se il certificato firmatario non viene riconosciuto come valido secondo la regola qui descritta, il sistema produrrà un avviso non bloccante. In ambiente di produzione il controllo sarà bloccante.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
-
-        :param numero_fir: Numero FIR del formulario a cui si aggiunge la firma (required)
-        :type numero_fir: str
-        :param dati_per_firma_model: Informazioni necessarie per il calcolo del codice hash da firmare (required)
-        :type dati_per_firma_model: DatiPerFirmaModel
-        :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
-        :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._numero_fir_hash_post_serialize(
-            numero_fir=numero_fir,
-            dati_per_firma_model=dati_per_firma_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method numero_fir_hash_post" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    def _numero_fir_hash_post_serialize(
-        self,
-        numero_fir,
-        dati_per_firma_model,
-        x_reply_to,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if numero_fir is not None:
-            _path_params['numero_fir'] = numero_fir
-        # process the query parameters
-        # process the header parameters
-        if x_reply_to is not None:
-            _header_params['X-ReplyTo'] = x_reply_to
-        # process the form parameters
-        # process the body parameter
-        if dati_per_firma_model is not None:
-            _body_params = dati_per_firma_model
+        _path_params = {}
+        if _params['numero_fir'] is not None:
+            _path_params['numero_fir'] = _params['numero_fir']
 
+
+        # process the query parameters
+        _query_params = []
+        # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
+        if _params['x_reply_to'] is not None:
+            _header_params['X-ReplyTo'] = _params['x_reply_to']
+
+        # process the form parameters
+        _form_params = []
+        _files = {}
+        # process the body parameter
+        _body_params = None
+        if _params['dati_per_firma_model'] is not None:
+            _body_params = _params['dati_per_firma_model']
 
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
 
         # set the HTTP header `Content-Type`
-        if _content_type:
-            _header_params['Content-Type'] = _content_type
-        else:
-            _default_content_type = (
-                self.api_client.select_header_content_type(
-                    [
-                        'application/json'
-                    ]
-                )
-            )
-            if _default_content_type is not None:
-                _header_params['Content-Type'] = _default_content_type
+        _content_types_list = _params.get('_content_type',
+            self.api_client.select_header_content_type(
+                ['application/json']))
+        if _content_types_list:
+                _header_params['Content-Type'] = _content_types_list
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='POST',
-            resource_path='/{numero_fir}/hash',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {
+            '202': "TransazioneModel",
+            '400': "ProblemDetails",
+            '403': None,
+            '404': None,
+            '429': None,
+            '500': "ProblemDetails",
+        }
+
+        return self.api_client.call_api(
+            '/{numero_fir}/hash', 'POST',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def numero_fir_pdf_get(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero FIR del formulario")], **kwargs) -> DownloadableBaseResponse:  # noqa: E501
+        """Stampa PDF del FIR  # noqa: E501
 
+        Ottiene una stampa in PDF del FIR  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_pdf_get(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> DownloadableBaseResponse:
-        """Stampa PDF del FIR
-
-        Ottiene una stampa in PDF del FIR
+        >>> thread = api.numero_fir_pdf_get(numero_fir, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: Numero FIR del formulario (required)
         :type numero_fir: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
+        :return: Returns the result object.
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: DownloadableBaseResponse
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the numero_fir_pdf_get_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.numero_fir_pdf_get_with_http_info(numero_fir, **kwargs)  # noqa: E501
+
+    @validate_arguments
+    def numero_fir_pdf_get_with_http_info(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero FIR del formulario")], **kwargs) -> ApiResponse:  # noqa: E501
+        """Stampa PDF del FIR  # noqa: E501
+
+        Ottiene una stampa in PDF del FIR  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+
+        >>> thread = api.numero_fir_pdf_get_with_http_info(numero_fir, async_req=True)
+        >>> result = thread.get()
+
+        :param numero_fir: Numero FIR del formulario (required)
+        :type numero_fir: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(DownloadableBaseResponse, status_code(int), headers(HTTPHeaderDict))
+        """
 
-        _param = self._numero_fir_pdf_get_serialize(
-            numero_fir=numero_fir,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "DownloadableBaseResponse",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
-
-
-    @validate_call
-    def numero_fir_pdf_get_with_http_info(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'numero_fir'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[DownloadableBaseResponse]:
-        """Stampa PDF del FIR
-
-        Ottiene una stampa in PDF del FIR
-
-        :param numero_fir: Numero FIR del formulario (required)
-        :type numero_fir: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._numero_fir_pdf_get_serialize(
-            numero_fir=numero_fir,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "DownloadableBaseResponse",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method numero_fir_pdf_get" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    @validate_call
-    def numero_fir_pdf_get_without_preload_content(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """Stampa PDF del FIR
-
-        Ottiene una stampa in PDF del FIR
-
-        :param numero_fir: Numero FIR del formulario (required)
-        :type numero_fir: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._numero_fir_pdf_get_serialize(
-            numero_fir=numero_fir,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
-
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "DownloadableBaseResponse",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
-
-
-    def _numero_fir_pdf_get_serialize(
-        self,
-        numero_fir,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if numero_fir is not None:
-            _path_params['numero_fir'] = numero_fir
+        _path_params = {}
+        if _params['numero_fir'] is not None:
+            _path_params['numero_fir'] = _params['numero_fir']
+
+
         # process the query parameters
+        _query_params = []
         # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
+        _form_params = []
+        _files = {}
         # process the body parameter
-
-
+        _body_params = None
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
-
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='GET',
-            resource_path='/{numero_fir}/pdf',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {
+            '200': "DownloadableBaseResponse",
+            '403': None,
+            '404': None,
+            '429': None,
+            '500': "ProblemDetails",
+        }
+
+        return self.api_client.call_api(
+            '/{numero_fir}/pdf', 'GET',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def numero_fir_put(self, numero_fir : constr(strict=True), nuovo_formulario_model : Annotated[NuovoFormularioModel, Field(..., description="Dati del formulario da sostituire a quelli presenti")], x_reply_to : Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None, **kwargs) -> TransazioneModel:  # noqa: E501
+        """🔁[ASYNC] Modifica FIR  # noqa: E501
 
+        Acquisisce la richiesta di modifica dei dati di un FIR esistente. Lo stato del formulario deve essere compatibile con l'operazione richiesta, ovvero non devono essere presenti firme.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_put(
-        self,
-        numero_fir: Annotated[str, Field(strict=True)],
-        nuovo_formulario_model: Annotated[NuovoFormularioModel, Field(description="Dati del formulario da sostituire a quelli presenti")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> TransazioneModel:
-        """🔁[ASYNC] Modifica FIR
-
-        Acquisisce la richiesta di modifica dei dati di un FIR esistente. Lo stato del formulario deve essere compatibile con l'operazione richiesta, ovvero non devono essere presenti firme.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.numero_fir_put(numero_fir, nuovo_formulario_model, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir:  (required)
         :type numero_fir: str
@@ -4226,79 +2226,33 @@ class FormularioDigitaleApi:
         :type nuovo_formulario_model: NuovoFormularioModel
         :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
         :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: TransazioneModel
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the numero_fir_put_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.numero_fir_put_with_http_info(numero_fir, nuovo_formulario_model, x_reply_to, **kwargs)  # noqa: E501
 
-        _param = self._numero_fir_put_serialize(
-            numero_fir=numero_fir,
-            nuovo_formulario_model=nuovo_formulario_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def numero_fir_put_with_http_info(self, numero_fir : constr(strict=True), nuovo_formulario_model : Annotated[NuovoFormularioModel, Field(..., description="Dati del formulario da sostituire a quelli presenti")], x_reply_to : Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        """🔁[ASYNC] Modifica FIR  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Acquisisce la richiesta di modifica dei dati di un FIR esistente. Lo stato del formulario deve essere compatibile con l'operazione richiesta, ovvero non devono essere presenti firme.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_put_with_http_info(
-        self,
-        numero_fir: Annotated[str, Field(strict=True)],
-        nuovo_formulario_model: Annotated[NuovoFormularioModel, Field(description="Dati del formulario da sostituire a quelli presenti")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[TransazioneModel]:
-        """🔁[ASYNC] Modifica FIR
-
-        Acquisisce la richiesta di modifica dei dati di un FIR esistente. Lo stato del formulario deve essere compatibile con l'operazione richiesta, ovvero non devono essere presenti firme.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.numero_fir_put_with_http_info(numero_fir, nuovo_formulario_model, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir:  (required)
         :type numero_fir: str
@@ -4306,239 +2260,133 @@ class FormularioDigitaleApi:
         :type nuovo_formulario_model: NuovoFormularioModel
         :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
         :type x_reply_to: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(TransazioneModel, status_code(int), headers(HTTPHeaderDict))
+        """
 
-        _param = self._numero_fir_put_serialize(
-            numero_fir=numero_fir,
-            nuovo_formulario_model=nuovo_formulario_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def numero_fir_put_without_preload_content(
-        self,
-        numero_fir: Annotated[str, Field(strict=True)],
-        nuovo_formulario_model: Annotated[NuovoFormularioModel, Field(description="Dati del formulario da sostituire a quelli presenti")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'numero_fir',
+            'nuovo_formulario_model',
+            'x_reply_to'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """🔁[ASYNC] Modifica FIR
-
-        Acquisisce la richiesta di modifica dei dati di un FIR esistente. Lo stato del formulario deve essere compatibile con l'operazione richiesta, ovvero non devono essere presenti firme.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
-
-        :param numero_fir:  (required)
-        :type numero_fir: str
-        :param nuovo_formulario_model: Dati del formulario da sostituire a quelli presenti (required)
-        :type nuovo_formulario_model: NuovoFormularioModel
-        :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
-        :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._numero_fir_put_serialize(
-            numero_fir=numero_fir,
-            nuovo_formulario_model=nuovo_formulario_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method numero_fir_put" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    def _numero_fir_put_serialize(
-        self,
-        numero_fir,
-        nuovo_formulario_model,
-        x_reply_to,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if numero_fir is not None:
-            _path_params['numero_fir'] = numero_fir
-        # process the query parameters
-        # process the header parameters
-        if x_reply_to is not None:
-            _header_params['X-ReplyTo'] = x_reply_to
-        # process the form parameters
-        # process the body parameter
-        if nuovo_formulario_model is not None:
-            _body_params = nuovo_formulario_model
+        _path_params = {}
+        if _params['numero_fir'] is not None:
+            _path_params['numero_fir'] = _params['numero_fir']
 
+
+        # process the query parameters
+        _query_params = []
+        # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
+        if _params['x_reply_to'] is not None:
+            _header_params['X-ReplyTo'] = _params['x_reply_to']
+
+        # process the form parameters
+        _form_params = []
+        _files = {}
+        # process the body parameter
+        _body_params = None
+        if _params['nuovo_formulario_model'] is not None:
+            _body_params = _params['nuovo_formulario_model']
 
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
 
         # set the HTTP header `Content-Type`
-        if _content_type:
-            _header_params['Content-Type'] = _content_type
-        else:
-            _default_content_type = (
-                self.api_client.select_header_content_type(
-                    [
-                        'application/json'
-                    ]
-                )
-            )
-            if _default_content_type is not None:
-                _header_params['Content-Type'] = _default_content_type
+        _content_types_list = _params.get('_content_type',
+            self.api_client.select_header_content_type(
+                ['application/json']))
+        if _content_types_list:
+                _header_params['Content-Type'] = _content_types_list
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='PUT',
-            resource_path='/{numero_fir}',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {
+            '202': "TransazioneModel",
+            '400': "ProblemDetails",
+            '403': None,
+            '404': None,
+            '429': None,
+            '500': "ProblemDetails",
+        }
+
+        return self.api_client.call_api(
+            '/{numero_fir}', 'PUT',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def numero_fir_quantita_post(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero FIR del formulario")], quantita_rifiuto_model : QuantitaRifiutoModel, x_reply_to : Optional[StrictStr] = None, **kwargs) -> TransazioneModel:  # noqa: E501
+        """🔁[ASYNC] Imposta quantità  # noqa: E501
 
+        Acquisice la richiesta di aggiunta o modifica del dato della quantità sul formulario indicato.  Stati del formulario ammessi: <ul><li>InserimentoQuantitaTrasportoIniziale</li><li>InserimentoTrasportoIniziale</li><li>InserimentoQuantita</li><li>FirmaProduttoreTrasportatoreIniziale</li></ul> L'operazione può essere eseguita da un'utenza che abbia visibilità su (o coincida con) il <i>produttore</i> o il <i>primo trasportatore</i>.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_quantita_post(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario")],
-        quantita_rifiuto_model: QuantitaRifiutoModel,
-        x_reply_to: Optional[StrictStr] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> TransazioneModel:
-        """🔁[ASYNC] Imposta quantità
-
-        Acquisice la richiesta di aggiunta o modifica del dato della quantità sul formulario indicato.  Stati del formulario ammessi: <ul><li>InserimentoQuantitaTrasportoIniziale</li><li>InserimentoTrasportoIniziale</li><li>InserimentoQuantita</li><li>FirmaProduttoreTrasportatoreIniziale</li></ul> L'operazione può essere eseguita da un'utenza che abbia visibilità su (o coincida con) il <i>produttore</i> o il <i>primo trasportatore</i>.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.numero_fir_quantita_post(numero_fir, quantita_rifiuto_model, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: Numero FIR del formulario (required)
         :type numero_fir: str
@@ -4546,79 +2394,33 @@ class FormularioDigitaleApi:
         :type quantita_rifiuto_model: QuantitaRifiutoModel
         :param x_reply_to: 
         :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: TransazioneModel
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the numero_fir_quantita_post_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.numero_fir_quantita_post_with_http_info(numero_fir, quantita_rifiuto_model, x_reply_to, **kwargs)  # noqa: E501
 
-        _param = self._numero_fir_quantita_post_serialize(
-            numero_fir=numero_fir,
-            quantita_rifiuto_model=quantita_rifiuto_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def numero_fir_quantita_post_with_http_info(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero FIR del formulario")], quantita_rifiuto_model : QuantitaRifiutoModel, x_reply_to : Optional[StrictStr] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        """🔁[ASYNC] Imposta quantità  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Acquisice la richiesta di aggiunta o modifica del dato della quantità sul formulario indicato.  Stati del formulario ammessi: <ul><li>InserimentoQuantitaTrasportoIniziale</li><li>InserimentoTrasportoIniziale</li><li>InserimentoQuantita</li><li>FirmaProduttoreTrasportatoreIniziale</li></ul> L'operazione può essere eseguita da un'utenza che abbia visibilità su (o coincida con) il <i>produttore</i> o il <i>primo trasportatore</i>.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_quantita_post_with_http_info(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario")],
-        quantita_rifiuto_model: QuantitaRifiutoModel,
-        x_reply_to: Optional[StrictStr] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[TransazioneModel]:
-        """🔁[ASYNC] Imposta quantità
-
-        Acquisice la richiesta di aggiunta o modifica del dato della quantità sul formulario indicato.  Stati del formulario ammessi: <ul><li>InserimentoQuantitaTrasportoIniziale</li><li>InserimentoTrasportoIniziale</li><li>InserimentoQuantita</li><li>FirmaProduttoreTrasportatoreIniziale</li></ul> L'operazione può essere eseguita da un'utenza che abbia visibilità su (o coincida con) il <i>produttore</i> o il <i>primo trasportatore</i>.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.numero_fir_quantita_post_with_http_info(numero_fir, quantita_rifiuto_model, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: Numero FIR del formulario (required)
         :type numero_fir: str
@@ -4626,275 +2428,251 @@ class FormularioDigitaleApi:
         :type quantita_rifiuto_model: QuantitaRifiutoModel
         :param x_reply_to: 
         :type x_reply_to: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(TransazioneModel, status_code(int), headers(HTTPHeaderDict))
+        """
 
-        _param = self._numero_fir_quantita_post_serialize(
-            numero_fir=numero_fir,
-            quantita_rifiuto_model=quantita_rifiuto_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def numero_fir_quantita_post_without_preload_content(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario")],
-        quantita_rifiuto_model: QuantitaRifiutoModel,
-        x_reply_to: Optional[StrictStr] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'numero_fir',
+            'quantita_rifiuto_model',
+            'x_reply_to'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """🔁[ASYNC] Imposta quantità
-
-        Acquisice la richiesta di aggiunta o modifica del dato della quantità sul formulario indicato.  Stati del formulario ammessi: <ul><li>InserimentoQuantitaTrasportoIniziale</li><li>InserimentoTrasportoIniziale</li><li>InserimentoQuantita</li><li>FirmaProduttoreTrasportatoreIniziale</li></ul> L'operazione può essere eseguita da un'utenza che abbia visibilità su (o coincida con) il <i>produttore</i> o il <i>primo trasportatore</i>.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
-
-        :param numero_fir: Numero FIR del formulario (required)
-        :type numero_fir: str
-        :param quantita_rifiuto_model:  (required)
-        :type quantita_rifiuto_model: QuantitaRifiutoModel
-        :param x_reply_to: 
-        :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._numero_fir_quantita_post_serialize(
-            numero_fir=numero_fir,
-            quantita_rifiuto_model=quantita_rifiuto_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method numero_fir_quantita_post" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    def _numero_fir_quantita_post_serialize(
-        self,
-        numero_fir,
-        quantita_rifiuto_model,
-        x_reply_to,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if numero_fir is not None:
-            _path_params['numero_fir'] = numero_fir
-        # process the query parameters
-        # process the header parameters
-        if x_reply_to is not None:
-            _header_params['X-ReplyTo'] = x_reply_to
-        # process the form parameters
-        # process the body parameter
-        if quantita_rifiuto_model is not None:
-            _body_params = quantita_rifiuto_model
+        _path_params = {}
+        if _params['numero_fir'] is not None:
+            _path_params['numero_fir'] = _params['numero_fir']
 
+
+        # process the query parameters
+        _query_params = []
+        # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
+        if _params['x_reply_to'] is not None:
+            _header_params['X-ReplyTo'] = _params['x_reply_to']
+
+        # process the form parameters
+        _form_params = []
+        _files = {}
+        # process the body parameter
+        _body_params = None
+        if _params['quantita_rifiuto_model'] is not None:
+            _body_params = _params['quantita_rifiuto_model']
 
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
 
         # set the HTTP header `Content-Type`
-        if _content_type:
-            _header_params['Content-Type'] = _content_type
-        else:
-            _default_content_type = (
-                self.api_client.select_header_content_type(
-                    [
-                        'application/json'
-                    ]
+        _content_types_list = _params.get('_content_type',
+            self.api_client.select_header_content_type(
+                ['application/json']))
+        if _content_types_list:
+                _header_params['Content-Type'] = _content_types_list
+
+        # authentication setting
+        _auth_settings = ['Bearer']  # noqa: E501
+
+        _response_types_map = {
+            '202': "TransazioneModel",
+            '400': "ProblemDetails",
+            '403': None,
+            '404': None,
+            '429': None,
+            '500': "ProblemDetails",
+        }
+
+        return self.api_client.call_api(
+            '/{numero_fir}/quantita', 'POST',
+            _path_params,
+            _query_params,
+            _header_params,
+            body=_body_params,
+            post_params=_form_params,
+            files=_files,
+            response_types_map=_response_types_map,
+            auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
+            collection_formats=_collection_formats,
+            _request_auth=_params.get('_request_auth'))
+
+    @validate_arguments
+    def numero_fir_reset_post(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero FIR del formulario")], x_reply_to : Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None, **kwargs) -> TransazioneModel:  # noqa: E501
+        """🔁[ASYNC] Reset stato  # noqa: E501
+
+        Acquisisce la richiesta di cancellazione degli ultimi dati inseriti nel formulario in attesa di firma, riportando lo stato del formulario a quello precedente.  Stati del formulario ammessi:  <ul><li>FirmaTrasportatoreSuccessivo</li><li>FirmaDestinatarioSuccessivo</li><li>FirmaAccettazione</li><li>FirmaAccettazioneSuccessiva</li><li>FirmaAnnotazione</li><li>FirmaAllegato</li><li>FirmaAnnullamento</li><li>FirmaTrasbordoParziale</li><li>FirmaTrasbordoTotale</li><li>FirmaSostaTecnica</li></ul> Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+
+        >>> thread = api.numero_fir_reset_post(numero_fir, x_reply_to, async_req=True)
+        >>> result = thread.get()
+
+        :param numero_fir: Numero FIR del formulario (required)
+        :type numero_fir: str
+        :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
+        :type x_reply_to: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
+        :return: Returns the result object.
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: TransazioneModel
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the numero_fir_reset_post_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.numero_fir_reset_post_with_http_info(numero_fir, x_reply_to, **kwargs)  # noqa: E501
+
+    @validate_arguments
+    def numero_fir_reset_post_with_http_info(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero FIR del formulario")], x_reply_to : Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        """🔁[ASYNC] Reset stato  # noqa: E501
+
+        Acquisisce la richiesta di cancellazione degli ultimi dati inseriti nel formulario in attesa di firma, riportando lo stato del formulario a quello precedente.  Stati del formulario ammessi:  <ul><li>FirmaTrasportatoreSuccessivo</li><li>FirmaDestinatarioSuccessivo</li><li>FirmaAccettazione</li><li>FirmaAccettazioneSuccessiva</li><li>FirmaAnnotazione</li><li>FirmaAllegato</li><li>FirmaAnnullamento</li><li>FirmaTrasbordoParziale</li><li>FirmaTrasbordoTotale</li><li>FirmaSostaTecnica</li></ul> Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+
+        >>> thread = api.numero_fir_reset_post_with_http_info(numero_fir, x_reply_to, async_req=True)
+        >>> result = thread.get()
+
+        :param numero_fir: Numero FIR del formulario (required)
+        :type numero_fir: str
+        :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
+        :type x_reply_to: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
+        :param _request_timeout: timeout setting for this request. If one
+                                 number provided, it will be total request
+                                 timeout. It can also be a pair (tuple) of
+                                 (connection, read) timeouts.
+        :param _request_auth: set to override the auth_settings for an a single
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
+        :type _request_auth: dict, optional
+        :type _content_type: string, optional: force content-type for the request
+        :return: Returns the result object.
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(TransazioneModel, status_code(int), headers(HTTPHeaderDict))
+        """
+
+        _params = locals()
+
+        _all_params = [
+            'numero_fir',
+            'x_reply_to'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
+            ]
+        )
+
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method numero_fir_reset_post" % _key
                 )
-            )
-            if _default_content_type is not None:
-                _header_params['Content-Type'] = _default_content_type
+            _params[_key] = _val
+        del _params['kwargs']
+
+        _collection_formats = {}
+
+        # process the path parameters
+        _path_params = {}
+        if _params['numero_fir'] is not None:
+            _path_params['numero_fir'] = _params['numero_fir']
+
+
+        # process the query parameters
+        _query_params = []
+        # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
+        if _params['x_reply_to'] is not None:
+            _header_params['X-ReplyTo'] = _params['x_reply_to']
+
+        # process the form parameters
+        _form_params = []
+        _files = {}
+        # process the body parameter
+        _body_params = None
+        # set the HTTP header `Accept`
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='POST',
-            resource_path='/{numero_fir}/quantita',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
-            body=_body_params,
-            post_params=_form_params,
-            files=_files,
-            auth_settings=_auth_settings,
-            collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
-
-
-
-
-    @validate_call
-    def numero_fir_reset_post(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> TransazioneModel:
-        """🔁[ASYNC] Reset stato
-
-        Acquisisce la richiesta di cancellazione degli ultimi dati inseriti nel formulario in attesa di firma, riportando lo stato del formulario a quello precedente.  Stati del formulario ammessi:  <ul><li>FirmaTrasportatoreSuccessivo</li><li>FirmaDestinatarioSuccessivo</li><li>FirmaAccettazione</li><li>FirmaAccettazioneSuccessiva</li><li>FirmaAnnotazione</li><li>FirmaAllegato</li><li>FirmaAnnullamento</li><li>FirmaTrasbordoParziale</li><li>FirmaTrasbordoTotale</li><li>FirmaSostaTecnica</li></ul> Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
-
-        :param numero_fir: Numero FIR del formulario (required)
-        :type numero_fir: str
-        :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
-        :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._numero_fir_reset_post_serialize(
-            numero_fir=numero_fir,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
-
-        _response_types_map: Dict[str, Optional[str]] = {
+        _response_types_map = {
             '202': "TransazioneModel",
             '400': "ProblemDetails",
             '403': None,
@@ -4902,842 +2680,328 @@ class FormularioDigitaleApi:
             '429': None,
             '500': "ProblemDetails",
         }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
 
-
-    @validate_call
-    def numero_fir_reset_post_with_http_info(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[TransazioneModel]:
-        """🔁[ASYNC] Reset stato
-
-        Acquisisce la richiesta di cancellazione degli ultimi dati inseriti nel formulario in attesa di firma, riportando lo stato del formulario a quello precedente.  Stati del formulario ammessi:  <ul><li>FirmaTrasportatoreSuccessivo</li><li>FirmaDestinatarioSuccessivo</li><li>FirmaAccettazione</li><li>FirmaAccettazioneSuccessiva</li><li>FirmaAnnotazione</li><li>FirmaAllegato</li><li>FirmaAnnullamento</li><li>FirmaTrasbordoParziale</li><li>FirmaTrasbordoTotale</li><li>FirmaSostaTecnica</li></ul> Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
-
-        :param numero_fir: Numero FIR del formulario (required)
-        :type numero_fir: str
-        :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
-        :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._numero_fir_reset_post_serialize(
-            numero_fir=numero_fir,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
-
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def numero_fir_reset_post_without_preload_content(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """🔁[ASYNC] Reset stato
-
-        Acquisisce la richiesta di cancellazione degli ultimi dati inseriti nel formulario in attesa di firma, riportando lo stato del formulario a quello precedente.  Stati del formulario ammessi:  <ul><li>FirmaTrasportatoreSuccessivo</li><li>FirmaDestinatarioSuccessivo</li><li>FirmaAccettazione</li><li>FirmaAccettazioneSuccessiva</li><li>FirmaAnnotazione</li><li>FirmaAllegato</li><li>FirmaAnnullamento</li><li>FirmaTrasbordoParziale</li><li>FirmaTrasbordoTotale</li><li>FirmaSostaTecnica</li></ul> Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
-
-        :param numero_fir: Numero FIR del formulario (required)
-        :type numero_fir: str
-        :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
-        :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._numero_fir_reset_post_serialize(
-            numero_fir=numero_fir,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
-
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
-
-
-    def _numero_fir_reset_post_serialize(
-        self,
-        numero_fir,
-        x_reply_to,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
-
-        # process the path parameters
-        if numero_fir is not None:
-            _path_params['numero_fir'] = numero_fir
-        # process the query parameters
-        # process the header parameters
-        if x_reply_to is not None:
-            _header_params['X-ReplyTo'] = x_reply_to
-        # process the form parameters
-        # process the body parameter
-
-
-        # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
-
-
-        # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
-
-        return self.api_client.param_serialize(
-            method='POST',
-            resource_path='/{numero_fir}/reset',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        return self.api_client.call_api(
+            '/{numero_fir}/reset', 'POST',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def numero_fir_respingi_post(self, numero_fir : constr(strict=True), num_iscr_sito : Optional[constr(strict=True)] = None, **kwargs) -> None:  # noqa: E501
+        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /{numeroFIR}/rilascio-visibilita/{numIscrSito} - Rilascio visibilità FIR  # noqa: E501
 
+        Abbandona la visibilità in ricerca sull'unità locale specificata, ottenuta con l'operazione di \"acquisizione\", relativamente al FIR digitale specificato creato da terzi.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_respingi_post(
-        self,
-        numero_fir: Annotated[str, Field(strict=True)],
-        num_iscr_sito: Optional[Annotated[str, Field(strict=True)]] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> None:
-        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /{numeroFIR}/rilascio-visibilita/{numIscrSito} - Rilascio visibilità FIR
-
-        Abbandona la visibilità in ricerca sull'unità locale specificata, ottenuta con l'operazione di \"acquisizione\", relativamente al FIR digitale specificato creato da terzi.
+        >>> thread = api.numero_fir_respingi_post(numero_fir, num_iscr_sito, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: (required)
         :type numero_fir: str
         :param num_iscr_sito:
         :type num_iscr_sito: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
-        warnings.warn("POST /{numero_fir}/respingi is deprecated.", DeprecationWarning)
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: None
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the numero_fir_respingi_post_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.numero_fir_respingi_post_with_http_info(numero_fir, num_iscr_sito, **kwargs)  # noqa: E501
 
-        _param = self._numero_fir_respingi_post_serialize(
-            numero_fir=numero_fir,
-            num_iscr_sito=num_iscr_sito,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def numero_fir_respingi_post_with_http_info(self, numero_fir : constr(strict=True), num_iscr_sito : Optional[constr(strict=True)] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /{numeroFIR}/rilascio-visibilita/{numIscrSito} - Rilascio visibilità FIR  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': None,
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Abbandona la visibilità in ricerca sull'unità locale specificata, ottenuta con l'operazione di \"acquisizione\", relativamente al FIR digitale specificato creato da terzi.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_respingi_post_with_http_info(
-        self,
-        numero_fir: Annotated[str, Field(strict=True)],
-        num_iscr_sito: Optional[Annotated[str, Field(strict=True)]] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[None]:
-        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /{numeroFIR}/rilascio-visibilita/{numIscrSito} - Rilascio visibilità FIR
-
-        Abbandona la visibilità in ricerca sull'unità locale specificata, ottenuta con l'operazione di \"acquisizione\", relativamente al FIR digitale specificato creato da terzi.
+        >>> thread = api.numero_fir_respingi_post_with_http_info(numero_fir, num_iscr_sito, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: (required)
         :type numero_fir: str
         :param num_iscr_sito:
         :type num_iscr_sito: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: None
+        """
+
         warnings.warn("POST /{numero_fir}/respingi is deprecated.", DeprecationWarning)
 
-        _param = self._numero_fir_respingi_post_serialize(
-            numero_fir=numero_fir,
-            num_iscr_sito=num_iscr_sito,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': None,
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def numero_fir_respingi_post_without_preload_content(
-        self,
-        numero_fir: Annotated[str, Field(strict=True)],
-        num_iscr_sito: Optional[Annotated[str, Field(strict=True)]] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'numero_fir',
+            'num_iscr_sito'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /{numeroFIR}/rilascio-visibilita/{numIscrSito} - Rilascio visibilità FIR
-
-        Abbandona la visibilità in ricerca sull'unità locale specificata, ottenuta con l'operazione di \"acquisizione\", relativamente al FIR digitale specificato creato da terzi.
-
-        :param numero_fir: (required)
-        :type numero_fir: str
-        :param num_iscr_sito:
-        :type num_iscr_sito: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-        warnings.warn("POST /{numero_fir}/respingi is deprecated.", DeprecationWarning)
-
-        _param = self._numero_fir_respingi_post_serialize(
-            numero_fir=numero_fir,
-            num_iscr_sito=num_iscr_sito,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': None,
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method numero_fir_respingi_post" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    def _numero_fir_respingi_post_serialize(
-        self,
-        numero_fir,
-        num_iscr_sito,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if numero_fir is not None:
-            _path_params['numero_fir'] = numero_fir
+        _path_params = {}
+        if _params['numero_fir'] is not None:
+            _path_params['numero_fir'] = _params['numero_fir']
+
+
         # process the query parameters
-        if num_iscr_sito is not None:
-            
-            _query_params.append(('num_iscr_sito', num_iscr_sito))
-            
+        _query_params = []
+        if _params.get('num_iscr_sito') is not None:  # noqa: E501
+            _query_params.append(('num_iscr_sito', _params['num_iscr_sito']))
+
         # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
+        _form_params = []
+        _files = {}
         # process the body parameter
-
-
+        _body_params = None
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/problem+json'
-                ]
-            )
-
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/problem+json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='POST',
-            resource_path='/{numero_fir}/respingi',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {}
+
+        return self.api_client.call_api(
+            '/{numero_fir}/respingi', 'POST',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def numero_fir_rilascio_visibilita_num_iscr_sito_post(self, numero_fir : constr(strict=True), num_iscr_sito : constr(strict=True), **kwargs) -> None:  # noqa: E501
+        """Rilascio visibilità FIR  # noqa: E501
 
+        Abbandona la visibilità in ricerca sull'unità locale specificata, ottenuta con l'operazione di \"acquisizione\", relativamente al FIR digitale specificato creato da terzi.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_rilascio_visibilita_num_iscr_sito_post(
-        self,
-        numero_fir: Annotated[str, Field(strict=True)],
-        num_iscr_sito: Annotated[str, Field(strict=True)],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> None:
-        """Rilascio visibilità FIR
-
-        Abbandona la visibilità in ricerca sull'unità locale specificata, ottenuta con l'operazione di \"acquisizione\", relativamente al FIR digitale specificato creato da terzi.
+        >>> thread = api.numero_fir_rilascio_visibilita_num_iscr_sito_post(numero_fir, num_iscr_sito, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: (required)
         :type numero_fir: str
         :param num_iscr_sito: (required)
         :type num_iscr_sito: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: None
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the numero_fir_rilascio_visibilita_num_iscr_sito_post_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.numero_fir_rilascio_visibilita_num_iscr_sito_post_with_http_info(numero_fir, num_iscr_sito, **kwargs)  # noqa: E501
 
-        _param = self._numero_fir_rilascio_visibilita_num_iscr_sito_post_serialize(
-            numero_fir=numero_fir,
-            num_iscr_sito=num_iscr_sito,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def numero_fir_rilascio_visibilita_num_iscr_sito_post_with_http_info(self, numero_fir : constr(strict=True), num_iscr_sito : constr(strict=True), **kwargs) -> ApiResponse:  # noqa: E501
+        """Rilascio visibilità FIR  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': None,
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Abbandona la visibilità in ricerca sull'unità locale specificata, ottenuta con l'operazione di \"acquisizione\", relativamente al FIR digitale specificato creato da terzi.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_rilascio_visibilita_num_iscr_sito_post_with_http_info(
-        self,
-        numero_fir: Annotated[str, Field(strict=True)],
-        num_iscr_sito: Annotated[str, Field(strict=True)],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[None]:
-        """Rilascio visibilità FIR
-
-        Abbandona la visibilità in ricerca sull'unità locale specificata, ottenuta con l'operazione di \"acquisizione\", relativamente al FIR digitale specificato creato da terzi.
+        >>> thread = api.numero_fir_rilascio_visibilita_num_iscr_sito_post_with_http_info(numero_fir, num_iscr_sito, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: (required)
         :type numero_fir: str
         :param num_iscr_sito: (required)
         :type num_iscr_sito: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: None
+        """
 
-        _param = self._numero_fir_rilascio_visibilita_num_iscr_sito_post_serialize(
-            numero_fir=numero_fir,
-            num_iscr_sito=num_iscr_sito,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': None,
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def numero_fir_rilascio_visibilita_num_iscr_sito_post_without_preload_content(
-        self,
-        numero_fir: Annotated[str, Field(strict=True)],
-        num_iscr_sito: Annotated[str, Field(strict=True)],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'numero_fir',
+            'num_iscr_sito'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """Rilascio visibilità FIR
-
-        Abbandona la visibilità in ricerca sull'unità locale specificata, ottenuta con l'operazione di \"acquisizione\", relativamente al FIR digitale specificato creato da terzi.
-
-        :param numero_fir: (required)
-        :type numero_fir: str
-        :param num_iscr_sito: (required)
-        :type num_iscr_sito: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._numero_fir_rilascio_visibilita_num_iscr_sito_post_serialize(
-            numero_fir=numero_fir,
-            num_iscr_sito=num_iscr_sito,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': None,
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method numero_fir_rilascio_visibilita_num_iscr_sito_post" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    def _numero_fir_rilascio_visibilita_num_iscr_sito_post_serialize(
-        self,
-        numero_fir,
-        num_iscr_sito,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if numero_fir is not None:
-            _path_params['numero_fir'] = numero_fir
-        if num_iscr_sito is not None:
-            _path_params['num_iscr_sito'] = num_iscr_sito
+        _path_params = {}
+        if _params['numero_fir'] is not None:
+            _path_params['numero_fir'] = _params['numero_fir']
+
+        if _params['num_iscr_sito'] is not None:
+            _path_params['num_iscr_sito'] = _params['num_iscr_sito']
+
+
         # process the query parameters
+        _query_params = []
         # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
+        _form_params = []
+        _files = {}
         # process the body parameter
-
-
+        _body_params = None
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/problem+json'
-                ]
-            )
-
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/problem+json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='POST',
-            resource_path='/{numero_fir}/rilascio-visibilita/{num_iscr_sito}',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {}
+
+        return self.api_client.call_api(
+            '/{numero_fir}/rilascio-visibilita/{num_iscr_sito}', 'POST',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def numero_fir_sosta_tecnica_post(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero FIR del formulario a cui si aggiungono i dati di sosta tecnica")], dati_sosta_tecnica_model : Annotated[DatiSostaTecnicaModel, Field(..., description="Dati con il dettaglio della sosta")], x_reply_to : Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None, **kwargs) -> TransazioneModel:  # noqa: E501
+        """🔁[ASYNC] Aggiunge sosta tecnica  # noqa: E501
 
+        Acquisisce la richiesta per l'aggiunta dei dati di sosta tecnica per il formulario indicato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_sosta_tecnica_post(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario a cui si aggiungono i dati di sosta tecnica")],
-        dati_sosta_tecnica_model: Annotated[DatiSostaTecnicaModel, Field(description="Dati con il dettaglio della sosta")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> TransazioneModel:
-        """🔁[ASYNC] Aggiunge sosta tecnica
-
-        Acquisisce la richiesta per l'aggiunta dei dati di sosta tecnica per il formulario indicato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.numero_fir_sosta_tecnica_post(numero_fir, dati_sosta_tecnica_model, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: Numero FIR del formulario a cui si aggiungono i dati di sosta tecnica (required)
         :type numero_fir: str
@@ -5745,79 +3009,33 @@ class FormularioDigitaleApi:
         :type dati_sosta_tecnica_model: DatiSostaTecnicaModel
         :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
         :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: TransazioneModel
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the numero_fir_sosta_tecnica_post_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.numero_fir_sosta_tecnica_post_with_http_info(numero_fir, dati_sosta_tecnica_model, x_reply_to, **kwargs)  # noqa: E501
 
-        _param = self._numero_fir_sosta_tecnica_post_serialize(
-            numero_fir=numero_fir,
-            dati_sosta_tecnica_model=dati_sosta_tecnica_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def numero_fir_sosta_tecnica_post_with_http_info(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero FIR del formulario a cui si aggiungono i dati di sosta tecnica")], dati_sosta_tecnica_model : Annotated[DatiSostaTecnicaModel, Field(..., description="Dati con il dettaglio della sosta")], x_reply_to : Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        """🔁[ASYNC] Aggiunge sosta tecnica  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Acquisisce la richiesta per l'aggiunta dei dati di sosta tecnica per il formulario indicato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_sosta_tecnica_post_with_http_info(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario a cui si aggiungono i dati di sosta tecnica")],
-        dati_sosta_tecnica_model: Annotated[DatiSostaTecnicaModel, Field(description="Dati con il dettaglio della sosta")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[TransazioneModel]:
-        """🔁[ASYNC] Aggiunge sosta tecnica
-
-        Acquisisce la richiesta per l'aggiunta dei dati di sosta tecnica per il formulario indicato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.numero_fir_sosta_tecnica_post_with_http_info(numero_fir, dati_sosta_tecnica_model, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: Numero FIR del formulario a cui si aggiungono i dati di sosta tecnica (required)
         :type numero_fir: str
@@ -5825,271 +3043,243 @@ class FormularioDigitaleApi:
         :type dati_sosta_tecnica_model: DatiSostaTecnicaModel
         :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
         :type x_reply_to: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(TransazioneModel, status_code(int), headers(HTTPHeaderDict))
+        """
 
-        _param = self._numero_fir_sosta_tecnica_post_serialize(
-            numero_fir=numero_fir,
-            dati_sosta_tecnica_model=dati_sosta_tecnica_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def numero_fir_sosta_tecnica_post_without_preload_content(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario a cui si aggiungono i dati di sosta tecnica")],
-        dati_sosta_tecnica_model: Annotated[DatiSostaTecnicaModel, Field(description="Dati con il dettaglio della sosta")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'numero_fir',
+            'dati_sosta_tecnica_model',
+            'x_reply_to'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """🔁[ASYNC] Aggiunge sosta tecnica
-
-        Acquisisce la richiesta per l'aggiunta dei dati di sosta tecnica per il formulario indicato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
-
-        :param numero_fir: Numero FIR del formulario a cui si aggiungono i dati di sosta tecnica (required)
-        :type numero_fir: str
-        :param dati_sosta_tecnica_model: Dati con il dettaglio della sosta (required)
-        :type dati_sosta_tecnica_model: DatiSostaTecnicaModel
-        :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
-        :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._numero_fir_sosta_tecnica_post_serialize(
-            numero_fir=numero_fir,
-            dati_sosta_tecnica_model=dati_sosta_tecnica_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method numero_fir_sosta_tecnica_post" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    def _numero_fir_sosta_tecnica_post_serialize(
-        self,
-        numero_fir,
-        dati_sosta_tecnica_model,
-        x_reply_to,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if numero_fir is not None:
-            _path_params['numero_fir'] = numero_fir
-        # process the query parameters
-        # process the header parameters
-        if x_reply_to is not None:
-            _header_params['X-ReplyTo'] = x_reply_to
-        # process the form parameters
-        # process the body parameter
-        if dati_sosta_tecnica_model is not None:
-            _body_params = dati_sosta_tecnica_model
+        _path_params = {}
+        if _params['numero_fir'] is not None:
+            _path_params['numero_fir'] = _params['numero_fir']
 
+
+        # process the query parameters
+        _query_params = []
+        # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
+        if _params['x_reply_to'] is not None:
+            _header_params['X-ReplyTo'] = _params['x_reply_to']
+
+        # process the form parameters
+        _form_params = []
+        _files = {}
+        # process the body parameter
+        _body_params = None
+        if _params['dati_sosta_tecnica_model'] is not None:
+            _body_params = _params['dati_sosta_tecnica_model']
 
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
 
         # set the HTTP header `Content-Type`
-        if _content_type:
-            _header_params['Content-Type'] = _content_type
-        else:
-            _default_content_type = (
-                self.api_client.select_header_content_type(
-                    [
-                        'application/json'
-                    ]
-                )
-            )
-            if _default_content_type is not None:
-                _header_params['Content-Type'] = _default_content_type
+        _content_types_list = _params.get('_content_type',
+            self.api_client.select_header_content_type(
+                ['application/json']))
+        if _content_types_list:
+                _header_params['Content-Type'] = _content_types_list
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='POST',
-            resource_path='/{numero_fir}/sosta-tecnica',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {
+            '202': "TransazioneModel",
+            '400': "ProblemDetails",
+            '403': None,
+            '404': None,
+            '429': None,
+            '500': "ProblemDetails",
+        }
+
+        return self.api_client.call_api(
+            '/{numero_fir}/sosta-tecnica', 'POST',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def numero_fir_stato_get(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero del FIR per il quale si richiede lo stato")], **kwargs) -> InfoFormulario:  # noqa: E501
+        """Stato FIR  # noqa: E501
 
+        Restituisce lo stato del formulario  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_stato_get(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero del FIR per il quale si richiede lo stato")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> InfoFormulario:
-        """Stato FIR
-
-        Restituisce lo stato del formulario
+        >>> thread = api.numero_fir_stato_get(numero_fir, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: Numero del FIR per il quale si richiede lo stato (required)
         :type numero_fir: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
+        :return: Returns the result object.
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: InfoFormulario
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the numero_fir_stato_get_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.numero_fir_stato_get_with_http_info(numero_fir, **kwargs)  # noqa: E501
+
+    @validate_arguments
+    def numero_fir_stato_get_with_http_info(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero del FIR per il quale si richiede lo stato")], **kwargs) -> ApiResponse:  # noqa: E501
+        """Stato FIR  # noqa: E501
+
+        Restituisce lo stato del formulario  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+
+        >>> thread = api.numero_fir_stato_get_with_http_info(numero_fir, async_req=True)
+        >>> result = thread.get()
+
+        :param numero_fir: Numero del FIR per il quale si richiede lo stato (required)
+        :type numero_fir: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(InfoFormulario, status_code(int), headers(HTTPHeaderDict))
+        """
 
-        _param = self._numero_fir_stato_get_serialize(
-            numero_fir=numero_fir,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
+        _params = locals()
+
+        _all_params = [
+            'numero_fir'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
+            ]
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method numero_fir_stato_get" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
+
+        _collection_formats = {}
+
+        # process the path parameters
+        _path_params = {}
+        if _params['numero_fir'] is not None:
+            _path_params['numero_fir'] = _params['numero_fir']
+
+
+        # process the query parameters
+        _query_params = []
+        # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
+        # process the form parameters
+        _form_params = []
+        _files = {}
+        # process the body parameter
+        _body_params = None
+        # set the HTTP header `Accept`
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
+
+        # authentication setting
+        _auth_settings = ['Bearer']  # noqa: E501
+
+        _response_types_map = {
             '200': "InfoFormulario",
             '400': "ProblemDetails",
             '403': None,
@@ -6097,276 +3287,144 @@ class FormularioDigitaleApi:
             '429': None,
             '500': "ProblemDetails",
         }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
 
-
-    @validate_call
-    def numero_fir_stato_get_with_http_info(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero del FIR per il quale si richiede lo stato")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[InfoFormulario]:
-        """Stato FIR
-
-        Restituisce lo stato del formulario
-
-        :param numero_fir: Numero del FIR per il quale si richiede lo stato (required)
-        :type numero_fir: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._numero_fir_stato_get_serialize(
-            numero_fir=numero_fir,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
-
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "InfoFormulario",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def numero_fir_stato_get_without_preload_content(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero del FIR per il quale si richiede lo stato")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """Stato FIR
-
-        Restituisce lo stato del formulario
-
-        :param numero_fir: Numero del FIR per il quale si richiede lo stato (required)
-        :type numero_fir: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._numero_fir_stato_get_serialize(
-            numero_fir=numero_fir,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
-
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "InfoFormulario",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
-
-
-    def _numero_fir_stato_get_serialize(
-        self,
-        numero_fir,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
-
-        # process the path parameters
-        if numero_fir is not None:
-            _path_params['numero_fir'] = numero_fir
-        # process the query parameters
-        # process the header parameters
-        # process the form parameters
-        # process the body parameter
-
-
-        # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
-
-
-        # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
-
-        return self.api_client.param_serialize(
-            method='GET',
-            resource_path='/{numero_fir}/stato',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        return self.api_client.call_api(
+            '/{numero_fir}/stato', 'GET',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def numero_fir_tipo_trasporto_get(self, numero_fir : constr(strict=True), **kwargs) -> TipoTrasportoResult:  # noqa: E501
+        """Tipo trasporto FIR  # noqa: E501
 
+        Restituisce il tipo di trasporto del FIR  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_tipo_trasporto_get(
-        self,
-        numero_fir: Annotated[str, Field(strict=True)],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> TipoTrasportoResult:
-        """Tipo trasporto FIR
-
-        Restituisce il tipo di trasporto del FIR
+        >>> thread = api.numero_fir_tipo_trasporto_get(numero_fir, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: (required)
         :type numero_fir: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
+        :return: Returns the result object.
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: TipoTrasportoResult
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the numero_fir_tipo_trasporto_get_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.numero_fir_tipo_trasporto_get_with_http_info(numero_fir, **kwargs)  # noqa: E501
+
+    @validate_arguments
+    def numero_fir_tipo_trasporto_get_with_http_info(self, numero_fir : constr(strict=True), **kwargs) -> ApiResponse:  # noqa: E501
+        """Tipo trasporto FIR  # noqa: E501
+
+        Restituisce il tipo di trasporto del FIR  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+
+        >>> thread = api.numero_fir_tipo_trasporto_get_with_http_info(numero_fir, async_req=True)
+        >>> result = thread.get()
+
+        :param numero_fir: (required)
+        :type numero_fir: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(TipoTrasportoResult, status_code(int), headers(HTTPHeaderDict))
+        """
 
-        _param = self._numero_fir_tipo_trasporto_get_serialize(
-            numero_fir=numero_fir,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
+        _params = locals()
+
+        _all_params = [
+            'numero_fir'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
+            ]
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method numero_fir_tipo_trasporto_get" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
+
+        _collection_formats = {}
+
+        # process the path parameters
+        _path_params = {}
+        if _params['numero_fir'] is not None:
+            _path_params['numero_fir'] = _params['numero_fir']
+
+
+        # process the query parameters
+        _query_params = []
+        # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
+        # process the form parameters
+        _form_params = []
+        _files = {}
+        # process the body parameter
+        _body_params = None
+        # set the HTTP header `Accept`
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
+
+        # authentication setting
+        _auth_settings = ['Bearer']  # noqa: E501
+
+        _response_types_map = {
             '200': "TipoTrasportoResult",
             '400': "ProblemDetails",
             '403': None,
@@ -6374,244 +3432,34 @@ class FormularioDigitaleApi:
             '429': None,
             '500': "ProblemDetails",
         }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
 
-
-    @validate_call
-    def numero_fir_tipo_trasporto_get_with_http_info(
-        self,
-        numero_fir: Annotated[str, Field(strict=True)],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[TipoTrasportoResult]:
-        """Tipo trasporto FIR
-
-        Restituisce il tipo di trasporto del FIR
-
-        :param numero_fir: (required)
-        :type numero_fir: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._numero_fir_tipo_trasporto_get_serialize(
-            numero_fir=numero_fir,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
-
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "TipoTrasportoResult",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def numero_fir_tipo_trasporto_get_without_preload_content(
-        self,
-        numero_fir: Annotated[str, Field(strict=True)],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """Tipo trasporto FIR
-
-        Restituisce il tipo di trasporto del FIR
-
-        :param numero_fir: (required)
-        :type numero_fir: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._numero_fir_tipo_trasporto_get_serialize(
-            numero_fir=numero_fir,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
-
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "TipoTrasportoResult",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
-
-
-    def _numero_fir_tipo_trasporto_get_serialize(
-        self,
-        numero_fir,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
-
-        # process the path parameters
-        if numero_fir is not None:
-            _path_params['numero_fir'] = numero_fir
-        # process the query parameters
-        # process the header parameters
-        # process the form parameters
-        # process the body parameter
-
-
-        # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
-
-
-        # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
-
-        return self.api_client.param_serialize(
-            method='GET',
-            resource_path='/{numero_fir}/tipo-trasporto',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        return self.api_client.call_api(
+            '/{numero_fir}/tipo-trasporto', 'GET',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def numero_fir_trasbordo_parziale_post(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero FIR del formulario a cui si aggiungono i dati del trasbordo")], dati_trasbordo_parziale_model : Annotated[DatiTrasbordoParzialeModel, Field(..., description="Dati con il dettaglio della sosta")], x_reply_to : Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None, **kwargs) -> TransazioneModel:  # noqa: E501
+        """🔁[ASYNC] Aggiunge trasbordo praziale  # noqa: E501
 
+        Acquisisce la richiesta per l'aggiunta dei dati di un trasbordo parziale per il formulario indicato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_trasbordo_parziale_post(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario a cui si aggiungono i dati del trasbordo")],
-        dati_trasbordo_parziale_model: Annotated[DatiTrasbordoParzialeModel, Field(description="Dati con il dettaglio della sosta")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> TransazioneModel:
-        """🔁[ASYNC] Aggiunge trasbordo praziale
-
-        Acquisisce la richiesta per l'aggiunta dei dati di un trasbordo parziale per il formulario indicato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.numero_fir_trasbordo_parziale_post(numero_fir, dati_trasbordo_parziale_model, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: Numero FIR del formulario a cui si aggiungono i dati del trasbordo (required)
         :type numero_fir: str
@@ -6619,79 +3467,33 @@ class FormularioDigitaleApi:
         :type dati_trasbordo_parziale_model: DatiTrasbordoParzialeModel
         :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
         :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: TransazioneModel
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the numero_fir_trasbordo_parziale_post_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.numero_fir_trasbordo_parziale_post_with_http_info(numero_fir, dati_trasbordo_parziale_model, x_reply_to, **kwargs)  # noqa: E501
 
-        _param = self._numero_fir_trasbordo_parziale_post_serialize(
-            numero_fir=numero_fir,
-            dati_trasbordo_parziale_model=dati_trasbordo_parziale_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def numero_fir_trasbordo_parziale_post_with_http_info(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero FIR del formulario a cui si aggiungono i dati del trasbordo")], dati_trasbordo_parziale_model : Annotated[DatiTrasbordoParzialeModel, Field(..., description="Dati con il dettaglio della sosta")], x_reply_to : Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        """🔁[ASYNC] Aggiunge trasbordo praziale  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Acquisisce la richiesta per l'aggiunta dei dati di un trasbordo parziale per il formulario indicato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_trasbordo_parziale_post_with_http_info(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario a cui si aggiungono i dati del trasbordo")],
-        dati_trasbordo_parziale_model: Annotated[DatiTrasbordoParzialeModel, Field(description="Dati con il dettaglio della sosta")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[TransazioneModel]:
-        """🔁[ASYNC] Aggiunge trasbordo praziale
-
-        Acquisisce la richiesta per l'aggiunta dei dati di un trasbordo parziale per il formulario indicato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.numero_fir_trasbordo_parziale_post_with_http_info(numero_fir, dati_trasbordo_parziale_model, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: Numero FIR del formulario a cui si aggiungono i dati del trasbordo (required)
         :type numero_fir: str
@@ -6699,239 +3501,133 @@ class FormularioDigitaleApi:
         :type dati_trasbordo_parziale_model: DatiTrasbordoParzialeModel
         :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
         :type x_reply_to: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(TransazioneModel, status_code(int), headers(HTTPHeaderDict))
+        """
 
-        _param = self._numero_fir_trasbordo_parziale_post_serialize(
-            numero_fir=numero_fir,
-            dati_trasbordo_parziale_model=dati_trasbordo_parziale_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def numero_fir_trasbordo_parziale_post_without_preload_content(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario a cui si aggiungono i dati del trasbordo")],
-        dati_trasbordo_parziale_model: Annotated[DatiTrasbordoParzialeModel, Field(description="Dati con il dettaglio della sosta")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'numero_fir',
+            'dati_trasbordo_parziale_model',
+            'x_reply_to'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """🔁[ASYNC] Aggiunge trasbordo praziale
-
-        Acquisisce la richiesta per l'aggiunta dei dati di un trasbordo parziale per il formulario indicato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
-
-        :param numero_fir: Numero FIR del formulario a cui si aggiungono i dati del trasbordo (required)
-        :type numero_fir: str
-        :param dati_trasbordo_parziale_model: Dati con il dettaglio della sosta (required)
-        :type dati_trasbordo_parziale_model: DatiTrasbordoParzialeModel
-        :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
-        :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._numero_fir_trasbordo_parziale_post_serialize(
-            numero_fir=numero_fir,
-            dati_trasbordo_parziale_model=dati_trasbordo_parziale_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method numero_fir_trasbordo_parziale_post" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    def _numero_fir_trasbordo_parziale_post_serialize(
-        self,
-        numero_fir,
-        dati_trasbordo_parziale_model,
-        x_reply_to,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if numero_fir is not None:
-            _path_params['numero_fir'] = numero_fir
-        # process the query parameters
-        # process the header parameters
-        if x_reply_to is not None:
-            _header_params['X-ReplyTo'] = x_reply_to
-        # process the form parameters
-        # process the body parameter
-        if dati_trasbordo_parziale_model is not None:
-            _body_params = dati_trasbordo_parziale_model
+        _path_params = {}
+        if _params['numero_fir'] is not None:
+            _path_params['numero_fir'] = _params['numero_fir']
 
+
+        # process the query parameters
+        _query_params = []
+        # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
+        if _params['x_reply_to'] is not None:
+            _header_params['X-ReplyTo'] = _params['x_reply_to']
+
+        # process the form parameters
+        _form_params = []
+        _files = {}
+        # process the body parameter
+        _body_params = None
+        if _params['dati_trasbordo_parziale_model'] is not None:
+            _body_params = _params['dati_trasbordo_parziale_model']
 
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
 
         # set the HTTP header `Content-Type`
-        if _content_type:
-            _header_params['Content-Type'] = _content_type
-        else:
-            _default_content_type = (
-                self.api_client.select_header_content_type(
-                    [
-                        'application/json'
-                    ]
-                )
-            )
-            if _default_content_type is not None:
-                _header_params['Content-Type'] = _default_content_type
+        _content_types_list = _params.get('_content_type',
+            self.api_client.select_header_content_type(
+                ['application/json']))
+        if _content_types_list:
+                _header_params['Content-Type'] = _content_types_list
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='POST',
-            resource_path='/{numero_fir}/trasbordo-parziale',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {
+            '202': "TransazioneModel",
+            '400': "ProblemDetails",
+            '403': None,
+            '404': None,
+            '429': None,
+            '500': "ProblemDetails",
+        }
+
+        return self.api_client.call_api(
+            '/{numero_fir}/trasbordo-parziale', 'POST',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def numero_fir_trasbordo_totale_post(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero FIR del formulario a cui si aggiungono i dati del trasbordo totale")], dati_trasbordo_totale_model : Annotated[DatiTrasbordoTotaleModel, Field(..., description="Dati con il dettaglio della sosta")], x_reply_to : Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None, **kwargs) -> TransazioneModel:  # noqa: E501
+        """🔁[ASYNC] Aggiunge trasbordo totale  # noqa: E501
 
+        Acquisisce la richiesta per l'aggiunta dei dati di un trasbordo totale per il formulario indicato. Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_trasbordo_totale_post(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario a cui si aggiungono i dati del trasbordo totale")],
-        dati_trasbordo_totale_model: Annotated[DatiTrasbordoTotaleModel, Field(description="Dati con il dettaglio della sosta")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> TransazioneModel:
-        """🔁[ASYNC] Aggiunge trasbordo totale
-
-        Acquisisce la richiesta per l'aggiunta dei dati di un trasbordo totale per il formulario indicato. Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.numero_fir_trasbordo_totale_post(numero_fir, dati_trasbordo_totale_model, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: Numero FIR del formulario a cui si aggiungono i dati del trasbordo totale (required)
         :type numero_fir: str
@@ -6939,79 +3635,33 @@ class FormularioDigitaleApi:
         :type dati_trasbordo_totale_model: DatiTrasbordoTotaleModel
         :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
         :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: TransazioneModel
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the numero_fir_trasbordo_totale_post_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.numero_fir_trasbordo_totale_post_with_http_info(numero_fir, dati_trasbordo_totale_model, x_reply_to, **kwargs)  # noqa: E501
 
-        _param = self._numero_fir_trasbordo_totale_post_serialize(
-            numero_fir=numero_fir,
-            dati_trasbordo_totale_model=dati_trasbordo_totale_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def numero_fir_trasbordo_totale_post_with_http_info(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero FIR del formulario a cui si aggiungono i dati del trasbordo totale")], dati_trasbordo_totale_model : Annotated[DatiTrasbordoTotaleModel, Field(..., description="Dati con il dettaglio della sosta")], x_reply_to : Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        """🔁[ASYNC] Aggiunge trasbordo totale  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Acquisisce la richiesta per l'aggiunta dei dati di un trasbordo totale per il formulario indicato. Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_trasbordo_totale_post_with_http_info(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario a cui si aggiungono i dati del trasbordo totale")],
-        dati_trasbordo_totale_model: Annotated[DatiTrasbordoTotaleModel, Field(description="Dati con il dettaglio della sosta")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[TransazioneModel]:
-        """🔁[ASYNC] Aggiunge trasbordo totale
-
-        Acquisisce la richiesta per l'aggiunta dei dati di un trasbordo totale per il formulario indicato. Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.numero_fir_trasbordo_totale_post_with_http_info(numero_fir, dati_trasbordo_totale_model, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: Numero FIR del formulario a cui si aggiungono i dati del trasbordo totale (required)
         :type numero_fir: str
@@ -7019,239 +3669,133 @@ class FormularioDigitaleApi:
         :type dati_trasbordo_totale_model: DatiTrasbordoTotaleModel
         :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
         :type x_reply_to: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(TransazioneModel, status_code(int), headers(HTTPHeaderDict))
+        """
 
-        _param = self._numero_fir_trasbordo_totale_post_serialize(
-            numero_fir=numero_fir,
-            dati_trasbordo_totale_model=dati_trasbordo_totale_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def numero_fir_trasbordo_totale_post_without_preload_content(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario a cui si aggiungono i dati del trasbordo totale")],
-        dati_trasbordo_totale_model: Annotated[DatiTrasbordoTotaleModel, Field(description="Dati con il dettaglio della sosta")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'numero_fir',
+            'dati_trasbordo_totale_model',
+            'x_reply_to'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """🔁[ASYNC] Aggiunge trasbordo totale
-
-        Acquisisce la richiesta per l'aggiunta dei dati di un trasbordo totale per il formulario indicato. Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
-
-        :param numero_fir: Numero FIR del formulario a cui si aggiungono i dati del trasbordo totale (required)
-        :type numero_fir: str
-        :param dati_trasbordo_totale_model: Dati con il dettaglio della sosta (required)
-        :type dati_trasbordo_totale_model: DatiTrasbordoTotaleModel
-        :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
-        :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._numero_fir_trasbordo_totale_post_serialize(
-            numero_fir=numero_fir,
-            dati_trasbordo_totale_model=dati_trasbordo_totale_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method numero_fir_trasbordo_totale_post" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    def _numero_fir_trasbordo_totale_post_serialize(
-        self,
-        numero_fir,
-        dati_trasbordo_totale_model,
-        x_reply_to,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if numero_fir is not None:
-            _path_params['numero_fir'] = numero_fir
-        # process the query parameters
-        # process the header parameters
-        if x_reply_to is not None:
-            _header_params['X-ReplyTo'] = x_reply_to
-        # process the form parameters
-        # process the body parameter
-        if dati_trasbordo_totale_model is not None:
-            _body_params = dati_trasbordo_totale_model
+        _path_params = {}
+        if _params['numero_fir'] is not None:
+            _path_params['numero_fir'] = _params['numero_fir']
 
+
+        # process the query parameters
+        _query_params = []
+        # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
+        if _params['x_reply_to'] is not None:
+            _header_params['X-ReplyTo'] = _params['x_reply_to']
+
+        # process the form parameters
+        _form_params = []
+        _files = {}
+        # process the body parameter
+        _body_params = None
+        if _params['dati_trasbordo_totale_model'] is not None:
+            _body_params = _params['dati_trasbordo_totale_model']
 
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
 
         # set the HTTP header `Content-Type`
-        if _content_type:
-            _header_params['Content-Type'] = _content_type
-        else:
-            _default_content_type = (
-                self.api_client.select_header_content_type(
-                    [
-                        'application/json'
-                    ]
-                )
-            )
-            if _default_content_type is not None:
-                _header_params['Content-Type'] = _default_content_type
+        _content_types_list = _params.get('_content_type',
+            self.api_client.select_header_content_type(
+                ['application/json']))
+        if _content_types_list:
+                _header_params['Content-Type'] = _content_types_list
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='POST',
-            resource_path='/{numero_fir}/trasbordo-totale',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {
+            '202': "TransazioneModel",
+            '400': "ProblemDetails",
+            '403': None,
+            '404': None,
+            '429': None,
+            '500': "ProblemDetails",
+        }
+
+        return self.api_client.call_api(
+            '/{numero_fir}/trasbordo-totale', 'POST',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def numero_fir_trasporto_post(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero FIR del formulario")], numero_fir_trasporto_post_request : Annotated[NumeroFirTrasportoPostRequest, Field(..., description="Dati di trasporto del rifiuto")], x_reply_to : Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None, **kwargs) -> TransazioneModel:  # noqa: E501
+        """🔁[ASYNC] Aggiunge dati trasporto  # noqa: E501
 
+        Acquisisce la richiesta di aggiunta dei dati di trasporto del rifiuto da parte del trasportatore che ha in carico il FIR specificato.  Il tipo di modello passato come contenuto del POST determina la modalità del trasporto.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_trasporto_post(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario")],
-        numero_fir_trasporto_post_request: Annotated[NumeroFirTrasportoPostRequest, Field(description="Dati di trasporto del rifiuto")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> TransazioneModel:
-        """🔁[ASYNC] Aggiunge dati trasporto
-
-        Acquisisce la richiesta di aggiunta dei dati di trasporto del rifiuto da parte del trasportatore che ha in carico il FIR specificato.  Il tipo di modello passato come contenuto del POST determina la modalità del trasporto.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.numero_fir_trasporto_post(numero_fir, numero_fir_trasporto_post_request, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: Numero FIR del formulario (required)
         :type numero_fir: str
@@ -7259,79 +3803,33 @@ class FormularioDigitaleApi:
         :type numero_fir_trasporto_post_request: NumeroFirTrasportoPostRequest
         :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
         :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: TransazioneModel
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the numero_fir_trasporto_post_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.numero_fir_trasporto_post_with_http_info(numero_fir, numero_fir_trasporto_post_request, x_reply_to, **kwargs)  # noqa: E501
 
-        _param = self._numero_fir_trasporto_post_serialize(
-            numero_fir=numero_fir,
-            numero_fir_trasporto_post_request=numero_fir_trasporto_post_request,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def numero_fir_trasporto_post_with_http_info(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero FIR del formulario")], numero_fir_trasporto_post_request : Annotated[NumeroFirTrasportoPostRequest, Field(..., description="Dati di trasporto del rifiuto")], x_reply_to : Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        """🔁[ASYNC] Aggiunge dati trasporto  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Acquisisce la richiesta di aggiunta dei dati di trasporto del rifiuto da parte del trasportatore che ha in carico il FIR specificato.  Il tipo di modello passato come contenuto del POST determina la modalità del trasporto.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_trasporto_post_with_http_info(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario")],
-        numero_fir_trasporto_post_request: Annotated[NumeroFirTrasportoPostRequest, Field(description="Dati di trasporto del rifiuto")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[TransazioneModel]:
-        """🔁[ASYNC] Aggiunge dati trasporto
-
-        Acquisisce la richiesta di aggiunta dei dati di trasporto del rifiuto da parte del trasportatore che ha in carico il FIR specificato.  Il tipo di modello passato come contenuto del POST determina la modalità del trasporto.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.numero_fir_trasporto_post_with_http_info(numero_fir, numero_fir_trasporto_post_request, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: Numero FIR del formulario (required)
         :type numero_fir: str
@@ -7339,521 +3837,277 @@ class FormularioDigitaleApi:
         :type numero_fir_trasporto_post_request: NumeroFirTrasportoPostRequest
         :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
         :type x_reply_to: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(TransazioneModel, status_code(int), headers(HTTPHeaderDict))
+        """
 
-        _param = self._numero_fir_trasporto_post_serialize(
-            numero_fir=numero_fir,
-            numero_fir_trasporto_post_request=numero_fir_trasporto_post_request,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def numero_fir_trasporto_post_without_preload_content(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario")],
-        numero_fir_trasporto_post_request: Annotated[NumeroFirTrasportoPostRequest, Field(description="Dati di trasporto del rifiuto")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'numero_fir',
+            'numero_fir_trasporto_post_request',
+            'x_reply_to'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """🔁[ASYNC] Aggiunge dati trasporto
-
-        Acquisisce la richiesta di aggiunta dei dati di trasporto del rifiuto da parte del trasportatore che ha in carico il FIR specificato.  Il tipo di modello passato come contenuto del POST determina la modalità del trasporto.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
-
-        :param numero_fir: Numero FIR del formulario (required)
-        :type numero_fir: str
-        :param numero_fir_trasporto_post_request: Dati di trasporto del rifiuto (required)
-        :type numero_fir_trasporto_post_request: NumeroFirTrasportoPostRequest
-        :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
-        :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._numero_fir_trasporto_post_serialize(
-            numero_fir=numero_fir,
-            numero_fir_trasporto_post_request=numero_fir_trasporto_post_request,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method numero_fir_trasporto_post" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    def _numero_fir_trasporto_post_serialize(
-        self,
-        numero_fir,
-        numero_fir_trasporto_post_request,
-        x_reply_to,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if numero_fir is not None:
-            _path_params['numero_fir'] = numero_fir
-        # process the query parameters
-        # process the header parameters
-        if x_reply_to is not None:
-            _header_params['X-ReplyTo'] = x_reply_to
-        # process the form parameters
-        # process the body parameter
-        if numero_fir_trasporto_post_request is not None:
-            _body_params = numero_fir_trasporto_post_request
+        _path_params = {}
+        if _params['numero_fir'] is not None:
+            _path_params['numero_fir'] = _params['numero_fir']
 
+
+        # process the query parameters
+        _query_params = []
+        # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
+        if _params['x_reply_to'] is not None:
+            _header_params['X-ReplyTo'] = _params['x_reply_to']
+
+        # process the form parameters
+        _form_params = []
+        _files = {}
+        # process the body parameter
+        _body_params = None
+        if _params['numero_fir_trasporto_post_request'] is not None:
+            _body_params = _params['numero_fir_trasporto_post_request']
 
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
 
         # set the HTTP header `Content-Type`
-        if _content_type:
-            _header_params['Content-Type'] = _content_type
-        else:
-            _default_content_type = (
-                self.api_client.select_header_content_type(
-                    [
-                        'application/json'
-                    ]
-                )
-            )
-            if _default_content_type is not None:
-                _header_params['Content-Type'] = _default_content_type
+        _content_types_list = _params.get('_content_type',
+            self.api_client.select_header_content_type(
+                ['application/json']))
+        if _content_types_list:
+                _header_params['Content-Type'] = _content_types_list
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='POST',
-            resource_path='/{numero_fir}/trasporto',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {
+            '202': "TransazioneModel",
+            '400': "ProblemDetails",
+            '403': None,
+            '404': None,
+            '429': None,
+            '500': "ProblemDetails",
+        }
+
+        return self.api_client.call_api(
+            '/{numero_fir}/trasporto', 'POST',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def numero_fir_xfir_get(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero FIR del formulario")], **kwargs) -> DownloadableBaseResponse:  # noqa: E501
+        """Download xFIR  # noqa: E501
 
+        Restituisce il file in formato xFIR che rappresenta il formulario specificato con il numero FIR. L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) almeno uno dei soggetti coinvolti nel formulario.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def numero_fir_xfir_get(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> DownloadableBaseResponse:
-        """Download xFIR
-
-        Restituisce il file in formato xFIR che rappresenta il formulario specificato con il numero FIR. L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) almeno uno dei soggetti coinvolti nel formulario.
+        >>> thread = api.numero_fir_xfir_get(numero_fir, async_req=True)
+        >>> result = thread.get()
 
         :param numero_fir: Numero FIR del formulario (required)
         :type numero_fir: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
+        :return: Returns the result object.
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: DownloadableBaseResponse
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the numero_fir_xfir_get_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.numero_fir_xfir_get_with_http_info(numero_fir, **kwargs)  # noqa: E501
+
+    @validate_arguments
+    def numero_fir_xfir_get_with_http_info(self, numero_fir : Annotated[constr(strict=True), Field(..., description="Numero FIR del formulario")], **kwargs) -> ApiResponse:  # noqa: E501
+        """Download xFIR  # noqa: E501
+
+        Restituisce il file in formato xFIR che rappresenta il formulario specificato con il numero FIR. L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) almeno uno dei soggetti coinvolti nel formulario.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+
+        >>> thread = api.numero_fir_xfir_get_with_http_info(numero_fir, async_req=True)
+        >>> result = thread.get()
+
+        :param numero_fir: Numero FIR del formulario (required)
+        :type numero_fir: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(DownloadableBaseResponse, status_code(int), headers(HTTPHeaderDict))
+        """
 
-        _param = self._numero_fir_xfir_get_serialize(
-            numero_fir=numero_fir,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "DownloadableBaseResponse",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
-
-
-    @validate_call
-    def numero_fir_xfir_get_with_http_info(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'numero_fir'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[DownloadableBaseResponse]:
-        """Download xFIR
-
-        Restituisce il file in formato xFIR che rappresenta il formulario specificato con il numero FIR. L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) almeno uno dei soggetti coinvolti nel formulario.
-
-        :param numero_fir: Numero FIR del formulario (required)
-        :type numero_fir: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._numero_fir_xfir_get_serialize(
-            numero_fir=numero_fir,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "DownloadableBaseResponse",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method numero_fir_xfir_get" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    @validate_call
-    def numero_fir_xfir_get_without_preload_content(
-        self,
-        numero_fir: Annotated[str, Field(strict=True, description="Numero FIR del formulario")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """Download xFIR
-
-        Restituisce il file in formato xFIR che rappresenta il formulario specificato con il numero FIR. L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) almeno uno dei soggetti coinvolti nel formulario.
-
-        :param numero_fir: Numero FIR del formulario (required)
-        :type numero_fir: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._numero_fir_xfir_get_serialize(
-            numero_fir=numero_fir,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
-
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "DownloadableBaseResponse",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
-
-
-    def _numero_fir_xfir_get_serialize(
-        self,
-        numero_fir,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if numero_fir is not None:
-            _path_params['numero_fir'] = numero_fir
+        _path_params = {}
+        if _params['numero_fir'] is not None:
+            _path_params['numero_fir'] = _params['numero_fir']
+
+
         # process the query parameters
+        _query_params = []
         # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
+        _form_params = []
+        _files = {}
         # process the body parameter
-
-
+        _body_params = None
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
-
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='GET',
-            resource_path='/{numero_fir}/xfir',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {
+            '200': "DownloadableBaseResponse",
+            '403': None,
+            '404': None,
+            '429': None,
+            '500': "ProblemDetails",
+        }
+
+        return self.api_client.call_api(
+            '/{numero_fir}/xfir', 'GET',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def root_get(self, num_iscr_sito : Annotated[StrictStr, Field(..., description="Numero iscrizione unità locale rilasciato all'iscrizione per il quale si richiedono i formulari")], numero_fir : Annotated[Optional[StrictStr], Field(description="Numero del FIR")] = None, data_creazione_da : Annotated[Optional[datetime], Field(description="Data di creazione a partire dalla quale si richiedono i formulari (formato ISO 8601 UTC)")] = None, data_creazione_a : Annotated[Optional[datetime], Field(description="Data massima di creazione per la quale si richiedono i formulari (formato ISO 8601 UTC)")] = None, data_emissione_da : Annotated[Optional[datetime], Field(description="Data di emissione a partire dalla quale si richiedono i formulari (formato ISO 8601 UTC)")] = None, data_emissione_a : Annotated[Optional[datetime], Field(description="Data massima di emissione entro la quale si richiedono i formulari (formato ISO 8601 UTC)")] = None, codice_eer : Annotated[Optional[constr(strict=True, max_length=8)], Field(description="Codice EER")] = None, tipo_ricerca : Optional[Any] = None, stati : Optional[conlist(StrictStr)] = None, paging_page : Annotated[Optional[conint(strict=True, le=2147483647, ge=1)], Field(description="Valore per l'header Paging-Page.")] = None, paging_page_size : Annotated[Optional[conint(strict=True, le=1000, ge=1)], Field(description="Valore per l'header Paging-PageSize.")] = None, **kwargs) -> List[FormularioItemResult]:  # noqa: E501
+        """Elenco formulari  # noqa: E501
 
+        Ottiene l'elenco dei formulari richiesti con visibilità per l'unità locale indicata e con i filtri specificati.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def root_get(
-        self,
-        num_iscr_sito: Annotated[StrictStr, Field(description="Numero iscrizione unità locale rilasciato all'iscrizione per il quale si richiedono i formulari")],
-        numero_fir: Annotated[Optional[StrictStr], Field(description="Numero del FIR")] = None,
-        data_creazione_da: Annotated[Optional[datetime], Field(description="Data di creazione a partire dalla quale si richiedono i formulari (formato ISO 8601 UTC)")] = None,
-        data_creazione_a: Annotated[Optional[datetime], Field(description="Data massima di creazione per la quale si richiedono i formulari (formato ISO 8601 UTC)")] = None,
-        data_emissione_da: Annotated[Optional[datetime], Field(description="Data di emissione a partire dalla quale si richiedono i formulari (formato ISO 8601 UTC)")] = None,
-        data_emissione_a: Annotated[Optional[datetime], Field(description="Data massima di emissione entro la quale si richiedono i formulari (formato ISO 8601 UTC)")] = None,
-        codice_eer: Annotated[Optional[Annotated[str, Field(strict=True, max_length=8)]], Field(description="Codice EER")] = None,
-        tipo_ricerca: Optional[Any] = None,
-        stati: Optional[List[StrictStr]] = None,
-        paging_page: Annotated[Optional[Annotated[int, Field(le=2147483647, strict=True, ge=1)]], Field(description="Valore per l'header Paging-Page.")] = None,
-        paging_page_size: Annotated[Optional[Annotated[int, Field(le=1000, strict=True, ge=1)]], Field(description="Valore per l'header Paging-PageSize.")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> List[FormularioItemResult]:
-        """Elenco formulari
-
-        Ottiene l'elenco dei formulari richiesti con visibilità per l'unità locale indicata e con i filtri specificati.
+        >>> thread = api.root_get(num_iscr_sito, numero_fir, data_creazione_da, data_creazione_a, data_emissione_da, data_emissione_a, codice_eer, tipo_ricerca, stati, paging_page, paging_page_size, async_req=True)
+        >>> result = thread.get()
 
         :param num_iscr_sito: Numero iscrizione unità locale rilasciato all'iscrizione per il quale si richiedono i formulari (required)
         :type num_iscr_sito: str
@@ -7877,95 +4131,33 @@ class FormularioDigitaleApi:
         :type paging_page: int
         :param paging_page_size: Valore per l'header Paging-PageSize.
         :type paging_page_size: int
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: List[FormularioItemResult]
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the root_get_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.root_get_with_http_info(num_iscr_sito, numero_fir, data_creazione_da, data_creazione_a, data_emissione_da, data_emissione_a, codice_eer, tipo_ricerca, stati, paging_page, paging_page_size, **kwargs)  # noqa: E501
 
-        _param = self._root_get_serialize(
-            num_iscr_sito=num_iscr_sito,
-            numero_fir=numero_fir,
-            data_creazione_da=data_creazione_da,
-            data_creazione_a=data_creazione_a,
-            data_emissione_da=data_emissione_da,
-            data_emissione_a=data_emissione_a,
-            codice_eer=codice_eer,
-            tipo_ricerca=tipo_ricerca,
-            stati=stati,
-            paging_page=paging_page,
-            paging_page_size=paging_page_size,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def root_get_with_http_info(self, num_iscr_sito : Annotated[StrictStr, Field(..., description="Numero iscrizione unità locale rilasciato all'iscrizione per il quale si richiedono i formulari")], numero_fir : Annotated[Optional[StrictStr], Field(description="Numero del FIR")] = None, data_creazione_da : Annotated[Optional[datetime], Field(description="Data di creazione a partire dalla quale si richiedono i formulari (formato ISO 8601 UTC)")] = None, data_creazione_a : Annotated[Optional[datetime], Field(description="Data massima di creazione per la quale si richiedono i formulari (formato ISO 8601 UTC)")] = None, data_emissione_da : Annotated[Optional[datetime], Field(description="Data di emissione a partire dalla quale si richiedono i formulari (formato ISO 8601 UTC)")] = None, data_emissione_a : Annotated[Optional[datetime], Field(description="Data massima di emissione entro la quale si richiedono i formulari (formato ISO 8601 UTC)")] = None, codice_eer : Annotated[Optional[constr(strict=True, max_length=8)], Field(description="Codice EER")] = None, tipo_ricerca : Optional[Any] = None, stati : Optional[conlist(StrictStr)] = None, paging_page : Annotated[Optional[conint(strict=True, le=2147483647, ge=1)], Field(description="Valore per l'header Paging-Page.")] = None, paging_page_size : Annotated[Optional[conint(strict=True, le=1000, ge=1)], Field(description="Valore per l'header Paging-PageSize.")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        """Elenco formulari  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "List[FormularioItemResult]",
-            '400': None,
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Ottiene l'elenco dei formulari richiesti con visibilità per l'unità locale indicata e con i filtri specificati.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def root_get_with_http_info(
-        self,
-        num_iscr_sito: Annotated[StrictStr, Field(description="Numero iscrizione unità locale rilasciato all'iscrizione per il quale si richiedono i formulari")],
-        numero_fir: Annotated[Optional[StrictStr], Field(description="Numero del FIR")] = None,
-        data_creazione_da: Annotated[Optional[datetime], Field(description="Data di creazione a partire dalla quale si richiedono i formulari (formato ISO 8601 UTC)")] = None,
-        data_creazione_a: Annotated[Optional[datetime], Field(description="Data massima di creazione per la quale si richiedono i formulari (formato ISO 8601 UTC)")] = None,
-        data_emissione_da: Annotated[Optional[datetime], Field(description="Data di emissione a partire dalla quale si richiedono i formulari (formato ISO 8601 UTC)")] = None,
-        data_emissione_a: Annotated[Optional[datetime], Field(description="Data massima di emissione entro la quale si richiedono i formulari (formato ISO 8601 UTC)")] = None,
-        codice_eer: Annotated[Optional[Annotated[str, Field(strict=True, max_length=8)]], Field(description="Codice EER")] = None,
-        tipo_ricerca: Optional[Any] = None,
-        stati: Optional[List[StrictStr]] = None,
-        paging_page: Annotated[Optional[Annotated[int, Field(le=2147483647, strict=True, ge=1)]], Field(description="Valore per l'header Paging-Page.")] = None,
-        paging_page_size: Annotated[Optional[Annotated[int, Field(le=1000, strict=True, ge=1)]], Field(description="Valore per l'header Paging-PageSize.")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[List[FormularioItemResult]]:
-        """Elenco formulari
-
-        Ottiene l'elenco dei formulari richiesti con visibilità per l'unità locale indicata e con i filtri specificati.
+        >>> thread = api.root_get_with_http_info(num_iscr_sito, numero_fir, data_creazione_da, data_creazione_a, data_emissione_da, data_emissione_a, codice_eer, tipo_ricerca, stati, paging_page, paging_page_size, async_req=True)
+        >>> result = thread.get()
 
         :param num_iscr_sito: Numero iscrizione unità locale rilasciato all'iscrizione per il quale si richiedono i formulari (required)
         :type num_iscr_sito: str
@@ -7989,47 +4181,136 @@ class FormularioDigitaleApi:
         :type paging_page: int
         :param paging_page_size: Valore per l'header Paging-PageSize.
         :type paging_page_size: int
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(List[FormularioItemResult], status_code(int), headers(HTTPHeaderDict))
+        """
 
-        _param = self._root_get_serialize(
-            num_iscr_sito=num_iscr_sito,
-            numero_fir=numero_fir,
-            data_creazione_da=data_creazione_da,
-            data_creazione_a=data_creazione_a,
-            data_emissione_da=data_emissione_da,
-            data_emissione_a=data_emissione_a,
-            codice_eer=codice_eer,
-            tipo_ricerca=tipo_ricerca,
-            stati=stati,
-            paging_page=paging_page,
-            paging_page_size=paging_page_size,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
+        _params = locals()
+
+        _all_params = [
+            'num_iscr_sito',
+            'numero_fir',
+            'data_creazione_da',
+            'data_creazione_a',
+            'data_emissione_da',
+            'data_emissione_a',
+            'codice_eer',
+            'tipo_ricerca',
+            'stati',
+            'paging_page',
+            'paging_page_size'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
+            ]
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method root_get" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
+
+        _collection_formats = {}
+
+        # process the path parameters
+        _path_params = {}
+
+        # process the query parameters
+        _query_params = []
+        if _params.get('num_iscr_sito') is not None:  # noqa: E501
+            _query_params.append(('num_iscr_sito', _params['num_iscr_sito']))
+
+        if _params.get('numero_fir') is not None:  # noqa: E501
+            _query_params.append(('numero_fir', _params['numero_fir']))
+
+        if _params.get('data_creazione_da') is not None:  # noqa: E501
+            if isinstance(_params['data_creazione_da'], datetime):
+                _query_params.append(('data_creazione_da', _params['data_creazione_da'].strftime(self.api_client.configuration.datetime_format)))
+            else:
+                _query_params.append(('data_creazione_da', _params['data_creazione_da']))
+
+        if _params.get('data_creazione_a') is not None:  # noqa: E501
+            if isinstance(_params['data_creazione_a'], datetime):
+                _query_params.append(('data_creazione_a', _params['data_creazione_a'].strftime(self.api_client.configuration.datetime_format)))
+            else:
+                _query_params.append(('data_creazione_a', _params['data_creazione_a']))
+
+        if _params.get('data_emissione_da') is not None:  # noqa: E501
+            if isinstance(_params['data_emissione_da'], datetime):
+                _query_params.append(('data_emissione_da', _params['data_emissione_da'].strftime(self.api_client.configuration.datetime_format)))
+            else:
+                _query_params.append(('data_emissione_da', _params['data_emissione_da']))
+
+        if _params.get('data_emissione_a') is not None:  # noqa: E501
+            if isinstance(_params['data_emissione_a'], datetime):
+                _query_params.append(('data_emissione_a', _params['data_emissione_a'].strftime(self.api_client.configuration.datetime_format)))
+            else:
+                _query_params.append(('data_emissione_a', _params['data_emissione_a']))
+
+        if _params.get('codice_eer') is not None:  # noqa: E501
+            _query_params.append(('codice_eer', _params['codice_eer']))
+
+        if _params.get('tipo_ricerca') is not None:  # noqa: E501
+            _query_params.append(('tipo_ricerca', _params['tipo_ricerca'].value))
+
+        if _params.get('stati') is not None:  # noqa: E501
+            _query_params.append(('stati', _params['stati']))
+            _collection_formats['stati'] = 'multi'
+
+        # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
+        if _params['paging_page'] is not None:
+            _header_params['Paging-Page'] = _params['paging_page']
+
+        if _params['paging_page_size'] is not None:
+            _header_params['Paging-PageSize'] = _params['paging_page_size']
+
+        # process the form parameters
+        _form_params = []
+        _files = {}
+        # process the body parameter
+        _body_params = None
+        # set the HTTP header `Accept`
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
+
+        # authentication setting
+        _auth_settings = ['Bearer']  # noqa: E501
+
+        _response_types_map = {
             '200': "List[FormularioItemResult]",
             '400': None,
             '403': None,
@@ -8037,297 +4318,34 @@ class FormularioDigitaleApi:
             '429': None,
             '500': "ProblemDetails",
         }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
 
-
-    @validate_call
-    def root_get_without_preload_content(
-        self,
-        num_iscr_sito: Annotated[StrictStr, Field(description="Numero iscrizione unità locale rilasciato all'iscrizione per il quale si richiedono i formulari")],
-        numero_fir: Annotated[Optional[StrictStr], Field(description="Numero del FIR")] = None,
-        data_creazione_da: Annotated[Optional[datetime], Field(description="Data di creazione a partire dalla quale si richiedono i formulari (formato ISO 8601 UTC)")] = None,
-        data_creazione_a: Annotated[Optional[datetime], Field(description="Data massima di creazione per la quale si richiedono i formulari (formato ISO 8601 UTC)")] = None,
-        data_emissione_da: Annotated[Optional[datetime], Field(description="Data di emissione a partire dalla quale si richiedono i formulari (formato ISO 8601 UTC)")] = None,
-        data_emissione_a: Annotated[Optional[datetime], Field(description="Data massima di emissione entro la quale si richiedono i formulari (formato ISO 8601 UTC)")] = None,
-        codice_eer: Annotated[Optional[Annotated[str, Field(strict=True, max_length=8)]], Field(description="Codice EER")] = None,
-        tipo_ricerca: Optional[Any] = None,
-        stati: Optional[List[StrictStr]] = None,
-        paging_page: Annotated[Optional[Annotated[int, Field(le=2147483647, strict=True, ge=1)]], Field(description="Valore per l'header Paging-Page.")] = None,
-        paging_page_size: Annotated[Optional[Annotated[int, Field(le=1000, strict=True, ge=1)]], Field(description="Valore per l'header Paging-PageSize.")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """Elenco formulari
-
-        Ottiene l'elenco dei formulari richiesti con visibilità per l'unità locale indicata e con i filtri specificati.
-
-        :param num_iscr_sito: Numero iscrizione unità locale rilasciato all'iscrizione per il quale si richiedono i formulari (required)
-        :type num_iscr_sito: str
-        :param numero_fir: Numero del FIR
-        :type numero_fir: str
-        :param data_creazione_da: Data di creazione a partire dalla quale si richiedono i formulari (formato ISO 8601 UTC)
-        :type data_creazione_da: datetime
-        :param data_creazione_a: Data massima di creazione per la quale si richiedono i formulari (formato ISO 8601 UTC)
-        :type data_creazione_a: datetime
-        :param data_emissione_da: Data di emissione a partire dalla quale si richiedono i formulari (formato ISO 8601 UTC)
-        :type data_emissione_da: datetime
-        :param data_emissione_a: Data massima di emissione entro la quale si richiedono i formulari (formato ISO 8601 UTC)
-        :type data_emissione_a: datetime
-        :param codice_eer: Codice EER
-        :type codice_eer: str
-        :param tipo_ricerca:
-        :type tipo_ricerca: TipoRicerca
-        :param stati:
-        :type stati: List[str]
-        :param paging_page: Valore per l'header Paging-Page.
-        :type paging_page: int
-        :param paging_page_size: Valore per l'header Paging-PageSize.
-        :type paging_page_size: int
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._root_get_serialize(
-            num_iscr_sito=num_iscr_sito,
-            numero_fir=numero_fir,
-            data_creazione_da=data_creazione_da,
-            data_creazione_a=data_creazione_a,
-            data_emissione_da=data_emissione_da,
-            data_emissione_a=data_emissione_a,
-            codice_eer=codice_eer,
-            tipo_ricerca=tipo_ricerca,
-            stati=stati,
-            paging_page=paging_page,
-            paging_page_size=paging_page_size,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
-
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "List[FormularioItemResult]",
-            '400': None,
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
-
-
-    def _root_get_serialize(
-        self,
-        num_iscr_sito,
-        numero_fir,
-        data_creazione_da,
-        data_creazione_a,
-        data_emissione_da,
-        data_emissione_a,
-        codice_eer,
-        tipo_ricerca,
-        stati,
-        paging_page,
-        paging_page_size,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-            'stati': 'multi',
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
-
-        # process the path parameters
-        # process the query parameters
-        if num_iscr_sito is not None:
-            
-            _query_params.append(('num_iscr_sito', num_iscr_sito))
-            
-        if numero_fir is not None:
-            
-            _query_params.append(('numero_fir', numero_fir))
-            
-        if data_creazione_da is not None:
-            if isinstance(data_creazione_da, datetime):
-                _query_params.append(
-                    (
-                        'data_creazione_da',
-                        data_creazione_da.strftime(
-                            self.api_client.configuration.datetime_format
-                        )
-                    )
-                )
-            else:
-                _query_params.append(('data_creazione_da', data_creazione_da))
-            
-        if data_creazione_a is not None:
-            if isinstance(data_creazione_a, datetime):
-                _query_params.append(
-                    (
-                        'data_creazione_a',
-                        data_creazione_a.strftime(
-                            self.api_client.configuration.datetime_format
-                        )
-                    )
-                )
-            else:
-                _query_params.append(('data_creazione_a', data_creazione_a))
-            
-        if data_emissione_da is not None:
-            if isinstance(data_emissione_da, datetime):
-                _query_params.append(
-                    (
-                        'data_emissione_da',
-                        data_emissione_da.strftime(
-                            self.api_client.configuration.datetime_format
-                        )
-                    )
-                )
-            else:
-                _query_params.append(('data_emissione_da', data_emissione_da))
-            
-        if data_emissione_a is not None:
-            if isinstance(data_emissione_a, datetime):
-                _query_params.append(
-                    (
-                        'data_emissione_a',
-                        data_emissione_a.strftime(
-                            self.api_client.configuration.datetime_format
-                        )
-                    )
-                )
-            else:
-                _query_params.append(('data_emissione_a', data_emissione_a))
-            
-        if codice_eer is not None:
-            
-            _query_params.append(('codice_eer', codice_eer))
-            
-        if tipo_ricerca is not None:
-            
-            _query_params.append(('tipo_ricerca', tipo_ricerca.value))
-            
-        if stati is not None:
-            
-            _query_params.append(('stati', stati))
-            
-        # process the header parameters
-        if paging_page is not None:
-            _header_params['Paging-Page'] = paging_page
-        if paging_page_size is not None:
-            _header_params['Paging-PageSize'] = paging_page_size
-        # process the form parameters
-        # process the body parameter
-
-
-        # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
-
-
-        # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
-
-        return self.api_client.param_serialize(
-            method='GET',
-            resource_path='/',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        return self.api_client.call_api(
+            '/', 'GET',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def root_post(self, nuovo_formulario_model : Annotated[NuovoFormularioModel, Field(..., description="Dati del formulario da creare")], codice_blocco : Annotated[Optional[constr(strict=True)], Field(description="Codice blocco dal nuovo dal quale verrà vidimato in automatico il nuovo numero FIR da associare al formulario")] = None, x_reply_to : Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None, **kwargs) -> TransazioneModel:  # noqa: E501
+        """🔁[ASYNC] Crea FIR  # noqa: E501
 
+        Acquisisce la richiesta di creazione di un nuovo FIR.  Il numero del nuovo FIR può essere specificato nell'apposita proprietà del modello, altrimenti verrà generato automaticamente dal sistema dal blocco indicato nel parametro codiceBlocco.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def root_post(
-        self,
-        nuovo_formulario_model: Annotated[NuovoFormularioModel, Field(description="Dati del formulario da creare")],
-        codice_blocco: Annotated[Optional[Annotated[str, Field(strict=True)]], Field(description="Codice blocco dal nuovo dal quale verrà vidimato in automatico il nuovo numero FIR da associare al formulario")] = None,
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> TransazioneModel:
-        """🔁[ASYNC] Crea FIR
-
-        Acquisisce la richiesta di creazione di un nuovo FIR.  Il numero del nuovo FIR può essere specificato nell'apposita proprietà del modello, altrimenti verrà generato automaticamente dal sistema dal blocco indicato nel parametro codiceBlocco.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.root_post(nuovo_formulario_model, codice_blocco, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param nuovo_formulario_model: Dati del formulario da creare (required)
         :type nuovo_formulario_model: NuovoFormularioModel
@@ -8335,79 +4353,33 @@ class FormularioDigitaleApi:
         :type codice_blocco: str
         :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
         :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: TransazioneModel
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the root_post_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.root_post_with_http_info(nuovo_formulario_model, codice_blocco, x_reply_to, **kwargs)  # noqa: E501
 
-        _param = self._root_post_serialize(
-            nuovo_formulario_model=nuovo_formulario_model,
-            codice_blocco=codice_blocco,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def root_post_with_http_info(self, nuovo_formulario_model : Annotated[NuovoFormularioModel, Field(..., description="Dati del formulario da creare")], codice_blocco : Annotated[Optional[constr(strict=True)], Field(description="Codice blocco dal nuovo dal quale verrà vidimato in automatico il nuovo numero FIR da associare al formulario")] = None, x_reply_to : Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        """🔁[ASYNC] Crea FIR  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Acquisisce la richiesta di creazione di un nuovo FIR.  Il numero del nuovo FIR può essere specificato nell'apposita proprietà del modello, altrimenti verrà generato automaticamente dal sistema dal blocco indicato nel parametro codiceBlocco.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def root_post_with_http_info(
-        self,
-        nuovo_formulario_model: Annotated[NuovoFormularioModel, Field(description="Dati del formulario da creare")],
-        codice_blocco: Annotated[Optional[Annotated[str, Field(strict=True)]], Field(description="Codice blocco dal nuovo dal quale verrà vidimato in automatico il nuovo numero FIR da associare al formulario")] = None,
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[TransazioneModel]:
-        """🔁[ASYNC] Crea FIR
-
-        Acquisisce la richiesta di creazione di un nuovo FIR.  Il numero del nuovo FIR può essere specificato nell'apposita proprietà del modello, altrimenti verrà generato automaticamente dal sistema dal blocco indicato nel parametro codiceBlocco.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.root_post_with_http_info(nuovo_formulario_model, codice_blocco, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param nuovo_formulario_model: Dati del formulario da creare (required)
         :type nuovo_formulario_model: NuovoFormularioModel
@@ -8415,519 +4387,279 @@ class FormularioDigitaleApi:
         :type codice_blocco: str
         :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
         :type x_reply_to: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(TransazioneModel, status_code(int), headers(HTTPHeaderDict))
+        """
 
-        _param = self._root_post_serialize(
-            nuovo_formulario_model=nuovo_formulario_model,
-            codice_blocco=codice_blocco,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def root_post_without_preload_content(
-        self,
-        nuovo_formulario_model: Annotated[NuovoFormularioModel, Field(description="Dati del formulario da creare")],
-        codice_blocco: Annotated[Optional[Annotated[str, Field(strict=True)]], Field(description="Codice blocco dal nuovo dal quale verrà vidimato in automatico il nuovo numero FIR da associare al formulario")] = None,
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'nuovo_formulario_model',
+            'codice_blocco',
+            'x_reply_to'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """🔁[ASYNC] Crea FIR
-
-        Acquisisce la richiesta di creazione di un nuovo FIR.  Il numero del nuovo FIR può essere specificato nell'apposita proprietà del modello, altrimenti verrà generato automaticamente dal sistema dal blocco indicato nel parametro codiceBlocco.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
-
-        :param nuovo_formulario_model: Dati del formulario da creare (required)
-        :type nuovo_formulario_model: NuovoFormularioModel
-        :param codice_blocco: Codice blocco dal nuovo dal quale verrà vidimato in automatico il nuovo numero FIR da associare al formulario
-        :type codice_blocco: str
-        :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
-        :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._root_post_serialize(
-            nuovo_formulario_model=nuovo_formulario_model,
-            codice_blocco=codice_blocco,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method root_post" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    def _root_post_serialize(
-        self,
-        nuovo_formulario_model,
-        codice_blocco,
-        x_reply_to,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        # process the query parameters
-        if codice_blocco is not None:
-            
-            _query_params.append(('codice_blocco', codice_blocco))
-            
-        # process the header parameters
-        if x_reply_to is not None:
-            _header_params['X-ReplyTo'] = x_reply_to
-        # process the form parameters
-        # process the body parameter
-        if nuovo_formulario_model is not None:
-            _body_params = nuovo_formulario_model
+        _path_params = {}
 
+        # process the query parameters
+        _query_params = []
+        if _params.get('codice_blocco') is not None:  # noqa: E501
+            _query_params.append(('codice_blocco', _params['codice_blocco']))
+
+        # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
+        if _params['x_reply_to'] is not None:
+            _header_params['X-ReplyTo'] = _params['x_reply_to']
+
+        # process the form parameters
+        _form_params = []
+        _files = {}
+        # process the body parameter
+        _body_params = None
+        if _params['nuovo_formulario_model'] is not None:
+            _body_params = _params['nuovo_formulario_model']
 
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
 
         # set the HTTP header `Content-Type`
-        if _content_type:
-            _header_params['Content-Type'] = _content_type
-        else:
-            _default_content_type = (
-                self.api_client.select_header_content_type(
-                    [
-                        'application/json'
-                    ]
-                )
-            )
-            if _default_content_type is not None:
-                _header_params['Content-Type'] = _default_content_type
+        _content_types_list = _params.get('_content_type',
+            self.api_client.select_header_content_type(
+                ['application/json']))
+        if _content_types_list:
+                _header_params['Content-Type'] = _content_types_list
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='POST',
-            resource_path='/',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {
+            '202': "TransazioneModel",
+            '400': "ProblemDetails",
+            '403': None,
+            '404': None,
+            '429': None,
+            '500': "ProblemDetails",
+        }
+
+        return self.api_client.call_api(
+            '/', 'POST',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def xfir_valida_post(self, valida_xfir_model : Annotated[ValidaXfirModel, Field(..., description="Oggetto contenente il contenuto del file xFIR")], x_reply_to : Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None, **kwargs) -> TransazioneModel:  # noqa: E501
+        """🔁[ASYNC] Validazione xFIR  # noqa: E501
 
+        Acquisisce la richiesta di controllo di validità dei dati contenuti nel file xFIR secondo le specifiche dal formato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def xfir_valida_post(
-        self,
-        valida_xfir_model: Annotated[ValidaXfirModel, Field(description="Oggetto contenente il contenuto del file xFIR")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> TransazioneModel:
-        """🔁[ASYNC] Validazione xFIR
-
-        Acquisisce la richiesta di controllo di validità dei dati contenuti nel file xFIR secondo le specifiche dal formato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.xfir_valida_post(valida_xfir_model, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param valida_xfir_model: Oggetto contenente il contenuto del file xFIR (required)
         :type valida_xfir_model: ValidaXfirModel
         :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
         :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: TransazioneModel
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the xfir_valida_post_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.xfir_valida_post_with_http_info(valida_xfir_model, x_reply_to, **kwargs)  # noqa: E501
 
-        _param = self._xfir_valida_post_serialize(
-            valida_xfir_model=valida_xfir_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def xfir_valida_post_with_http_info(self, valida_xfir_model : Annotated[ValidaXfirModel, Field(..., description="Oggetto contenente il contenuto del file xFIR")], x_reply_to : Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        """🔁[ASYNC] Validazione xFIR  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Acquisisce la richiesta di controllo di validità dei dati contenuti nel file xFIR secondo le specifiche dal formato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def xfir_valida_post_with_http_info(
-        self,
-        valida_xfir_model: Annotated[ValidaXfirModel, Field(description="Oggetto contenente il contenuto del file xFIR")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[TransazioneModel]:
-        """🔁[ASYNC] Validazione xFIR
-
-        Acquisisce la richiesta di controllo di validità dei dati contenuti nel file xFIR secondo le specifiche dal formato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.xfir_valida_post_with_http_info(valida_xfir_model, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param valida_xfir_model: Oggetto contenente il contenuto del file xFIR (required)
         :type valida_xfir_model: ValidaXfirModel
         :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
         :type x_reply_to: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(TransazioneModel, status_code(int), headers(HTTPHeaderDict))
+        """
 
-        _param = self._xfir_valida_post_serialize(
-            valida_xfir_model=valida_xfir_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def xfir_valida_post_without_preload_content(
-        self,
-        valida_xfir_model: Annotated[ValidaXfirModel, Field(description="Oggetto contenente il contenuto del file xFIR")],
-        x_reply_to: Annotated[Optional[StrictStr], Field(description="URL di callback alla quale verrà inviata la notifica di fine elaborazione")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'valida_xfir_model',
+            'x_reply_to'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """🔁[ASYNC] Validazione xFIR
-
-        Acquisisce la richiesta di controllo di validità dei dati contenuti nel file xFIR secondo le specifiche dal formato.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
-
-        :param valida_xfir_model: Oggetto contenente il contenuto del file xFIR (required)
-        :type valida_xfir_model: ValidaXfirModel
-        :param x_reply_to: URL di callback alla quale verrà inviata la notifica di fine elaborazione
-        :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._xfir_valida_post_serialize(
-            valida_xfir_model=valida_xfir_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method xfir_valida_post" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    def _xfir_valida_post_serialize(
-        self,
-        valida_xfir_model,
-        x_reply_to,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        # process the query parameters
-        # process the header parameters
-        if x_reply_to is not None:
-            _header_params['X-ReplyTo'] = x_reply_to
-        # process the form parameters
-        # process the body parameter
-        if valida_xfir_model is not None:
-            _body_params = valida_xfir_model
+        _path_params = {}
 
+        # process the query parameters
+        _query_params = []
+        # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
+        if _params['x_reply_to'] is not None:
+            _header_params['X-ReplyTo'] = _params['x_reply_to']
+
+        # process the form parameters
+        _form_params = []
+        _files = {}
+        # process the body parameter
+        _body_params = None
+        if _params['valida_xfir_model'] is not None:
+            _body_params = _params['valida_xfir_model']
 
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
 
         # set the HTTP header `Content-Type`
-        if _content_type:
-            _header_params['Content-Type'] = _content_type
-        else:
-            _default_content_type = (
-                self.api_client.select_header_content_type(
-                    [
-                        'application/json'
-                    ]
-                )
-            )
-            if _default_content_type is not None:
-                _header_params['Content-Type'] = _default_content_type
+        _content_types_list = _params.get('_content_type',
+            self.api_client.select_header_content_type(
+                ['application/json']))
+        if _content_types_list:
+                _header_params['Content-Type'] = _content_types_list
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='POST',
-            resource_path='/xfir/valida',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {
+            '202': "TransazioneModel",
+            '400': "ProblemDetails",
+            '403': None,
+            '404': None,
+            '429': None,
+            '500': "ProblemDetails",
+        }
+
+        return self.api_client.call_api(
+            '/xfir/valida', 'POST',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
-
-
+            _request_auth=_params.get('_request_auth'))

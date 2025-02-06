@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.dati_allegato_result_model import DatiAllegatoResultModel
+from rentri_formulari.models.dati_allegato_result_model import DatiAllegatoResultModel  # noqa: E501
 
 class TestDatiAllegatoResultModel(unittest.TestCase):
     """DatiAllegatoResultModel unit test stubs"""
@@ -28,12 +29,12 @@ class TestDatiAllegatoResultModel(unittest.TestCase):
 
     def make_instance(self, include_optional) -> DatiAllegatoResultModel:
         """Test DatiAllegatoResultModel
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `DatiAllegatoResultModel`
         """
-        model = DatiAllegatoResultModel()
+        model = DatiAllegatoResultModel()  # noqa: E501
         if include_optional:
             return DatiAllegatoResultModel(
                 dati_firma = rentri_formulari.models.dati_firma_result.DatiFirmaResult(

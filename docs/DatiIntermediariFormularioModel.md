@@ -3,7 +3,6 @@
 Dati intermediario
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **denominazione** | **str** | Denominazione del soggetto | 
@@ -21,7 +20,7 @@ json = "{}"
 # create an instance of DatiIntermediariFormularioModel from a JSON string
 dati_intermediari_formulario_model_instance = DatiIntermediariFormularioModel.from_json(json)
 # print the JSON string representation of the object
-print(DatiIntermediariFormularioModel.to_json())
+print DatiIntermediariFormularioModel.to_json()
 
 # convert the object into a dict
 dati_intermediari_formulario_model_dict = dati_intermediari_formulario_model_instance.to_dict()

@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **denominazione_firmatario** | **str** |  | [optional] 
@@ -21,7 +20,7 @@ json = "{}"
 # create an instance of DatiFirmaResult from a JSON string
 dati_firma_result_instance = DatiFirmaResult.from_json(json)
 # print the JSON string representation of the object
-print(DatiFirmaResult.to_json())
+print DatiFirmaResult.to_json()
 
 # convert the object into a dict
 dati_firma_result_dict = dati_firma_result_instance.to_dict()

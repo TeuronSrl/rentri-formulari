@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.dati_trasporto_marittimo_model import DatiTrasportoMarittimoModel
+from rentri_formulari.models.dati_trasporto_marittimo_model import DatiTrasportoMarittimoModel  # noqa: E501
 
 class TestDatiTrasportoMarittimoModel(unittest.TestCase):
     """DatiTrasportoMarittimoModel unit test stubs"""
@@ -28,12 +29,12 @@ class TestDatiTrasportoMarittimoModel(unittest.TestCase):
 
     def make_instance(self, include_optional) -> DatiTrasportoMarittimoModel:
         """Test DatiTrasportoMarittimoModel
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `DatiTrasportoMarittimoModel`
         """
-        model = DatiTrasportoMarittimoModel()
+        model = DatiTrasportoMarittimoModel()  # noqa: E501
         if include_optional:
             return DatiTrasportoMarittimoModel(
                 nave = '0',

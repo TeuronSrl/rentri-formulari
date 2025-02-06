@@ -3,7 +3,6 @@
 Dati del trasporto base
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **tipo_trasporto** | [**TipoTrasporto**](TipoTrasporto.md) |  | [optional] 
@@ -31,7 +30,7 @@ json = "{}"
 # create an instance of DettaglioFormularioDatiTrasportoInner from a JSON string
 dettaglio_formulario_dati_trasporto_inner_instance = DettaglioFormularioDatiTrasportoInner.from_json(json)
 # print the JSON string representation of the object
-print(DettaglioFormularioDatiTrasportoInner.to_json())
+print DettaglioFormularioDatiTrasportoInner.to_json()
 
 # convert the object into a dict
 dettaglio_formulario_dati_trasporto_inner_dict = dettaglio_formulario_dati_trasporto_inner_instance.to_dict()

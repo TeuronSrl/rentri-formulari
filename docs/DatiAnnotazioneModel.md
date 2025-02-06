@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **annotazione** | **str** |  | 
@@ -18,7 +17,7 @@ json = "{}"
 # create an instance of DatiAnnotazioneModel from a JSON string
 dati_annotazione_model_instance = DatiAnnotazioneModel.from_json(json)
 # print the JSON string representation of the object
-print(DatiAnnotazioneModel.to_json())
+print DatiAnnotazioneModel.to_json()
 
 # convert the object into a dict
 dati_annotazione_model_dict = dati_annotazione_model_instance.to_dict()

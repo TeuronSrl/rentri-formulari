@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.dati_destinatario_formulario_model1 import DatiDestinatarioFormularioModel1
+from rentri_formulari.models.dati_destinatario_formulario_model1 import DatiDestinatarioFormularioModel1  # noqa: E501
 
 class TestDatiDestinatarioFormularioModel1(unittest.TestCase):
     """DatiDestinatarioFormularioModel1 unit test stubs"""
@@ -28,12 +29,12 @@ class TestDatiDestinatarioFormularioModel1(unittest.TestCase):
 
     def make_instance(self, include_optional) -> DatiDestinatarioFormularioModel1:
         """Test DatiDestinatarioFormularioModel1
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `DatiDestinatarioFormularioModel1`
         """
-        model = DatiDestinatarioFormularioModel1()
+        model = DatiDestinatarioFormularioModel1()  # noqa: E501
         if include_optional:
             return DatiDestinatarioFormularioModel1(
                 denominazione = '0',

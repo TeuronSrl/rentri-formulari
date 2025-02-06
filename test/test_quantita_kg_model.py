@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.quantita_kg_model import QuantitaKgModel
+from rentri_formulari.models.quantita_kg_model import QuantitaKgModel  # noqa: E501
 
 class TestQuantitaKgModel(unittest.TestCase):
     """QuantitaKgModel unit test stubs"""
@@ -28,12 +29,12 @@ class TestQuantitaKgModel(unittest.TestCase):
 
     def make_instance(self, include_optional) -> QuantitaKgModel:
         """Test QuantitaKgModel
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `QuantitaKgModel`
         """
-        model = QuantitaKgModel()
+        model = QuantitaKgModel()  # noqa: E501
         if include_optional:
             return QuantitaKgModel(
                 valore = 1.337

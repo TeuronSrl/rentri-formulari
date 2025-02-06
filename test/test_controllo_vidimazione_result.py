@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.controllo_vidimazione_result import ControlloVidimazioneResult
+from rentri_formulari.models.controllo_vidimazione_result import ControlloVidimazioneResult  # noqa: E501
 
 class TestControlloVidimazioneResult(unittest.TestCase):
     """ControlloVidimazioneResult unit test stubs"""
@@ -28,12 +29,12 @@ class TestControlloVidimazioneResult(unittest.TestCase):
 
     def make_instance(self, include_optional) -> ControlloVidimazioneResult:
         """Test ControlloVidimazioneResult
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `ControlloVidimazioneResult`
         """
-        model = ControlloVidimazioneResult()
+        model = ControlloVidimazioneResult()  # noqa: E501
         if include_optional:
             return ControlloVidimazioneResult(
                 codice = '',

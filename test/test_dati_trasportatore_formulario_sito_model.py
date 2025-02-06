@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.dati_trasportatore_formulario_sito_model import DatiTrasportatoreFormularioSitoModel
+from rentri_formulari.models.dati_trasportatore_formulario_sito_model import DatiTrasportatoreFormularioSitoModel  # noqa: E501
 
 class TestDatiTrasportatoreFormularioSitoModel(unittest.TestCase):
     """DatiTrasportatoreFormularioSitoModel unit test stubs"""
@@ -28,12 +29,12 @@ class TestDatiTrasportatoreFormularioSitoModel(unittest.TestCase):
 
     def make_instance(self, include_optional) -> DatiTrasportatoreFormularioSitoModel:
         """Test DatiTrasportatoreFormularioSitoModel
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `DatiTrasportatoreFormularioSitoModel`
         """
-        model = DatiTrasportatoreFormularioSitoModel()
+        model = DatiTrasportatoreFormularioSitoModel()  # noqa: E501
         if include_optional:
             return DatiTrasportatoreFormularioSitoModel(
                 num_iscr_sito = 'OP0480ZGC880015-CM02170',

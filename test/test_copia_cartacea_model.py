@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.copia_cartacea_model import CopiaCartaceaModel
+from rentri_formulari.models.copia_cartacea_model import CopiaCartaceaModel  # noqa: E501
 
 class TestCopiaCartaceaModel(unittest.TestCase):
     """CopiaCartaceaModel unit test stubs"""
@@ -28,18 +29,18 @@ class TestCopiaCartaceaModel(unittest.TestCase):
 
     def make_instance(self, include_optional) -> CopiaCartaceaModel:
         """Test CopiaCartaceaModel
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `CopiaCartaceaModel`
         """
-        model = CopiaCartaceaModel()
+        model = CopiaCartaceaModel()  # noqa: E501
         if include_optional:
             return CopiaCartaceaModel(
                 file_content = 'YQ==',
                 nome_file = '0',
                 mime = '0',
-                numero_fir = 'WPQZYQ ) ._),,#_**&,\"%\"* - *- !\'# 1757701929816286488291663/.$\'\"&(_#+% #\"&%-/*- )!./ !),+#/)B0',
+                numero_fir = 'WPQZYQ ) ._),,#_**&,\"%\"* - *- !'# 1757701929816286488291663/.$'\"&(_#+% #\"&%-/*- )!./ !),+#/)B0',
                 data_emissione = datetime.datetime.strptime('2013-10-20 19:20:30.00', '%Y-%m-%d %H:%M:%S.%f'),
                 produttore = rentri_formulari.models.copia_cartacea_soggetto_info.CopiaCartaceaSoggettoInfo(
                     nazione_id = '', 
@@ -70,7 +71,7 @@ class TestCopiaCartaceaModel(unittest.TestCase):
                 file_content = 'YQ==',
                 nome_file = '0',
                 mime = '0',
-                numero_fir = 'WPQZYQ ) ._),,#_**&,\"%\"* - *- !\'# 1757701929816286488291663/.$\'\"&(_#+% #\"&%-/*- )!./ !),+#/)B0',
+                numero_fir = 'WPQZYQ ) ._),,#_**&,\"%\"* - *- !'# 1757701929816286488291663/.$'\"&(_#+% #\"&%-/*- )!./ !),+#/)B0',
                 data_emissione = datetime.datetime.strptime('2013-10-20 19:20:30.00', '%Y-%m-%d %H:%M:%S.%f'),
                 produttore = rentri_formulari.models.copia_cartacea_soggetto_info.CopiaCartaceaSoggettoInfo(
                     nazione_id = '', 

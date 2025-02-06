@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **content_type** | **str** |  | 
@@ -21,7 +20,7 @@ json = "{}"
 # create an instance of DatiAllegatoModel from a JSON string
 dati_allegato_model_instance = DatiAllegatoModel.from_json(json)
 # print the JSON string representation of the object
-print(DatiAllegatoModel.to_json())
+print DatiAllegatoModel.to_json()
 
 # convert the object into a dict
 dati_allegato_model_dict = dati_allegato_model_instance.to_dict()

@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.esito_estrazione_dati_xfir_model import EsitoEstrazioneDatiXfirModel
+from rentri_formulari.models.esito_estrazione_dati_xfir_model import EsitoEstrazioneDatiXfirModel  # noqa: E501
 
 class TestEsitoEstrazioneDatiXfirModel(unittest.TestCase):
     """EsitoEstrazioneDatiXfirModel unit test stubs"""
@@ -28,12 +29,12 @@ class TestEsitoEstrazioneDatiXfirModel(unittest.TestCase):
 
     def make_instance(self, include_optional) -> EsitoEstrazioneDatiXfirModel:
         """Test EsitoEstrazioneDatiXfirModel
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `EsitoEstrazioneDatiXfirModel`
         """
-        model = EsitoEstrazioneDatiXfirModel()
+        model = EsitoEstrazioneDatiXfirModel()  # noqa: E501
         if include_optional:
             return EsitoEstrazioneDatiXfirModel(
                 esito = rentri_formulari.models.esito_estrai_dati_xfir_model.EsitoEstraiDatiXfirModel(

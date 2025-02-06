@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.dati_partenza_result_model import DatiPartenzaResultModel
+from rentri_formulari.models.dati_partenza_result_model import DatiPartenzaResultModel  # noqa: E501
 
 class TestDatiPartenzaResultModel(unittest.TestCase):
     """DatiPartenzaResultModel unit test stubs"""
@@ -28,12 +29,12 @@ class TestDatiPartenzaResultModel(unittest.TestCase):
 
     def make_instance(self, include_optional) -> DatiPartenzaResultModel:
         """Test DatiPartenzaResultModel
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `DatiPartenzaResultModel`
         """
-        model = DatiPartenzaResultModel()
+        model = DatiPartenzaResultModel()  # noqa: E501
         if include_optional:
             return DatiPartenzaResultModel(
                 produttore = rentri_formulari.models.dati_produttore_formulario_model.DatiProduttoreFormularioModel(
@@ -79,7 +80,7 @@ class TestDatiPartenzaResultModel(unittest.TestCase):
                     data_firma = datetime.datetime.strptime('2013-10-20 19:20:30.00', '%Y-%m-%d %H:%M:%S.%f'), 
                     identificativo_utente = '', 
                     credentials_id = '', ),
-                numero_fir = 'WPQZYQ ) ._),,#_**&,\"%\"* - *- !\'# 1757701929816286488291663/.$\'\"&(_#+% #\"&%-/*- )!./ !),+#/)B',
+                numero_fir = 'WPQZYQ ) ._),,#_**&,\"%\"* - *- !'# 1757701929816286488291663/.$'\"&(_#+% #\"&%-/*- )!./ !),+#/)B',
                 annotazioni = ''
             )
         else:

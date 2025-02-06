@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **destinatario** | [**DestinatarioSuccessivoResultModel**](DestinatarioSuccessivoResultModel.md) |  | [optional] 
@@ -18,7 +17,7 @@ json = "{}"
 # create an instance of DatiDestinazioniSuccessiveResultMdodel from a JSON string
 dati_destinazioni_successive_result_mdodel_instance = DatiDestinazioniSuccessiveResultMdodel.from_json(json)
 # print the JSON string representation of the object
-print(DatiDestinazioniSuccessiveResultMdodel.to_json())
+print DatiDestinazioniSuccessiveResultMdodel.to_json()
 
 # convert the object into a dict
 dati_destinazioni_successive_result_mdodel_dict = dati_destinazioni_successive_result_mdodel_instance.to_dict()

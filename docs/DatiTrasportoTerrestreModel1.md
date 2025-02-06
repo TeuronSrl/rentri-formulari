@@ -3,7 +3,6 @@
 Dati del trasporto terrestre
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **conducente** | [**ConducenteModel**](ConducenteModel.md) | Conducente | 
@@ -26,7 +25,7 @@ json = "{}"
 # create an instance of DatiTrasportoTerrestreModel1 from a JSON string
 dati_trasporto_terrestre_model1_instance = DatiTrasportoTerrestreModel1.from_json(json)
 # print the JSON string representation of the object
-print(DatiTrasportoTerrestreModel1.to_json())
+print DatiTrasportoTerrestreModel1.to_json()
 
 # convert the object into a dict
 dati_trasporto_terrestre_model1_dict = dati_trasporto_terrestre_model1_instance.to_dict()

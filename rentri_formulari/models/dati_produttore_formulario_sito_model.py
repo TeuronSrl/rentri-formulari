@@ -18,33 +18,31 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field, StrictBool, field_validator
-from typing import Any, ClassVar, Dict, List, Optional
-from typing_extensions import Annotated
+
+from typing import Optional
+from pydantic import BaseModel, Field, StrictBool, constr, validator
 from rentri_formulari.models.autorizzazione_model import AutorizzazioneModel
 from rentri_formulari.models.indirizzo_model import IndirizzoModel
-from typing import Optional, Set
-from typing_extensions import Self
 
 class DatiProduttoreFormularioSitoModel(BaseModel):
     """
-    Dati produttore
-    """ # noqa: E501
-    num_iscr_sito: Annotated[str, Field(min_length=1, strict=True)] = Field(description="Numero di iscrizione al RENTRI")
+    Dati produttore  # noqa: E501
+    """
+    num_iscr_sito: constr(strict=True, min_length=1) = Field(default=..., description="Numero di iscrizione al RENTRI")
     luogo_produzione: Optional[IndirizzoModel] = Field(default=None, description="Luogo di produzione se diverso da indirizzo")
     autorizzazione: Optional[AutorizzazioneModel] = Field(default=None, description="Autorizzazione")
     detentore: Optional[StrictBool] = Field(default=None, description="Specifica se il dato del produttore è riferito al detentore del rifiuto")
-    numero_iscrizione_albo: Optional[Annotated[str, Field(strict=True)]] = Field(default=None, description="Iscrizione Albo")
-    __properties: ClassVar[List[str]] = ["luogo_produzione", "autorizzazione", "detentore", "numero_iscrizione_albo"]
+    numero_iscrizione_albo: Optional[constr(strict=True)] = Field(default=None, description="Iscrizione Albo")
+    __properties = ["luogo_produzione", "autorizzazione", "detentore", "numero_iscrizione_albo"]
 
-    @field_validator('num_iscr_sito')
+    @validator('num_iscr_sito')
     def num_iscr_sito_validate_regular_expression(cls, value):
         """Validates the regular expression"""
         if not re.match(r"^OP[0-9]{4}[A-Z0-9]{3}[0-9]{6}-[A-Z]{2}[0-9]{4}$", value):
             raise ValueError(r"must validate the regular expression /^OP[0-9]{4}[A-Z0-9]{3}[0-9]{6}-[A-Z]{2}[0-9]{4}$/")
         return value
 
-    @field_validator('numero_iscrizione_albo')
+    @validator('numero_iscrizione_albo')
     def numero_iscrizione_albo_validate_regular_expression(cls, value):
         """Validates the regular expression"""
         if value is None:
@@ -54,45 +52,30 @@ class DatiProduttoreFormularioSitoModel(BaseModel):
             raise ValueError(r"must validate the regular expression /^([A-Za-z]{2})\/([0-9]{6})$/")
         return value
 
-    model_config = ConfigDict(
-        populate_by_name=True,
-        validate_assignment=True,
-        protected_namespaces=(),
-    )
-
+    class Config:
+        """Pydantic configuration"""
+        allow_population_by_field_name = True
+        validate_assignment = True
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""
-        return pprint.pformat(self.model_dump(by_alias=True))
+        return pprint.pformat(self.dict(by_alias=True))
 
     def to_json(self) -> str:
         """Returns the JSON representation of the model using alias"""
-        # TODO: pydantic v2: use .model_dump_json(by_alias=True, exclude_unset=True) instead
         return json.dumps(self.to_dict())
 
     @classmethod
-    def from_json(cls, json_str: str) -> Optional[Self]:
+    def from_json(cls, json_str: str) -> DatiProduttoreFormularioSitoModel:
         """Create an instance of DatiProduttoreFormularioSitoModel from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
-    def to_dict(self) -> Dict[str, Any]:
-        """Return the dictionary representation of the model using alias.
-
-        This has the following differences from calling pydantic's
-        `self.model_dump(by_alias=True)`:
-
-        * `None` is only added to the output dict for nullable fields that
-          were set at model initialization. Other fields with value `None`
-          are ignored.
-        """
-        excluded_fields: Set[str] = set([
-        ])
-
-        _dict = self.model_dump(
-            by_alias=True,
-            exclude=excluded_fields,
-            exclude_none=True,
-        )
+    def to_dict(self):
+        """Returns the dictionary representation of the model using alias"""
+        _dict = self.dict(by_alias=True,
+                          exclude={
+                          },
+                          exclude_none=True)
         # override the default output from pydantic by calling `to_dict()` of luogo_produzione
         if self.luogo_produzione:
             _dict['luogo_produzione'] = self.luogo_produzione.to_dict()
@@ -100,39 +83,39 @@ class DatiProduttoreFormularioSitoModel(BaseModel):
         if self.autorizzazione:
             _dict['autorizzazione'] = self.autorizzazione.to_dict()
         # set to None if luogo_produzione (nullable) is None
-        # and model_fields_set contains the field
-        if self.luogo_produzione is None and "luogo_produzione" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.luogo_produzione is None and "luogo_produzione" in self.__fields_set__:
             _dict['luogo_produzione'] = None
 
         # set to None if autorizzazione (nullable) is None
-        # and model_fields_set contains the field
-        if self.autorizzazione is None and "autorizzazione" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.autorizzazione is None and "autorizzazione" in self.__fields_set__:
             _dict['autorizzazione'] = None
 
         # set to None if detentore (nullable) is None
-        # and model_fields_set contains the field
-        if self.detentore is None and "detentore" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.detentore is None and "detentore" in self.__fields_set__:
             _dict['detentore'] = None
 
         # set to None if numero_iscrizione_albo (nullable) is None
-        # and model_fields_set contains the field
-        if self.numero_iscrizione_albo is None and "numero_iscrizione_albo" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.numero_iscrizione_albo is None and "numero_iscrizione_albo" in self.__fields_set__:
             _dict['numero_iscrizione_albo'] = None
 
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
+    def from_dict(cls, obj: dict) -> DatiProduttoreFormularioSitoModel:
         """Create an instance of DatiProduttoreFormularioSitoModel from a dict"""
         if obj is None:
             return None
 
         if not isinstance(obj, dict):
-            return cls.model_validate(obj)
+            return DatiProduttoreFormularioSitoModel.parse_obj(obj)
 
-        _obj = cls.model_validate({
-            "luogo_produzione": IndirizzoModel.from_dict(obj["luogo_produzione"]) if obj.get("luogo_produzione") is not None else None,
-            "autorizzazione": AutorizzazioneModel.from_dict(obj["autorizzazione"]) if obj.get("autorizzazione") is not None else None,
+        _obj = DatiProduttoreFormularioSitoModel.parse_obj({
+            "luogo_produzione": IndirizzoModel.from_dict(obj.get("luogo_produzione")) if obj.get("luogo_produzione") is not None else None,
+            "autorizzazione": AutorizzazioneModel.from_dict(obj.get("autorizzazione")) if obj.get("autorizzazione") is not None else None,
             "detentore": obj.get("detentore"),
             "numero_iscrizione_albo": obj.get("numero_iscrizione_albo")
         })

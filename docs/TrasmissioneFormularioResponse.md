@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **identificativo** | **str** |  | [optional] 
@@ -17,7 +16,7 @@ json = "{}"
 # create an instance of TrasmissioneFormularioResponse from a JSON string
 trasmissione_formulario_response_instance = TrasmissioneFormularioResponse.from_json(json)
 # print the JSON string representation of the object
-print(TrasmissioneFormularioResponse.to_json())
+print TrasmissioneFormularioResponse.to_json()
 
 # convert the object into a dict
 trasmissione_formulario_response_dict = trasmissione_formulario_response_instance.to_dict()

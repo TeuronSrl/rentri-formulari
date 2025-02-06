@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.stato_formulario import StatoFormulario
+from rentri_formulari.models.stato_formulario import StatoFormulario  # noqa: E501
 
 class TestStatoFormulario(unittest.TestCase):
     """StatoFormulario unit test stubs"""

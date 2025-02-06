@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.dati_partenza_model import DatiPartenzaModel
+from rentri_formulari.models.dati_partenza_model import DatiPartenzaModel  # noqa: E501
 
 class TestDatiPartenzaModel(unittest.TestCase):
     """DatiPartenzaModel unit test stubs"""
@@ -28,15 +29,15 @@ class TestDatiPartenzaModel(unittest.TestCase):
 
     def make_instance(self, include_optional) -> DatiPartenzaModel:
         """Test DatiPartenzaModel
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `DatiPartenzaModel`
         """
-        model = DatiPartenzaModel()
+        model = DatiPartenzaModel()  # noqa: E501
         if include_optional:
             return DatiPartenzaModel(
-                numero_fir = 'WPQZYQ ) ._),,#_**&,\"%\"* - *- !\'# 1757701929816286488291663/.$\'\"&(_#+% #\"&%-/*- )!./ !),+#/)B',
+                numero_fir = 'WPQZYQ ) ._),,#_**&,\"%\"* - *- !'# 1757701929816286488291663/.$'\"&(_#+% #\"&%-/*- )!./ !),+#/)B',
                 produttore = None,
                 destinatario = None,
                 trasportatori = [
@@ -66,7 +67,7 @@ class TestDatiPartenzaModel(unittest.TestCase):
                     numero_colli = '', 
                     rinfusa = True, ),
                 trasbordo_parziale_origine = rentri_formulari.models.dati_trasbordo_parziale_origine_model.DatiTrasbordoParzialeOrigineModel(
-                    numero_fir_origine = 'WPQZYQ ) ._),,#_**&,\"%\"* - *- !\'# 1757701929816286488291663/.$\'\"&(_#+% #\"&%-/*- )!./ !),+#/)B0', 
+                    numero_fir_origine = 'WPQZYQ ) ._),,#_**&,\"%\"* - *- !'# 1757701929816286488291663/.$'\"&(_#+% #\"&%-/*- )!./ !),+#/)B0', 
                     produttore_originario = null, 
                     causale = '0', ),
                 annotazioni = ''

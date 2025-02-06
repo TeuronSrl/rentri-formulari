@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.dettaglio_formulario import DettaglioFormulario
+from rentri_formulari.models.dettaglio_formulario import DettaglioFormulario  # noqa: E501
 
 class TestDettaglioFormulario(unittest.TestCase):
     """DettaglioFormulario unit test stubs"""
@@ -28,12 +29,12 @@ class TestDettaglioFormulario(unittest.TestCase):
 
     def make_instance(self, include_optional) -> DettaglioFormulario:
         """Test DettaglioFormulario
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `DettaglioFormulario`
         """
-        model = DettaglioFormulario()
+        model = DettaglioFormulario()  # noqa: E501
         if include_optional:
             return DettaglioFormulario(
                 stato_formulario = 'InserimentoQuantita',
@@ -59,7 +60,7 @@ class TestDettaglioFormulario(unittest.TestCase):
                     rifiuto = null, 
                     trasbordo_parziale_origine = null, 
                     dati_firma_produttore = null, 
-                    numero_fir = 'WPQZYQ ) ._),,#_**&,\"%\"* - *- !\'# 1757701929816286488291663/.$\'\"&(_#+% #\"&%-/*- )!./ !),+#/)B', 
+                    numero_fir = 'WPQZYQ ) ._),,#_**&,\"%\"* - *- !'# 1757701929816286488291663/.$'\"&(_#+% #\"&%-/*- )!./ !),+#/)B', 
                     annotazioni = '', ),
                 dati_trasporto = [
                     null

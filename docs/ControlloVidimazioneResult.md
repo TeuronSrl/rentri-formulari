@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **codice** | **str** |  | [optional] 
@@ -21,7 +20,7 @@ json = "{}"
 # create an instance of ControlloVidimazioneResult from a JSON string
 controllo_vidimazione_result_instance = ControlloVidimazioneResult.from_json(json)
 # print the JSON string representation of the object
-print(ControlloVidimazioneResult.to_json())
+print ControlloVidimazioneResult.to_json()
 
 # convert the object into a dict
 controllo_vidimazione_result_dict = controllo_vidimazione_result_instance.to_dict()

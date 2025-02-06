@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.numero_fir_trasporto_post_request import NumeroFirTrasportoPostRequest
+from rentri_formulari.models.numero_fir_trasporto_post_request import NumeroFirTrasportoPostRequest  # noqa: E501
 
 class TestNumeroFirTrasportoPostRequest(unittest.TestCase):
     """NumeroFirTrasportoPostRequest unit test stubs"""
@@ -28,12 +29,12 @@ class TestNumeroFirTrasportoPostRequest(unittest.TestCase):
 
     def make_instance(self, include_optional) -> NumeroFirTrasportoPostRequest:
         """Test NumeroFirTrasportoPostRequest
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `NumeroFirTrasportoPostRequest`
         """
-        model = NumeroFirTrasportoPostRequest()
+        model = NumeroFirTrasportoPostRequest()  # noqa: E501
         if include_optional:
             return NumeroFirTrasportoPostRequest(
                 conducente = rentri_formulari.models.conducente_model.ConducenteModel(

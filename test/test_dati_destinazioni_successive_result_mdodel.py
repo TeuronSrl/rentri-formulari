@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.dati_destinazioni_successive_result_mdodel import DatiDestinazioniSuccessiveResultMdodel
+from rentri_formulari.models.dati_destinazioni_successive_result_mdodel import DatiDestinazioniSuccessiveResultMdodel  # noqa: E501
 
 class TestDatiDestinazioniSuccessiveResultMdodel(unittest.TestCase):
     """DatiDestinazioniSuccessiveResultMdodel unit test stubs"""
@@ -28,12 +29,12 @@ class TestDatiDestinazioniSuccessiveResultMdodel(unittest.TestCase):
 
     def make_instance(self, include_optional) -> DatiDestinazioniSuccessiveResultMdodel:
         """Test DatiDestinazioniSuccessiveResultMdodel
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `DatiDestinazioniSuccessiveResultMdodel`
         """
-        model = DatiDestinazioniSuccessiveResultMdodel()
+        model = DatiDestinazioniSuccessiveResultMdodel()  # noqa: E501
         if include_optional:
             return DatiDestinazioniSuccessiveResultMdodel(
                 destinatario = rentri_formulari.models.destinatario_successivo_result_model.DestinatarioSuccessivoResultModel(

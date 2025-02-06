@@ -18,61 +18,45 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, StrictInt
-from typing import Any, ClassVar, Dict, List, Optional
+
+from typing import Optional
+from pydantic import BaseModel, StrictInt
 from rentri_formulari.models.dati_trasportatore_formulario_result_model import DatiTrasportatoreFormularioResultModel
 from rentri_formulari.models.dati_trasporto_terrestre_result_model import DatiTrasportoTerrestreResultModel
-from typing import Optional, Set
-from typing_extensions import Self
 
 class DatiTrasbordoTotaleResultModel(BaseModel):
     """
     DatiTrasbordoTotaleResultModel
-    """ # noqa: E501
+    """
     trasportatore: Optional[DatiTrasportatoreFormularioResultModel] = None
     presa_in_carico: Optional[DatiTrasportoTerrestreResultModel] = None
     trasportatore_id: Optional[StrictInt] = None
-    __properties: ClassVar[List[str]] = ["trasportatore", "presa_in_carico", "trasportatore_id"]
+    __properties = ["trasportatore", "presa_in_carico", "trasportatore_id"]
 
-    model_config = ConfigDict(
-        populate_by_name=True,
-        validate_assignment=True,
-        protected_namespaces=(),
-    )
-
+    class Config:
+        """Pydantic configuration"""
+        allow_population_by_field_name = True
+        validate_assignment = True
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""
-        return pprint.pformat(self.model_dump(by_alias=True))
+        return pprint.pformat(self.dict(by_alias=True))
 
     def to_json(self) -> str:
         """Returns the JSON representation of the model using alias"""
-        # TODO: pydantic v2: use .model_dump_json(by_alias=True, exclude_unset=True) instead
         return json.dumps(self.to_dict())
 
     @classmethod
-    def from_json(cls, json_str: str) -> Optional[Self]:
+    def from_json(cls, json_str: str) -> DatiTrasbordoTotaleResultModel:
         """Create an instance of DatiTrasbordoTotaleResultModel from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
-    def to_dict(self) -> Dict[str, Any]:
-        """Return the dictionary representation of the model using alias.
-
-        This has the following differences from calling pydantic's
-        `self.model_dump(by_alias=True)`:
-
-        * `None` is only added to the output dict for nullable fields that
-          were set at model initialization. Other fields with value `None`
-          are ignored.
-        """
-        excluded_fields: Set[str] = set([
-        ])
-
-        _dict = self.model_dump(
-            by_alias=True,
-            exclude=excluded_fields,
-            exclude_none=True,
-        )
+    def to_dict(self):
+        """Returns the dictionary representation of the model using alias"""
+        _dict = self.dict(by_alias=True,
+                          exclude={
+                          },
+                          exclude_none=True)
         # override the default output from pydantic by calling `to_dict()` of trasportatore
         if self.trasportatore:
             _dict['trasportatore'] = self.trasportatore.to_dict()
@@ -80,34 +64,34 @@ class DatiTrasbordoTotaleResultModel(BaseModel):
         if self.presa_in_carico:
             _dict['presa_in_carico'] = self.presa_in_carico.to_dict()
         # set to None if trasportatore (nullable) is None
-        # and model_fields_set contains the field
-        if self.trasportatore is None and "trasportatore" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.trasportatore is None and "trasportatore" in self.__fields_set__:
             _dict['trasportatore'] = None
 
         # set to None if presa_in_carico (nullable) is None
-        # and model_fields_set contains the field
-        if self.presa_in_carico is None and "presa_in_carico" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.presa_in_carico is None and "presa_in_carico" in self.__fields_set__:
             _dict['presa_in_carico'] = None
 
         # set to None if trasportatore_id (nullable) is None
-        # and model_fields_set contains the field
-        if self.trasportatore_id is None and "trasportatore_id" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.trasportatore_id is None and "trasportatore_id" in self.__fields_set__:
             _dict['trasportatore_id'] = None
 
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
+    def from_dict(cls, obj: dict) -> DatiTrasbordoTotaleResultModel:
         """Create an instance of DatiTrasbordoTotaleResultModel from a dict"""
         if obj is None:
             return None
 
         if not isinstance(obj, dict):
-            return cls.model_validate(obj)
+            return DatiTrasbordoTotaleResultModel.parse_obj(obj)
 
-        _obj = cls.model_validate({
-            "trasportatore": DatiTrasportatoreFormularioResultModel.from_dict(obj["trasportatore"]) if obj.get("trasportatore") is not None else None,
-            "presa_in_carico": DatiTrasportoTerrestreResultModel.from_dict(obj["presa_in_carico"]) if obj.get("presa_in_carico") is not None else None,
+        _obj = DatiTrasbordoTotaleResultModel.parse_obj({
+            "trasportatore": DatiTrasportatoreFormularioResultModel.from_dict(obj.get("trasportatore")) if obj.get("trasportatore") is not None else None,
+            "presa_in_carico": DatiTrasportoTerrestreResultModel.from_dict(obj.get("presa_in_carico")) if obj.get("presa_in_carico") is not None else None,
             "trasportatore_id": obj.get("trasportatore_id")
         })
         return _obj

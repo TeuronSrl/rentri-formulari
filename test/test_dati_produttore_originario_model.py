@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.dati_produttore_originario_model import DatiProduttoreOriginarioModel
+from rentri_formulari.models.dati_produttore_originario_model import DatiProduttoreOriginarioModel  # noqa: E501
 
 class TestDatiProduttoreOriginarioModel(unittest.TestCase):
     """DatiProduttoreOriginarioModel unit test stubs"""
@@ -28,12 +29,12 @@ class TestDatiProduttoreOriginarioModel(unittest.TestCase):
 
     def make_instance(self, include_optional) -> DatiProduttoreOriginarioModel:
         """Test DatiProduttoreOriginarioModel
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `DatiProduttoreOriginarioModel`
         """
-        model = DatiProduttoreOriginarioModel()
+        model = DatiProduttoreOriginarioModel()  # noqa: E501
         if include_optional:
             return DatiProduttoreOriginarioModel(
                 nazione_id = '',

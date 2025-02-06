@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.soggetto_item_result import SoggettoItemResult
+from rentri_formulari.models.soggetto_item_result import SoggettoItemResult  # noqa: E501
 
 class TestSoggettoItemResult(unittest.TestCase):
     """SoggettoItemResult unit test stubs"""
@@ -28,12 +29,12 @@ class TestSoggettoItemResult(unittest.TestCase):
 
     def make_instance(self, include_optional) -> SoggettoItemResult:
         """Test SoggettoItemResult
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `SoggettoItemResult`
         """
-        model = SoggettoItemResult()
+        model = SoggettoItemResult()  # noqa: E501
         if include_optional:
             return SoggettoItemResult(
                 denominazione = '',

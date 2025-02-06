@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.esito_messaggio_tipo import EsitoMessaggioTipo
+from rentri_formulari.models.esito_messaggio_tipo import EsitoMessaggioTipo  # noqa: E501
 
 class TestEsitoMessaggioTipo(unittest.TestCase):
     """EsitoMessaggioTipo unit test stubs"""

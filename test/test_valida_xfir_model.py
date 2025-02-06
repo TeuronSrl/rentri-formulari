@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.valida_xfir_model import ValidaXfirModel
+from rentri_formulari.models.valida_xfir_model import ValidaXfirModel  # noqa: E501
 
 class TestValidaXfirModel(unittest.TestCase):
     """ValidaXfirModel unit test stubs"""
@@ -28,12 +29,12 @@ class TestValidaXfirModel(unittest.TestCase):
 
     def make_instance(self, include_optional) -> ValidaXfirModel:
         """Test ValidaXfirModel
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `ValidaXfirModel`
         """
-        model = ValidaXfirModel()
+        model = ValidaXfirModel()  # noqa: E501
         if include_optional:
             return ValidaXfirModel(
                 xfir = 'YQ=='

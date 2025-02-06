@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.operazione import Operazione
+from rentri_formulari.models.operazione import Operazione  # noqa: E501
 
 class TestOperazione(unittest.TestCase):
     """Operazione unit test stubs"""

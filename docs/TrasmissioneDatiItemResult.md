@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **identificativo** | **str** |  | [optional] 
@@ -26,7 +25,7 @@ json = "{}"
 # create an instance of TrasmissioneDatiItemResult from a JSON string
 trasmissione_dati_item_result_instance = TrasmissioneDatiItemResult.from_json(json)
 # print the JSON string representation of the object
-print(TrasmissioneDatiItemResult.to_json())
+print TrasmissioneDatiItemResult.to_json()
 
 # convert the object into a dict
 trasmissione_dati_item_result_dict = trasmissione_dati_item_result_instance.to_dict()

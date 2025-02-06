@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.tipi_accettazione import TipiAccettazione
+from rentri_formulari.models.tipi_accettazione import TipiAccettazione  # noqa: E501
 
 class TestTipiAccettazione(unittest.TestCase):
     """TipiAccettazione unit test stubs"""

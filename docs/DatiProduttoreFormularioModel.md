@@ -3,7 +3,6 @@
 Dati produttore
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **denominazione** | **str** | Denominazione del soggetto | 
@@ -25,7 +24,7 @@ json = "{}"
 # create an instance of DatiProduttoreFormularioModel from a JSON string
 dati_produttore_formulario_model_instance = DatiProduttoreFormularioModel.from_json(json)
 # print the JSON string representation of the object
-print(DatiProduttoreFormularioModel.to_json())
+print DatiProduttoreFormularioModel.to_json()
 
 # convert the object into a dict
 dati_produttore_formulario_model_dict = dati_produttore_formulario_model_instance.to_dict()

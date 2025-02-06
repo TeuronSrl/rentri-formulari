@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **xfir** | **bytearray** | Contenuto del file xFIR | 
@@ -17,7 +16,7 @@ json = "{}"
 # create an instance of EstraiDatiXfirModel from a JSON string
 estrai_dati_xfir_model_instance = EstraiDatiXfirModel.from_json(json)
 # print the JSON string representation of the object
-print(EstraiDatiXfirModel.to_json())
+print EstraiDatiXfirModel.to_json()
 
 # convert the object into a dict
 estrai_dati_xfir_model_dict = estrai_dati_xfir_model_instance.to_dict()

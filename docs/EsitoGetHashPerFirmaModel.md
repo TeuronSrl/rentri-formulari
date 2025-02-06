@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **hash_algorithm** | **str** |  | [optional] 
@@ -19,7 +18,7 @@ json = "{}"
 # create an instance of EsitoGetHashPerFirmaModel from a JSON string
 esito_get_hash_per_firma_model_instance = EsitoGetHashPerFirmaModel.from_json(json)
 # print the JSON string representation of the object
-print(EsitoGetHashPerFirmaModel.to_json())
+print EsitoGetHashPerFirmaModel.to_json()
 
 # convert the object into a dict
 esito_get_hash_per_firma_model_dict = esito_get_hash_per_firma_model_instance.to_dict()

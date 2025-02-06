@@ -12,15 +12,20 @@
     Do not edit the class manually.
 """  # noqa: E501
 
-import warnings
-from pydantic import validate_call, Field, StrictFloat, StrictStr, StrictInt
-from typing import Any, Dict, List, Optional, Tuple, Union
-from typing_extensions import Annotated
 
-from datetime import datetime
-from pydantic import Field, StrictStr, field_validator
-from typing import Any, List, Optional
+import re  # noqa: F401
+import io
+import warnings
+
+from pydantic import validate_arguments, ValidationError
+
 from typing_extensions import Annotated
+from datetime import datetime
+
+from pydantic import Field, StrictStr, conint, constr, validator
+
+from typing import Any, List, Optional
+
 from rentri_formulari.models.dati_trasmissione_formulario_model import DatiTrasmissioneFormularioModel
 from rentri_formulari.models.esito_trasmissione_dati_model import EsitoTrasmissioneDatiModel
 from rentri_formulari.models.estrai_dati_xfir_model import EstraiDatiXfirModel
@@ -29,9 +34,12 @@ from rentri_formulari.models.trasmissione_dati_item_result import TrasmissioneDa
 from rentri_formulari.models.trasmissione_dati_result import TrasmissioneDatiResult
 from rentri_formulari.models.trasmissione_formulario_response import TrasmissioneFormularioResponse
 
-from rentri_formulari.api_client import ApiClient, RequestSerialized
+from rentri_formulari.api_client import ApiClient
 from rentri_formulari.api_response import ApiResponse
-from rentri_formulari.rest import RESTResponseType
+from rentri_formulari.exceptions import (  # noqa: F401
+    ApiTypeError,
+    ApiValueError
+)
 
 
 class TrasmissioneDatiOperatoreApi:
@@ -46,35 +54,16 @@ class TrasmissioneDatiOperatoreApi:
             api_client = ApiClient.get_default()
         self.api_client = api_client
 
+    @validate_arguments
+    def trasmissioni_num_iscr_sito_get(self, num_iscr_sito : Annotated[constr(strict=True), Field(..., description="Numero iscrizione dell'unità locale per cui si vogliono recuperare le trasmissioni")], numero_fir : Optional[StrictStr] = None, data_trasmissione_da : Annotated[Optional[datetime], Field(description="Formato ISO 8601 UTC")] = None, data_trasmissione_a : Annotated[Optional[datetime], Field(description="Formato ISO 8601 UTC")] = None, codice_eer : Optional[StrictStr] = None, tipo : Optional[Any] = None, stato : Optional[Any] = None, paging_page : Annotated[Optional[conint(strict=True, le=2147483647, ge=1)], Field(description="Valore per l'header Paging-Page")] = None, paging_page_size : Annotated[Optional[conint(strict=True, le=1000, ge=1)], Field(description="Valore per l'header Paging-PageSize")] = None, **kwargs) -> List[TrasmissioneDatiItemResult]:  # noqa: E501
+        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /trasmissioni/operatore/{numIscrSito} - Trasmissioni effettuate  # noqa: E501
 
-    @validate_call
-    def trasmissioni_num_iscr_sito_get(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True, description="Numero iscrizione dell'unità locale per cui si vogliono recuperare le trasmissioni")],
-        numero_fir: Optional[StrictStr] = None,
-        data_trasmissione_da: Annotated[Optional[datetime], Field(description="Formato ISO 8601 UTC")] = None,
-        data_trasmissione_a: Annotated[Optional[datetime], Field(description="Formato ISO 8601 UTC")] = None,
-        codice_eer: Optional[StrictStr] = None,
-        tipo: Optional[Any] = None,
-        stato: Optional[Any] = None,
-        paging_page: Annotated[Optional[Annotated[int, Field(le=2147483647, strict=True, ge=1)]], Field(description="Valore per l'header Paging-Page")] = None,
-        paging_page_size: Annotated[Optional[Annotated[int, Field(le=1000, strict=True, ge=1)]], Field(description="Valore per l'header Paging-PageSize")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> List[TrasmissioneDatiItemResult]:
-        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /trasmissioni/operatore/{numIscrSito} - Trasmissioni effettuate
+        Ottiene la lista delle trasmissioni di dati di FIR digitali effettuate per l'unità locale specificata.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-        Ottiene la lista delle trasmissioni di dati di FIR digitali effettuate per l'unità locale specificata.
+        >>> thread = api.trasmissioni_num_iscr_sito_get(num_iscr_sito, numero_fir, data_trasmissione_da, data_trasmissione_a, codice_eer, tipo, stato, paging_page, paging_page_size, async_req=True)
+        >>> result = thread.get()
 
         :param num_iscr_sito: Numero iscrizione dell'unità locale per cui si vogliono recuperare le trasmissioni (required)
         :type num_iscr_sito: str
@@ -94,995 +83,505 @@ class TrasmissioneDatiOperatoreApi:
         :type paging_page: int
         :param paging_page_size: Valore per l'header Paging-PageSize
         :type paging_page_size: int
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
+        :return: Returns the result object.
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: List[TrasmissioneDatiItemResult]
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the trasmissioni_num_iscr_sito_get_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.trasmissioni_num_iscr_sito_get_with_http_info(num_iscr_sito, numero_fir, data_trasmissione_da, data_trasmissione_a, codice_eer, tipo, stato, paging_page, paging_page_size, **kwargs)  # noqa: E501
+
+    @validate_arguments
+    def trasmissioni_num_iscr_sito_get_with_http_info(self, num_iscr_sito : Annotated[constr(strict=True), Field(..., description="Numero iscrizione dell'unità locale per cui si vogliono recuperare le trasmissioni")], numero_fir : Optional[StrictStr] = None, data_trasmissione_da : Annotated[Optional[datetime], Field(description="Formato ISO 8601 UTC")] = None, data_trasmissione_a : Annotated[Optional[datetime], Field(description="Formato ISO 8601 UTC")] = None, codice_eer : Optional[StrictStr] = None, tipo : Optional[Any] = None, stato : Optional[Any] = None, paging_page : Annotated[Optional[conint(strict=True, le=2147483647, ge=1)], Field(description="Valore per l'header Paging-Page")] = None, paging_page_size : Annotated[Optional[conint(strict=True, le=1000, ge=1)], Field(description="Valore per l'header Paging-PageSize")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /trasmissioni/operatore/{numIscrSito} - Trasmissioni effettuate  # noqa: E501
+
+        Ottiene la lista delle trasmissioni di dati di FIR digitali effettuate per l'unità locale specificata.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+
+        >>> thread = api.trasmissioni_num_iscr_sito_get_with_http_info(num_iscr_sito, numero_fir, data_trasmissione_da, data_trasmissione_a, codice_eer, tipo, stato, paging_page, paging_page_size, async_req=True)
+        >>> result = thread.get()
+
+        :param num_iscr_sito: Numero iscrizione dell'unità locale per cui si vogliono recuperare le trasmissioni (required)
+        :type num_iscr_sito: str
+        :param numero_fir:
+        :type numero_fir: str
+        :param data_trasmissione_da: Formato ISO 8601 UTC
+        :type data_trasmissione_da: datetime
+        :param data_trasmissione_a: Formato ISO 8601 UTC
+        :type data_trasmissione_a: datetime
+        :param codice_eer:
+        :type codice_eer: str
+        :param tipo:
+        :type tipo: TipoTrasmissione
+        :param stato:
+        :type stato: StatiTrasmissioneDati
+        :param paging_page: Valore per l'header Paging-Page
+        :type paging_page: int
+        :param paging_page_size: Valore per l'header Paging-PageSize
+        :type paging_page_size: int
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(List[TrasmissioneDatiItemResult], status_code(int), headers(HTTPHeaderDict))
+        """
+
         warnings.warn("GET /trasmissioni/{num_iscr_sito} is deprecated.", DeprecationWarning)
 
-        _param = self._trasmissioni_num_iscr_sito_get_serialize(
-            num_iscr_sito=num_iscr_sito,
-            numero_fir=numero_fir,
-            data_trasmissione_da=data_trasmissione_da,
-            data_trasmissione_a=data_trasmissione_a,
-            codice_eer=codice_eer,
-            tipo=tipo,
-            stato=stato,
-            paging_page=paging_page,
-            paging_page_size=paging_page_size,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "List[TrasmissioneDatiItemResult]",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
-
-
-    @validate_call
-    def trasmissioni_num_iscr_sito_get_with_http_info(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True, description="Numero iscrizione dell'unità locale per cui si vogliono recuperare le trasmissioni")],
-        numero_fir: Optional[StrictStr] = None,
-        data_trasmissione_da: Annotated[Optional[datetime], Field(description="Formato ISO 8601 UTC")] = None,
-        data_trasmissione_a: Annotated[Optional[datetime], Field(description="Formato ISO 8601 UTC")] = None,
-        codice_eer: Optional[StrictStr] = None,
-        tipo: Optional[Any] = None,
-        stato: Optional[Any] = None,
-        paging_page: Annotated[Optional[Annotated[int, Field(le=2147483647, strict=True, ge=1)]], Field(description="Valore per l'header Paging-Page")] = None,
-        paging_page_size: Annotated[Optional[Annotated[int, Field(le=1000, strict=True, ge=1)]], Field(description="Valore per l'header Paging-PageSize")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'num_iscr_sito',
+            'numero_fir',
+            'data_trasmissione_da',
+            'data_trasmissione_a',
+            'codice_eer',
+            'tipo',
+            'stato',
+            'paging_page',
+            'paging_page_size'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[List[TrasmissioneDatiItemResult]]:
-        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /trasmissioni/operatore/{numIscrSito} - Trasmissioni effettuate
-
-        Ottiene la lista delle trasmissioni di dati di FIR digitali effettuate per l'unità locale specificata.
-
-        :param num_iscr_sito: Numero iscrizione dell'unità locale per cui si vogliono recuperare le trasmissioni (required)
-        :type num_iscr_sito: str
-        :param numero_fir:
-        :type numero_fir: str
-        :param data_trasmissione_da: Formato ISO 8601 UTC
-        :type data_trasmissione_da: datetime
-        :param data_trasmissione_a: Formato ISO 8601 UTC
-        :type data_trasmissione_a: datetime
-        :param codice_eer:
-        :type codice_eer: str
-        :param tipo:
-        :type tipo: TipoTrasmissione
-        :param stato:
-        :type stato: StatiTrasmissioneDati
-        :param paging_page: Valore per l'header Paging-Page
-        :type paging_page: int
-        :param paging_page_size: Valore per l'header Paging-PageSize
-        :type paging_page_size: int
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-        warnings.warn("GET /trasmissioni/{num_iscr_sito} is deprecated.", DeprecationWarning)
-
-        _param = self._trasmissioni_num_iscr_sito_get_serialize(
-            num_iscr_sito=num_iscr_sito,
-            numero_fir=numero_fir,
-            data_trasmissione_da=data_trasmissione_da,
-            data_trasmissione_a=data_trasmissione_a,
-            codice_eer=codice_eer,
-            tipo=tipo,
-            stato=stato,
-            paging_page=paging_page,
-            paging_page_size=paging_page_size,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "List[TrasmissioneDatiItemResult]",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method trasmissioni_num_iscr_sito_get" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    @validate_call
-    def trasmissioni_num_iscr_sito_get_without_preload_content(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True, description="Numero iscrizione dell'unità locale per cui si vogliono recuperare le trasmissioni")],
-        numero_fir: Optional[StrictStr] = None,
-        data_trasmissione_da: Annotated[Optional[datetime], Field(description="Formato ISO 8601 UTC")] = None,
-        data_trasmissione_a: Annotated[Optional[datetime], Field(description="Formato ISO 8601 UTC")] = None,
-        codice_eer: Optional[StrictStr] = None,
-        tipo: Optional[Any] = None,
-        stato: Optional[Any] = None,
-        paging_page: Annotated[Optional[Annotated[int, Field(le=2147483647, strict=True, ge=1)]], Field(description="Valore per l'header Paging-Page")] = None,
-        paging_page_size: Annotated[Optional[Annotated[int, Field(le=1000, strict=True, ge=1)]], Field(description="Valore per l'header Paging-PageSize")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /trasmissioni/operatore/{numIscrSito} - Trasmissioni effettuate
-
-        Ottiene la lista delle trasmissioni di dati di FIR digitali effettuate per l'unità locale specificata.
-
-        :param num_iscr_sito: Numero iscrizione dell'unità locale per cui si vogliono recuperare le trasmissioni (required)
-        :type num_iscr_sito: str
-        :param numero_fir:
-        :type numero_fir: str
-        :param data_trasmissione_da: Formato ISO 8601 UTC
-        :type data_trasmissione_da: datetime
-        :param data_trasmissione_a: Formato ISO 8601 UTC
-        :type data_trasmissione_a: datetime
-        :param codice_eer:
-        :type codice_eer: str
-        :param tipo:
-        :type tipo: TipoTrasmissione
-        :param stato:
-        :type stato: StatiTrasmissioneDati
-        :param paging_page: Valore per l'header Paging-Page
-        :type paging_page: int
-        :param paging_page_size: Valore per l'header Paging-PageSize
-        :type paging_page_size: int
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-        warnings.warn("GET /trasmissioni/{num_iscr_sito} is deprecated.", DeprecationWarning)
-
-        _param = self._trasmissioni_num_iscr_sito_get_serialize(
-            num_iscr_sito=num_iscr_sito,
-            numero_fir=numero_fir,
-            data_trasmissione_da=data_trasmissione_da,
-            data_trasmissione_a=data_trasmissione_a,
-            codice_eer=codice_eer,
-            tipo=tipo,
-            stato=stato,
-            paging_page=paging_page,
-            paging_page_size=paging_page_size,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
-
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "List[TrasmissioneDatiItemResult]",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
-
-
-    def _trasmissioni_num_iscr_sito_get_serialize(
-        self,
-        num_iscr_sito,
-        numero_fir,
-        data_trasmissione_da,
-        data_trasmissione_a,
-        codice_eer,
-        tipo,
-        stato,
-        paging_page,
-        paging_page_size,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if num_iscr_sito is not None:
-            _path_params['num_iscr_sito'] = num_iscr_sito
+        _path_params = {}
+        if _params['num_iscr_sito'] is not None:
+            _path_params['num_iscr_sito'] = _params['num_iscr_sito']
+
+
         # process the query parameters
-        if numero_fir is not None:
-            
-            _query_params.append(('numero_fir', numero_fir))
-            
-        if data_trasmissione_da is not None:
-            if isinstance(data_trasmissione_da, datetime):
-                _query_params.append(
-                    (
-                        'data_trasmissione_da',
-                        data_trasmissione_da.strftime(
-                            self.api_client.configuration.datetime_format
-                        )
-                    )
-                )
+        _query_params = []
+        if _params.get('numero_fir') is not None:  # noqa: E501
+            _query_params.append(('numero_fir', _params['numero_fir']))
+
+        if _params.get('data_trasmissione_da') is not None:  # noqa: E501
+            if isinstance(_params['data_trasmissione_da'], datetime):
+                _query_params.append(('data_trasmissione_da', _params['data_trasmissione_da'].strftime(self.api_client.configuration.datetime_format)))
             else:
-                _query_params.append(('data_trasmissione_da', data_trasmissione_da))
-            
-        if data_trasmissione_a is not None:
-            if isinstance(data_trasmissione_a, datetime):
-                _query_params.append(
-                    (
-                        'data_trasmissione_a',
-                        data_trasmissione_a.strftime(
-                            self.api_client.configuration.datetime_format
-                        )
-                    )
-                )
+                _query_params.append(('data_trasmissione_da', _params['data_trasmissione_da']))
+
+        if _params.get('data_trasmissione_a') is not None:  # noqa: E501
+            if isinstance(_params['data_trasmissione_a'], datetime):
+                _query_params.append(('data_trasmissione_a', _params['data_trasmissione_a'].strftime(self.api_client.configuration.datetime_format)))
             else:
-                _query_params.append(('data_trasmissione_a', data_trasmissione_a))
-            
-        if codice_eer is not None:
-            
-            _query_params.append(('codice_eer', codice_eer))
-            
-        if tipo is not None:
-            
-            _query_params.append(('tipo', tipo.value))
-            
-        if stato is not None:
-            
-            _query_params.append(('stato', stato.value))
-            
+                _query_params.append(('data_trasmissione_a', _params['data_trasmissione_a']))
+
+        if _params.get('codice_eer') is not None:  # noqa: E501
+            _query_params.append(('codice_eer', _params['codice_eer']))
+
+        if _params.get('tipo') is not None:  # noqa: E501
+            _query_params.append(('tipo', _params['tipo'].value))
+
+        if _params.get('stato') is not None:  # noqa: E501
+            _query_params.append(('stato', _params['stato'].value))
+
         # process the header parameters
-        if paging_page is not None:
-            _header_params['Paging-Page'] = paging_page
-        if paging_page_size is not None:
-            _header_params['Paging-PageSize'] = paging_page_size
+        _header_params = dict(_params.get('_headers', {}))
+        if _params['paging_page'] is not None:
+            _header_params['Paging-Page'] = _params['paging_page']
+
+        if _params['paging_page_size'] is not None:
+            _header_params['Paging-PageSize'] = _params['paging_page_size']
+
         # process the form parameters
+        _form_params = []
+        _files = {}
         # process the body parameter
-
-
+        _body_params = None
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
-
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='GET',
-            resource_path='/trasmissioni/{num_iscr_sito}',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {
+            '200': "List[TrasmissioneDatiItemResult]",
+            '403': None,
+            '404': None,
+            '429': None,
+            '500': "ProblemDetails",
+        }
+
+        return self.api_client.call_api(
+            '/trasmissioni/{num_iscr_sito}', 'GET',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def trasmissioni_num_iscr_sito_identificativo_annulla_post(self, num_iscr_sito : constr(strict=True), identificativo : StrictStr, **kwargs) -> None:  # noqa: E501
+        """(Deprecated) ⚠️[DEPRECATO] - utilizzare public/trasmissioni/operatore/{numIscrSito}/{identificativo}/annulla - Annulla trasmissione di dati del FIR digitale  # noqa: E501
 
+        Pone in stato \"annullata\" la trasmissione di dati del FIR digitale specificata.  L'operazione non è reversibile.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def trasmissioni_num_iscr_sito_identificativo_annulla_post(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True)],
-        identificativo: StrictStr,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> None:
-        """(Deprecated) ⚠️[DEPRECATO] - utilizzare public/trasmissioni/operatore/{numIscrSito}/{identificativo}/annulla - Annulla trasmissione di dati del FIR digitale
-
-        Pone in stato \"annullata\" la trasmissione di dati del FIR digitale specificata.  L'operazione non è reversibile.
+        >>> thread = api.trasmissioni_num_iscr_sito_identificativo_annulla_post(num_iscr_sito, identificativo, async_req=True)
+        >>> result = thread.get()
 
         :param num_iscr_sito:  (required)
         :type num_iscr_sito: str
         :param identificativo:  (required)
         :type identificativo: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
+        :return: Returns the result object.
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: None
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the trasmissioni_num_iscr_sito_identificativo_annulla_post_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.trasmissioni_num_iscr_sito_identificativo_annulla_post_with_http_info(num_iscr_sito, identificativo, **kwargs)  # noqa: E501
+
+    @validate_arguments
+    def trasmissioni_num_iscr_sito_identificativo_annulla_post_with_http_info(self, num_iscr_sito : constr(strict=True), identificativo : StrictStr, **kwargs) -> ApiResponse:  # noqa: E501
+        """(Deprecated) ⚠️[DEPRECATO] - utilizzare public/trasmissioni/operatore/{numIscrSito}/{identificativo}/annulla - Annulla trasmissione di dati del FIR digitale  # noqa: E501
+
+        Pone in stato \"annullata\" la trasmissione di dati del FIR digitale specificata.  L'operazione non è reversibile.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+
+        >>> thread = api.trasmissioni_num_iscr_sito_identificativo_annulla_post_with_http_info(num_iscr_sito, identificativo, async_req=True)
+        >>> result = thread.get()
+
+        :param num_iscr_sito:  (required)
+        :type num_iscr_sito: str
+        :param identificativo:  (required)
+        :type identificativo: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: None
+        """
+
         warnings.warn("POST /trasmissioni/{num_iscr_sito}/{identificativo}/annulla is deprecated.", DeprecationWarning)
 
-        _param = self._trasmissioni_num_iscr_sito_identificativo_annulla_post_serialize(
-            num_iscr_sito=num_iscr_sito,
-            identificativo=identificativo,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': None,
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
-
-
-    @validate_call
-    def trasmissioni_num_iscr_sito_identificativo_annulla_post_with_http_info(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True)],
-        identificativo: StrictStr,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'num_iscr_sito',
+            'identificativo'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[None]:
-        """(Deprecated) ⚠️[DEPRECATO] - utilizzare public/trasmissioni/operatore/{numIscrSito}/{identificativo}/annulla - Annulla trasmissione di dati del FIR digitale
-
-        Pone in stato \"annullata\" la trasmissione di dati del FIR digitale specificata.  L'operazione non è reversibile.
-
-        :param num_iscr_sito:  (required)
-        :type num_iscr_sito: str
-        :param identificativo:  (required)
-        :type identificativo: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-        warnings.warn("POST /trasmissioni/{num_iscr_sito}/{identificativo}/annulla is deprecated.", DeprecationWarning)
-
-        _param = self._trasmissioni_num_iscr_sito_identificativo_annulla_post_serialize(
-            num_iscr_sito=num_iscr_sito,
-            identificativo=identificativo,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': None,
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method trasmissioni_num_iscr_sito_identificativo_annulla_post" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    @validate_call
-    def trasmissioni_num_iscr_sito_identificativo_annulla_post_without_preload_content(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True)],
-        identificativo: StrictStr,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """(Deprecated) ⚠️[DEPRECATO] - utilizzare public/trasmissioni/operatore/{numIscrSito}/{identificativo}/annulla - Annulla trasmissione di dati del FIR digitale
-
-        Pone in stato \"annullata\" la trasmissione di dati del FIR digitale specificata.  L'operazione non è reversibile.
-
-        :param num_iscr_sito:  (required)
-        :type num_iscr_sito: str
-        :param identificativo:  (required)
-        :type identificativo: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-        warnings.warn("POST /trasmissioni/{num_iscr_sito}/{identificativo}/annulla is deprecated.", DeprecationWarning)
-
-        _param = self._trasmissioni_num_iscr_sito_identificativo_annulla_post_serialize(
-            num_iscr_sito=num_iscr_sito,
-            identificativo=identificativo,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
-
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': None,
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
-
-
-    def _trasmissioni_num_iscr_sito_identificativo_annulla_post_serialize(
-        self,
-        num_iscr_sito,
-        identificativo,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if num_iscr_sito is not None:
-            _path_params['num_iscr_sito'] = num_iscr_sito
-        if identificativo is not None:
-            _path_params['identificativo'] = identificativo
+        _path_params = {}
+        if _params['num_iscr_sito'] is not None:
+            _path_params['num_iscr_sito'] = _params['num_iscr_sito']
+
+        if _params['identificativo'] is not None:
+            _path_params['identificativo'] = _params['identificativo']
+
+
         # process the query parameters
+        _query_params = []
         # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
+        _form_params = []
+        _files = {}
         # process the body parameter
-
-
+        _body_params = None
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/problem+json'
-                ]
-            )
-
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/problem+json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='POST',
-            resource_path='/trasmissioni/{num_iscr_sito}/{identificativo}/annulla',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {}
+
+        return self.api_client.call_api(
+            '/trasmissioni/{num_iscr_sito}/{identificativo}/annulla', 'POST',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def trasmissioni_num_iscr_sito_identificativo_get(self, num_iscr_sito : Annotated[constr(strict=True), Field(..., description="Numero iscrizione dell'unità locale per cui si vogliono recuperare le trasmissioni")], identificativo : Annotated[StrictStr, Field(..., description="Identificativo della trasmissione")], **kwargs) -> TrasmissioneDatiResult:  # noqa: E501
+        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /trasmissioni/operatore/{numIscrSito}/{identificativo} - Dettaglio trasmissione  # noqa: E501
 
+        Recupera le informazioni di dettaglio della trasmissione di dati di FIR digitale corrispondente all'identificativo specificato  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def trasmissioni_num_iscr_sito_identificativo_get(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True, description="Numero iscrizione dell'unità locale per cui si vogliono recuperare le trasmissioni")],
-        identificativo: Annotated[StrictStr, Field(description="Identificativo della trasmissione")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> TrasmissioneDatiResult:
-        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /trasmissioni/operatore/{numIscrSito}/{identificativo} - Dettaglio trasmissione
-
-        Recupera le informazioni di dettaglio della trasmissione di dati di FIR digitale corrispondente all'identificativo specificato
+        >>> thread = api.trasmissioni_num_iscr_sito_identificativo_get(num_iscr_sito, identificativo, async_req=True)
+        >>> result = thread.get()
 
         :param num_iscr_sito: Numero iscrizione dell'unità locale per cui si vogliono recuperare le trasmissioni (required)
         :type num_iscr_sito: str
         :param identificativo: Identificativo della trasmissione (required)
         :type identificativo: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
-        warnings.warn("GET /trasmissioni/{num_iscr_sito}/{identificativo} is deprecated.", DeprecationWarning)
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: TrasmissioneDatiResult
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the trasmissioni_num_iscr_sito_identificativo_get_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.trasmissioni_num_iscr_sito_identificativo_get_with_http_info(num_iscr_sito, identificativo, **kwargs)  # noqa: E501
 
-        _param = self._trasmissioni_num_iscr_sito_identificativo_get_serialize(
-            num_iscr_sito=num_iscr_sito,
-            identificativo=identificativo,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def trasmissioni_num_iscr_sito_identificativo_get_with_http_info(self, num_iscr_sito : Annotated[constr(strict=True), Field(..., description="Numero iscrizione dell'unità locale per cui si vogliono recuperare le trasmissioni")], identificativo : Annotated[StrictStr, Field(..., description="Identificativo della trasmissione")], **kwargs) -> ApiResponse:  # noqa: E501
+        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /trasmissioni/operatore/{numIscrSito}/{identificativo} - Dettaglio trasmissione  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "TrasmissioneDatiResult",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Recupera le informazioni di dettaglio della trasmissione di dati di FIR digitale corrispondente all'identificativo specificato  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def trasmissioni_num_iscr_sito_identificativo_get_with_http_info(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True, description="Numero iscrizione dell'unità locale per cui si vogliono recuperare le trasmissioni")],
-        identificativo: Annotated[StrictStr, Field(description="Identificativo della trasmissione")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[TrasmissioneDatiResult]:
-        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /trasmissioni/operatore/{numIscrSito}/{identificativo} - Dettaglio trasmissione
-
-        Recupera le informazioni di dettaglio della trasmissione di dati di FIR digitale corrispondente all'identificativo specificato
+        >>> thread = api.trasmissioni_num_iscr_sito_identificativo_get_with_http_info(num_iscr_sito, identificativo, async_req=True)
+        >>> result = thread.get()
 
         :param num_iscr_sito: Numero iscrizione dell'unità locale per cui si vogliono recuperare le trasmissioni (required)
         :type num_iscr_sito: str
         :param identificativo: Identificativo della trasmissione (required)
         :type identificativo: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(TrasmissioneDatiResult, status_code(int), headers(HTTPHeaderDict))
+        """
+
         warnings.warn("GET /trasmissioni/{num_iscr_sito}/{identificativo} is deprecated.", DeprecationWarning)
 
-        _param = self._trasmissioni_num_iscr_sito_identificativo_get_serialize(
-            num_iscr_sito=num_iscr_sito,
-            identificativo=identificativo,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "TrasmissioneDatiResult",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def trasmissioni_num_iscr_sito_identificativo_get_without_preload_content(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True, description="Numero iscrizione dell'unità locale per cui si vogliono recuperare le trasmissioni")],
-        identificativo: Annotated[StrictStr, Field(description="Identificativo della trasmissione")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'num_iscr_sito',
+            'identificativo'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /trasmissioni/operatore/{numIscrSito}/{identificativo} - Dettaglio trasmissione
-
-        Recupera le informazioni di dettaglio della trasmissione di dati di FIR digitale corrispondente all'identificativo specificato
-
-        :param num_iscr_sito: Numero iscrizione dell'unità locale per cui si vogliono recuperare le trasmissioni (required)
-        :type num_iscr_sito: str
-        :param identificativo: Identificativo della trasmissione (required)
-        :type identificativo: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-        warnings.warn("GET /trasmissioni/{num_iscr_sito}/{identificativo} is deprecated.", DeprecationWarning)
-
-        _param = self._trasmissioni_num_iscr_sito_identificativo_get_serialize(
-            num_iscr_sito=num_iscr_sito,
-            identificativo=identificativo,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "TrasmissioneDatiResult",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method trasmissioni_num_iscr_sito_identificativo_get" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    def _trasmissioni_num_iscr_sito_identificativo_get_serialize(
-        self,
-        num_iscr_sito,
-        identificativo,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if num_iscr_sito is not None:
-            _path_params['num_iscr_sito'] = num_iscr_sito
-        if identificativo is not None:
-            _path_params['identificativo'] = identificativo
+        _path_params = {}
+        if _params['num_iscr_sito'] is not None:
+            _path_params['num_iscr_sito'] = _params['num_iscr_sito']
+
+        if _params['identificativo'] is not None:
+            _path_params['identificativo'] = _params['identificativo']
+
+
         # process the query parameters
+        _query_params = []
         # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
+        _form_params = []
+        _files = {}
         # process the body parameter
-
-
+        _body_params = None
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
-
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='GET',
-            resource_path='/trasmissioni/{num_iscr_sito}/{identificativo}',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {
+            '200': "TrasmissioneDatiResult",
+            '403': None,
+            '404': None,
+            '429': None,
+            '500': "ProblemDetails",
+        }
+
+        return self.api_client.call_api(
+            '/trasmissioni/{num_iscr_sito}/{identificativo}', 'GET',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def trasmissioni_num_iscr_sito_numero_fir_estrai_post(self, num_iscr_sito : constr(strict=True), numero_fir : constr(strict=True), estrai_dati_xfir_model : EstraiDatiXfirModel, x_reply_to : Optional[StrictStr] = None, **kwargs) -> TransazioneModel:  # noqa: E501
+        """(Deprecated) 🔁[ASYNC] ⚠️[DEPRECATO] - utilizzare /trasmissioni/operatore/{numIscrSito}/{numeroFir}/estrai - Estrazione dati per FIR digitale  # noqa: E501
 
+        Effettua l'estrazione dei dati che devono essere trasmessi dal file del FIR digitale che viene specificato tra i dati della richiesta.   Il file del FIR digitale inviato deve essere firmato digitalmente e deve essere valido secondo le regole definite dalle specifiche xFIR e verificabile dalla specifica funzione di validazione definita dall'endpoint dell'API.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def trasmissioni_num_iscr_sito_numero_fir_estrai_post(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True)],
-        numero_fir: Annotated[str, Field(strict=True)],
-        estrai_dati_xfir_model: EstraiDatiXfirModel,
-        x_reply_to: Optional[StrictStr] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> TransazioneModel:
-        """(Deprecated) 🔁[ASYNC] ⚠️[DEPRECATO] - utilizzare /trasmissioni/operatore/{numIscrSito}/{numeroFir}/estrai - Estrazione dati per FIR digitale
-
-        Effettua l'estrazione dei dati che devono essere trasmessi dal file del FIR digitale che viene specificato tra i dati della richiesta.   Il file del FIR digitale inviato deve essere firmato digitalmente e deve essere valido secondo le regole definite dalle specifiche xFIR e verificabile dalla specifica funzione di validazione definita dall'endpoint dell'API.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.trasmissioni_num_iscr_sito_numero_fir_estrai_post(num_iscr_sito, numero_fir, estrai_dati_xfir_model, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param num_iscr_sito:  (required)
         :type num_iscr_sito: str
@@ -1092,82 +591,33 @@ class TrasmissioneDatiOperatoreApi:
         :type estrai_dati_xfir_model: EstraiDatiXfirModel
         :param x_reply_to: 
         :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
-        warnings.warn("POST /trasmissioni/{num_iscr_sito}/{numero_fir}/estrai is deprecated.", DeprecationWarning)
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: TransazioneModel
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the trasmissioni_num_iscr_sito_numero_fir_estrai_post_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.trasmissioni_num_iscr_sito_numero_fir_estrai_post_with_http_info(num_iscr_sito, numero_fir, estrai_dati_xfir_model, x_reply_to, **kwargs)  # noqa: E501
 
-        _param = self._trasmissioni_num_iscr_sito_numero_fir_estrai_post_serialize(
-            num_iscr_sito=num_iscr_sito,
-            numero_fir=numero_fir,
-            estrai_dati_xfir_model=estrai_dati_xfir_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def trasmissioni_num_iscr_sito_numero_fir_estrai_post_with_http_info(self, num_iscr_sito : constr(strict=True), numero_fir : constr(strict=True), estrai_dati_xfir_model : EstraiDatiXfirModel, x_reply_to : Optional[StrictStr] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        """(Deprecated) 🔁[ASYNC] ⚠️[DEPRECATO] - utilizzare /trasmissioni/operatore/{numIscrSito}/{numeroFir}/estrai - Estrazione dati per FIR digitale  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Effettua l'estrazione dei dati che devono essere trasmessi dal file del FIR digitale che viene specificato tra i dati della richiesta.   Il file del FIR digitale inviato deve essere firmato digitalmente e deve essere valido secondo le regole definite dalle specifiche xFIR e verificabile dalla specifica funzione di validazione definita dall'endpoint dell'API.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def trasmissioni_num_iscr_sito_numero_fir_estrai_post_with_http_info(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True)],
-        numero_fir: Annotated[str, Field(strict=True)],
-        estrai_dati_xfir_model: EstraiDatiXfirModel,
-        x_reply_to: Optional[StrictStr] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[TransazioneModel]:
-        """(Deprecated) 🔁[ASYNC] ⚠️[DEPRECATO] - utilizzare /trasmissioni/operatore/{numIscrSito}/{numeroFir}/estrai - Estrazione dati per FIR digitale
-
-        Effettua l'estrazione dei dati che devono essere trasmessi dal file del FIR digitale che viene specificato tra i dati della richiesta.   Il file del FIR digitale inviato deve essere firmato digitalmente e deve essere valido secondo le regole definite dalle specifiche xFIR e verificabile dalla specifica funzione di validazione definita dall'endpoint dell'API.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.trasmissioni_num_iscr_sito_numero_fir_estrai_post_with_http_info(num_iscr_sito, numero_fir, estrai_dati_xfir_model, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param num_iscr_sito:  (required)
         :type num_iscr_sito: str
@@ -1177,563 +627,301 @@ class TrasmissioneDatiOperatoreApi:
         :type estrai_dati_xfir_model: EstraiDatiXfirModel
         :param x_reply_to: 
         :type x_reply_to: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(TransazioneModel, status_code(int), headers(HTTPHeaderDict))
+        """
+
         warnings.warn("POST /trasmissioni/{num_iscr_sito}/{numero_fir}/estrai is deprecated.", DeprecationWarning)
 
-        _param = self._trasmissioni_num_iscr_sito_numero_fir_estrai_post_serialize(
-            num_iscr_sito=num_iscr_sito,
-            numero_fir=numero_fir,
-            estrai_dati_xfir_model=estrai_dati_xfir_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def trasmissioni_num_iscr_sito_numero_fir_estrai_post_without_preload_content(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True)],
-        numero_fir: Annotated[str, Field(strict=True)],
-        estrai_dati_xfir_model: EstraiDatiXfirModel,
-        x_reply_to: Optional[StrictStr] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'num_iscr_sito',
+            'numero_fir',
+            'estrai_dati_xfir_model',
+            'x_reply_to'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """(Deprecated) 🔁[ASYNC] ⚠️[DEPRECATO] - utilizzare /trasmissioni/operatore/{numIscrSito}/{numeroFir}/estrai - Estrazione dati per FIR digitale
-
-        Effettua l'estrazione dei dati che devono essere trasmessi dal file del FIR digitale che viene specificato tra i dati della richiesta.   Il file del FIR digitale inviato deve essere firmato digitalmente e deve essere valido secondo le regole definite dalle specifiche xFIR e verificabile dalla specifica funzione di validazione definita dall'endpoint dell'API.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
-
-        :param num_iscr_sito:  (required)
-        :type num_iscr_sito: str
-        :param numero_fir:  (required)
-        :type numero_fir: str
-        :param estrai_dati_xfir_model:  (required)
-        :type estrai_dati_xfir_model: EstraiDatiXfirModel
-        :param x_reply_to: 
-        :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-        warnings.warn("POST /trasmissioni/{num_iscr_sito}/{numero_fir}/estrai is deprecated.", DeprecationWarning)
-
-        _param = self._trasmissioni_num_iscr_sito_numero_fir_estrai_post_serialize(
-            num_iscr_sito=num_iscr_sito,
-            numero_fir=numero_fir,
-            estrai_dati_xfir_model=estrai_dati_xfir_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method trasmissioni_num_iscr_sito_numero_fir_estrai_post" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    def _trasmissioni_num_iscr_sito_numero_fir_estrai_post_serialize(
-        self,
-        num_iscr_sito,
-        numero_fir,
-        estrai_dati_xfir_model,
-        x_reply_to,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if num_iscr_sito is not None:
-            _path_params['num_iscr_sito'] = num_iscr_sito
-        if numero_fir is not None:
-            _path_params['numero_fir'] = numero_fir
-        # process the query parameters
-        # process the header parameters
-        if x_reply_to is not None:
-            _header_params['X-ReplyTo'] = x_reply_to
-        # process the form parameters
-        # process the body parameter
-        if estrai_dati_xfir_model is not None:
-            _body_params = estrai_dati_xfir_model
+        _path_params = {}
+        if _params['num_iscr_sito'] is not None:
+            _path_params['num_iscr_sito'] = _params['num_iscr_sito']
 
+        if _params['numero_fir'] is not None:
+            _path_params['numero_fir'] = _params['numero_fir']
+
+
+        # process the query parameters
+        _query_params = []
+        # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
+        if _params['x_reply_to'] is not None:
+            _header_params['X-ReplyTo'] = _params['x_reply_to']
+
+        # process the form parameters
+        _form_params = []
+        _files = {}
+        # process the body parameter
+        _body_params = None
+        if _params['estrai_dati_xfir_model'] is not None:
+            _body_params = _params['estrai_dati_xfir_model']
 
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
 
         # set the HTTP header `Content-Type`
-        if _content_type:
-            _header_params['Content-Type'] = _content_type
-        else:
-            _default_content_type = (
-                self.api_client.select_header_content_type(
-                    [
-                        'application/json'
-                    ]
-                )
-            )
-            if _default_content_type is not None:
-                _header_params['Content-Type'] = _default_content_type
+        _content_types_list = _params.get('_content_type',
+            self.api_client.select_header_content_type(
+                ['application/json']))
+        if _content_types_list:
+                _header_params['Content-Type'] = _content_types_list
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='POST',
-            resource_path='/trasmissioni/{num_iscr_sito}/{numero_fir}/estrai',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {
+            '202': "TransazioneModel",
+            '400': "ProblemDetails",
+            '403': None,
+            '404': None,
+            '429': None,
+            '500': "ProblemDetails",
+        }
+
+        return self.api_client.call_api(
+            '/trasmissioni/{num_iscr_sito}/{numero_fir}/estrai', 'POST',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def trasmissioni_num_iscr_sito_post(self, num_iscr_sito : constr(strict=True), dati_trasmissione_formulario_model : DatiTrasmissioneFormularioModel, **kwargs) -> TrasmissioneFormularioResponse:  # noqa: E501
+        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /trasmissioni/operatore/{numIscrSito} - Trasmette i dati del FIR digitale  # noqa: E501
 
+        Effettua la trasmissione dei dati estratti da un FIR digitale riferibili all'unità locale specificata.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def trasmissioni_num_iscr_sito_post(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True)],
-        dati_trasmissione_formulario_model: DatiTrasmissioneFormularioModel,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> TrasmissioneFormularioResponse:
-        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /trasmissioni/operatore/{numIscrSito} - Trasmette i dati del FIR digitale
-
-        Effettua la trasmissione dei dati estratti da un FIR digitale riferibili all'unità locale specificata.
+        >>> thread = api.trasmissioni_num_iscr_sito_post(num_iscr_sito, dati_trasmissione_formulario_model, async_req=True)
+        >>> result = thread.get()
 
         :param num_iscr_sito:  (required)
         :type num_iscr_sito: str
         :param dati_trasmissione_formulario_model:  (required)
         :type dati_trasmissione_formulario_model: DatiTrasmissioneFormularioModel
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
-        warnings.warn("POST /trasmissioni/{num_iscr_sito} is deprecated.", DeprecationWarning)
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: TrasmissioneFormularioResponse
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the trasmissioni_num_iscr_sito_post_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.trasmissioni_num_iscr_sito_post_with_http_info(num_iscr_sito, dati_trasmissione_formulario_model, **kwargs)  # noqa: E501
 
-        _param = self._trasmissioni_num_iscr_sito_post_serialize(
-            num_iscr_sito=num_iscr_sito,
-            dati_trasmissione_formulario_model=dati_trasmissione_formulario_model,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def trasmissioni_num_iscr_sito_post_with_http_info(self, num_iscr_sito : constr(strict=True), dati_trasmissione_formulario_model : DatiTrasmissioneFormularioModel, **kwargs) -> ApiResponse:  # noqa: E501
+        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /trasmissioni/operatore/{numIscrSito} - Trasmette i dati del FIR digitale  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '201': "TrasmissioneFormularioResponse",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Effettua la trasmissione dei dati estratti da un FIR digitale riferibili all'unità locale specificata.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def trasmissioni_num_iscr_sito_post_with_http_info(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True)],
-        dati_trasmissione_formulario_model: DatiTrasmissioneFormularioModel,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[TrasmissioneFormularioResponse]:
-        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /trasmissioni/operatore/{numIscrSito} - Trasmette i dati del FIR digitale
-
-        Effettua la trasmissione dei dati estratti da un FIR digitale riferibili all'unità locale specificata.
+        >>> thread = api.trasmissioni_num_iscr_sito_post_with_http_info(num_iscr_sito, dati_trasmissione_formulario_model, async_req=True)
+        >>> result = thread.get()
 
         :param num_iscr_sito:  (required)
         :type num_iscr_sito: str
         :param dati_trasmissione_formulario_model:  (required)
         :type dati_trasmissione_formulario_model: DatiTrasmissioneFormularioModel
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(TrasmissioneFormularioResponse, status_code(int), headers(HTTPHeaderDict))
+        """
+
         warnings.warn("POST /trasmissioni/{num_iscr_sito} is deprecated.", DeprecationWarning)
 
-        _param = self._trasmissioni_num_iscr_sito_post_serialize(
-            num_iscr_sito=num_iscr_sito,
-            dati_trasmissione_formulario_model=dati_trasmissione_formulario_model,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '201': "TrasmissioneFormularioResponse",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def trasmissioni_num_iscr_sito_post_without_preload_content(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True)],
-        dati_trasmissione_formulario_model: DatiTrasmissioneFormularioModel,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'num_iscr_sito',
+            'dati_trasmissione_formulario_model'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /trasmissioni/operatore/{numIscrSito} - Trasmette i dati del FIR digitale
-
-        Effettua la trasmissione dei dati estratti da un FIR digitale riferibili all'unità locale specificata.
-
-        :param num_iscr_sito:  (required)
-        :type num_iscr_sito: str
-        :param dati_trasmissione_formulario_model:  (required)
-        :type dati_trasmissione_formulario_model: DatiTrasmissioneFormularioModel
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-        warnings.warn("POST /trasmissioni/{num_iscr_sito} is deprecated.", DeprecationWarning)
-
-        _param = self._trasmissioni_num_iscr_sito_post_serialize(
-            num_iscr_sito=num_iscr_sito,
-            dati_trasmissione_formulario_model=dati_trasmissione_formulario_model,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '201': "TrasmissioneFormularioResponse",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method trasmissioni_num_iscr_sito_post" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    def _trasmissioni_num_iscr_sito_post_serialize(
-        self,
-        num_iscr_sito,
-        dati_trasmissione_formulario_model,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if num_iscr_sito is not None:
-            _path_params['num_iscr_sito'] = num_iscr_sito
-        # process the query parameters
-        # process the header parameters
-        # process the form parameters
-        # process the body parameter
-        if dati_trasmissione_formulario_model is not None:
-            _body_params = dati_trasmissione_formulario_model
+        _path_params = {}
+        if _params['num_iscr_sito'] is not None:
+            _path_params['num_iscr_sito'] = _params['num_iscr_sito']
 
+
+        # process the query parameters
+        _query_params = []
+        # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
+        # process the form parameters
+        _form_params = []
+        _files = {}
+        # process the body parameter
+        _body_params = None
+        if _params['dati_trasmissione_formulario_model'] is not None:
+            _body_params = _params['dati_trasmissione_formulario_model']
 
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
 
         # set the HTTP header `Content-Type`
-        if _content_type:
-            _header_params['Content-Type'] = _content_type
-        else:
-            _default_content_type = (
-                self.api_client.select_header_content_type(
-                    [
-                        'application/json'
-                    ]
-                )
-            )
-            if _default_content_type is not None:
-                _header_params['Content-Type'] = _default_content_type
+        _content_types_list = _params.get('_content_type',
+            self.api_client.select_header_content_type(
+                ['application/json']))
+        if _content_types_list:
+                _header_params['Content-Type'] = _content_types_list
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='POST',
-            resource_path='/trasmissioni/{num_iscr_sito}',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {
+            '201': "TrasmissioneFormularioResponse",
+            '400': "ProblemDetails",
+            '403': None,
+            '404': None,
+            '429': None,
+            '500': "ProblemDetails",
+        }
+
+        return self.api_client.call_api(
+            '/trasmissioni/{num_iscr_sito}', 'POST',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def trasmissioni_operatore_num_iscr_sito_get(self, num_iscr_sito : Annotated[constr(strict=True), Field(..., description="Numero iscrizione dell'unità locale per cui si vogliono recuperare le trasmissioni")], numero_fir : Optional[StrictStr] = None, data_trasmissione_da : Annotated[Optional[datetime], Field(description="Formato ISO 8601 UTC")] = None, data_trasmissione_a : Annotated[Optional[datetime], Field(description="Formato ISO 8601 UTC")] = None, codice_eer : Optional[StrictStr] = None, tipo : Optional[Any] = None, stato : Optional[Any] = None, paging_page : Annotated[Optional[conint(strict=True, le=2147483647, ge=1)], Field(description="Valore per l'header Paging-Page")] = None, paging_page_size : Annotated[Optional[conint(strict=True, le=1000, ge=1)], Field(description="Valore per l'header Paging-PageSize")] = None, **kwargs) -> List[TrasmissioneDatiItemResult]:  # noqa: E501
+        """Trasmissioni effettuate  # noqa: E501
 
+        Ottiene la lista delle trasmissioni di dati di FIR digitali effettuate per l'unità locale specificata.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def trasmissioni_operatore_num_iscr_sito_get(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True, description="Numero iscrizione dell'unità locale per cui si vogliono recuperare le trasmissioni")],
-        numero_fir: Optional[StrictStr] = None,
-        data_trasmissione_da: Annotated[Optional[datetime], Field(description="Formato ISO 8601 UTC")] = None,
-        data_trasmissione_a: Annotated[Optional[datetime], Field(description="Formato ISO 8601 UTC")] = None,
-        codice_eer: Optional[StrictStr] = None,
-        tipo: Optional[Any] = None,
-        stato: Optional[Any] = None,
-        paging_page: Annotated[Optional[Annotated[int, Field(le=2147483647, strict=True, ge=1)]], Field(description="Valore per l'header Paging-Page")] = None,
-        paging_page_size: Annotated[Optional[Annotated[int, Field(le=1000, strict=True, ge=1)]], Field(description="Valore per l'header Paging-PageSize")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> List[TrasmissioneDatiItemResult]:
-        """Trasmissioni effettuate
-
-        Ottiene la lista delle trasmissioni di dati di FIR digitali effettuate per l'unità locale specificata.
+        >>> thread = api.trasmissioni_operatore_num_iscr_sito_get(num_iscr_sito, numero_fir, data_trasmissione_da, data_trasmissione_a, codice_eer, tipo, stato, paging_page, paging_page_size, async_req=True)
+        >>> result = thread.get()
 
         :param num_iscr_sito: Numero iscrizione dell'unità locale per cui si vogliono recuperare le trasmissioni (required)
         :type num_iscr_sito: str
@@ -1753,90 +941,33 @@ class TrasmissioneDatiOperatoreApi:
         :type paging_page: int
         :param paging_page_size: Valore per l'header Paging-PageSize
         :type paging_page_size: int
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: List[TrasmissioneDatiItemResult]
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the trasmissioni_operatore_num_iscr_sito_get_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.trasmissioni_operatore_num_iscr_sito_get_with_http_info(num_iscr_sito, numero_fir, data_trasmissione_da, data_trasmissione_a, codice_eer, tipo, stato, paging_page, paging_page_size, **kwargs)  # noqa: E501
 
-        _param = self._trasmissioni_operatore_num_iscr_sito_get_serialize(
-            num_iscr_sito=num_iscr_sito,
-            numero_fir=numero_fir,
-            data_trasmissione_da=data_trasmissione_da,
-            data_trasmissione_a=data_trasmissione_a,
-            codice_eer=codice_eer,
-            tipo=tipo,
-            stato=stato,
-            paging_page=paging_page,
-            paging_page_size=paging_page_size,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def trasmissioni_operatore_num_iscr_sito_get_with_http_info(self, num_iscr_sito : Annotated[constr(strict=True), Field(..., description="Numero iscrizione dell'unità locale per cui si vogliono recuperare le trasmissioni")], numero_fir : Optional[StrictStr] = None, data_trasmissione_da : Annotated[Optional[datetime], Field(description="Formato ISO 8601 UTC")] = None, data_trasmissione_a : Annotated[Optional[datetime], Field(description="Formato ISO 8601 UTC")] = None, codice_eer : Optional[StrictStr] = None, tipo : Optional[Any] = None, stato : Optional[Any] = None, paging_page : Annotated[Optional[conint(strict=True, le=2147483647, ge=1)], Field(description="Valore per l'header Paging-Page")] = None, paging_page_size : Annotated[Optional[conint(strict=True, le=1000, ge=1)], Field(description="Valore per l'header Paging-PageSize")] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        """Trasmissioni effettuate  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "List[TrasmissioneDatiItemResult]",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Ottiene la lista delle trasmissioni di dati di FIR digitali effettuate per l'unità locale specificata.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def trasmissioni_operatore_num_iscr_sito_get_with_http_info(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True, description="Numero iscrizione dell'unità locale per cui si vogliono recuperare le trasmissioni")],
-        numero_fir: Optional[StrictStr] = None,
-        data_trasmissione_da: Annotated[Optional[datetime], Field(description="Formato ISO 8601 UTC")] = None,
-        data_trasmissione_a: Annotated[Optional[datetime], Field(description="Formato ISO 8601 UTC")] = None,
-        codice_eer: Optional[StrictStr] = None,
-        tipo: Optional[Any] = None,
-        stato: Optional[Any] = None,
-        paging_page: Annotated[Optional[Annotated[int, Field(le=2147483647, strict=True, ge=1)]], Field(description="Valore per l'header Paging-Page")] = None,
-        paging_page_size: Annotated[Optional[Annotated[int, Field(le=1000, strict=True, ge=1)]], Field(description="Valore per l'header Paging-PageSize")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[List[TrasmissioneDatiItemResult]]:
-        """Trasmissioni effettuate
-
-        Ottiene la lista delle trasmissioni di dati di FIR digitali effettuate per l'unità locale specificata.
+        >>> thread = api.trasmissioni_operatore_num_iscr_sito_get_with_http_info(num_iscr_sito, numero_fir, data_trasmissione_da, data_trasmissione_a, codice_eer, tipo, stato, paging_page, paging_page_size, async_req=True)
+        >>> result = thread.get()
 
         :param num_iscr_sito: Numero iscrizione dell'unità locale per cui si vogliono recuperare le trasmissioni (required)
         :type num_iscr_sito: str
@@ -1856,883 +987,453 @@ class TrasmissioneDatiOperatoreApi:
         :type paging_page: int
         :param paging_page_size: Valore per l'header Paging-PageSize
         :type paging_page_size: int
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(List[TrasmissioneDatiItemResult], status_code(int), headers(HTTPHeaderDict))
+        """
 
-        _param = self._trasmissioni_operatore_num_iscr_sito_get_serialize(
-            num_iscr_sito=num_iscr_sito,
-            numero_fir=numero_fir,
-            data_trasmissione_da=data_trasmissione_da,
-            data_trasmissione_a=data_trasmissione_a,
-            codice_eer=codice_eer,
-            tipo=tipo,
-            stato=stato,
-            paging_page=paging_page,
-            paging_page_size=paging_page_size,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "List[TrasmissioneDatiItemResult]",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def trasmissioni_operatore_num_iscr_sito_get_without_preload_content(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True, description="Numero iscrizione dell'unità locale per cui si vogliono recuperare le trasmissioni")],
-        numero_fir: Optional[StrictStr] = None,
-        data_trasmissione_da: Annotated[Optional[datetime], Field(description="Formato ISO 8601 UTC")] = None,
-        data_trasmissione_a: Annotated[Optional[datetime], Field(description="Formato ISO 8601 UTC")] = None,
-        codice_eer: Optional[StrictStr] = None,
-        tipo: Optional[Any] = None,
-        stato: Optional[Any] = None,
-        paging_page: Annotated[Optional[Annotated[int, Field(le=2147483647, strict=True, ge=1)]], Field(description="Valore per l'header Paging-Page")] = None,
-        paging_page_size: Annotated[Optional[Annotated[int, Field(le=1000, strict=True, ge=1)]], Field(description="Valore per l'header Paging-PageSize")] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'num_iscr_sito',
+            'numero_fir',
+            'data_trasmissione_da',
+            'data_trasmissione_a',
+            'codice_eer',
+            'tipo',
+            'stato',
+            'paging_page',
+            'paging_page_size'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """Trasmissioni effettuate
-
-        Ottiene la lista delle trasmissioni di dati di FIR digitali effettuate per l'unità locale specificata.
-
-        :param num_iscr_sito: Numero iscrizione dell'unità locale per cui si vogliono recuperare le trasmissioni (required)
-        :type num_iscr_sito: str
-        :param numero_fir:
-        :type numero_fir: str
-        :param data_trasmissione_da: Formato ISO 8601 UTC
-        :type data_trasmissione_da: datetime
-        :param data_trasmissione_a: Formato ISO 8601 UTC
-        :type data_trasmissione_a: datetime
-        :param codice_eer:
-        :type codice_eer: str
-        :param tipo:
-        :type tipo: TipoTrasmissione
-        :param stato:
-        :type stato: StatiTrasmissioneDati
-        :param paging_page: Valore per l'header Paging-Page
-        :type paging_page: int
-        :param paging_page_size: Valore per l'header Paging-PageSize
-        :type paging_page_size: int
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._trasmissioni_operatore_num_iscr_sito_get_serialize(
-            num_iscr_sito=num_iscr_sito,
-            numero_fir=numero_fir,
-            data_trasmissione_da=data_trasmissione_da,
-            data_trasmissione_a=data_trasmissione_a,
-            codice_eer=codice_eer,
-            tipo=tipo,
-            stato=stato,
-            paging_page=paging_page,
-            paging_page_size=paging_page_size,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "List[TrasmissioneDatiItemResult]",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method trasmissioni_operatore_num_iscr_sito_get" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    def _trasmissioni_operatore_num_iscr_sito_get_serialize(
-        self,
-        num_iscr_sito,
-        numero_fir,
-        data_trasmissione_da,
-        data_trasmissione_a,
-        codice_eer,
-        tipo,
-        stato,
-        paging_page,
-        paging_page_size,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if num_iscr_sito is not None:
-            _path_params['num_iscr_sito'] = num_iscr_sito
+        _path_params = {}
+        if _params['num_iscr_sito'] is not None:
+            _path_params['num_iscr_sito'] = _params['num_iscr_sito']
+
+
         # process the query parameters
-        if numero_fir is not None:
-            
-            _query_params.append(('numero_fir', numero_fir))
-            
-        if data_trasmissione_da is not None:
-            if isinstance(data_trasmissione_da, datetime):
-                _query_params.append(
-                    (
-                        'data_trasmissione_da',
-                        data_trasmissione_da.strftime(
-                            self.api_client.configuration.datetime_format
-                        )
-                    )
-                )
+        _query_params = []
+        if _params.get('numero_fir') is not None:  # noqa: E501
+            _query_params.append(('numero_fir', _params['numero_fir']))
+
+        if _params.get('data_trasmissione_da') is not None:  # noqa: E501
+            if isinstance(_params['data_trasmissione_da'], datetime):
+                _query_params.append(('data_trasmissione_da', _params['data_trasmissione_da'].strftime(self.api_client.configuration.datetime_format)))
             else:
-                _query_params.append(('data_trasmissione_da', data_trasmissione_da))
-            
-        if data_trasmissione_a is not None:
-            if isinstance(data_trasmissione_a, datetime):
-                _query_params.append(
-                    (
-                        'data_trasmissione_a',
-                        data_trasmissione_a.strftime(
-                            self.api_client.configuration.datetime_format
-                        )
-                    )
-                )
+                _query_params.append(('data_trasmissione_da', _params['data_trasmissione_da']))
+
+        if _params.get('data_trasmissione_a') is not None:  # noqa: E501
+            if isinstance(_params['data_trasmissione_a'], datetime):
+                _query_params.append(('data_trasmissione_a', _params['data_trasmissione_a'].strftime(self.api_client.configuration.datetime_format)))
             else:
-                _query_params.append(('data_trasmissione_a', data_trasmissione_a))
-            
-        if codice_eer is not None:
-            
-            _query_params.append(('codice_eer', codice_eer))
-            
-        if tipo is not None:
-            
-            _query_params.append(('tipo', tipo.value))
-            
-        if stato is not None:
-            
-            _query_params.append(('stato', stato.value))
-            
+                _query_params.append(('data_trasmissione_a', _params['data_trasmissione_a']))
+
+        if _params.get('codice_eer') is not None:  # noqa: E501
+            _query_params.append(('codice_eer', _params['codice_eer']))
+
+        if _params.get('tipo') is not None:  # noqa: E501
+            _query_params.append(('tipo', _params['tipo'].value))
+
+        if _params.get('stato') is not None:  # noqa: E501
+            _query_params.append(('stato', _params['stato'].value))
+
         # process the header parameters
-        if paging_page is not None:
-            _header_params['Paging-Page'] = paging_page
-        if paging_page_size is not None:
-            _header_params['Paging-PageSize'] = paging_page_size
+        _header_params = dict(_params.get('_headers', {}))
+        if _params['paging_page'] is not None:
+            _header_params['Paging-Page'] = _params['paging_page']
+
+        if _params['paging_page_size'] is not None:
+            _header_params['Paging-PageSize'] = _params['paging_page_size']
+
         # process the form parameters
+        _form_params = []
+        _files = {}
         # process the body parameter
-
-
+        _body_params = None
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
-
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='GET',
-            resource_path='/trasmissioni/operatore/{num_iscr_sito}',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {
+            '200': "List[TrasmissioneDatiItemResult]",
+            '403': None,
+            '404': None,
+            '429': None,
+            '500': "ProblemDetails",
+        }
+
+        return self.api_client.call_api(
+            '/trasmissioni/operatore/{num_iscr_sito}', 'GET',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def trasmissioni_operatore_num_iscr_sito_identificativo_annulla_delete(self, num_iscr_sito : constr(strict=True), identificativo : StrictStr, **kwargs) -> None:  # noqa: E501
+        """Annulla trasmissione di dati del FIR digitale  # noqa: E501
 
+        Pone in stato \"annullata\" la trasmissione di dati del FIR digitale specificata.  L'operazione non è reversibile.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def trasmissioni_operatore_num_iscr_sito_identificativo_annulla_delete(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True)],
-        identificativo: StrictStr,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> None:
-        """Annulla trasmissione di dati del FIR digitale
-
-        Pone in stato \"annullata\" la trasmissione di dati del FIR digitale specificata.  L'operazione non è reversibile.
+        >>> thread = api.trasmissioni_operatore_num_iscr_sito_identificativo_annulla_delete(num_iscr_sito, identificativo, async_req=True)
+        >>> result = thread.get()
 
         :param num_iscr_sito:  (required)
         :type num_iscr_sito: str
         :param identificativo:  (required)
         :type identificativo: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: None
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the trasmissioni_operatore_num_iscr_sito_identificativo_annulla_delete_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.trasmissioni_operatore_num_iscr_sito_identificativo_annulla_delete_with_http_info(num_iscr_sito, identificativo, **kwargs)  # noqa: E501
 
-        _param = self._trasmissioni_operatore_num_iscr_sito_identificativo_annulla_delete_serialize(
-            num_iscr_sito=num_iscr_sito,
-            identificativo=identificativo,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def trasmissioni_operatore_num_iscr_sito_identificativo_annulla_delete_with_http_info(self, num_iscr_sito : constr(strict=True), identificativo : StrictStr, **kwargs) -> ApiResponse:  # noqa: E501
+        """Annulla trasmissione di dati del FIR digitale  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': None,
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Pone in stato \"annullata\" la trasmissione di dati del FIR digitale specificata.  L'operazione non è reversibile.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def trasmissioni_operatore_num_iscr_sito_identificativo_annulla_delete_with_http_info(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True)],
-        identificativo: StrictStr,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[None]:
-        """Annulla trasmissione di dati del FIR digitale
-
-        Pone in stato \"annullata\" la trasmissione di dati del FIR digitale specificata.  L'operazione non è reversibile.
+        >>> thread = api.trasmissioni_operatore_num_iscr_sito_identificativo_annulla_delete_with_http_info(num_iscr_sito, identificativo, async_req=True)
+        >>> result = thread.get()
 
         :param num_iscr_sito:  (required)
         :type num_iscr_sito: str
         :param identificativo:  (required)
         :type identificativo: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: None
+        """
 
-        _param = self._trasmissioni_operatore_num_iscr_sito_identificativo_annulla_delete_serialize(
-            num_iscr_sito=num_iscr_sito,
-            identificativo=identificativo,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': None,
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def trasmissioni_operatore_num_iscr_sito_identificativo_annulla_delete_without_preload_content(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True)],
-        identificativo: StrictStr,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'num_iscr_sito',
+            'identificativo'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """Annulla trasmissione di dati del FIR digitale
-
-        Pone in stato \"annullata\" la trasmissione di dati del FIR digitale specificata.  L'operazione non è reversibile.
-
-        :param num_iscr_sito:  (required)
-        :type num_iscr_sito: str
-        :param identificativo:  (required)
-        :type identificativo: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._trasmissioni_operatore_num_iscr_sito_identificativo_annulla_delete_serialize(
-            num_iscr_sito=num_iscr_sito,
-            identificativo=identificativo,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': None,
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method trasmissioni_operatore_num_iscr_sito_identificativo_annulla_delete" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    def _trasmissioni_operatore_num_iscr_sito_identificativo_annulla_delete_serialize(
-        self,
-        num_iscr_sito,
-        identificativo,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if num_iscr_sito is not None:
-            _path_params['num_iscr_sito'] = num_iscr_sito
-        if identificativo is not None:
-            _path_params['identificativo'] = identificativo
+        _path_params = {}
+        if _params['num_iscr_sito'] is not None:
+            _path_params['num_iscr_sito'] = _params['num_iscr_sito']
+
+        if _params['identificativo'] is not None:
+            _path_params['identificativo'] = _params['identificativo']
+
+
         # process the query parameters
+        _query_params = []
         # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
+        _form_params = []
+        _files = {}
         # process the body parameter
-
-
+        _body_params = None
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/problem+json'
-                ]
-            )
-
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/problem+json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='DELETE',
-            resource_path='/trasmissioni/operatore/{num_iscr_sito}/{identificativo}/annulla',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {}
+
+        return self.api_client.call_api(
+            '/trasmissioni/operatore/{num_iscr_sito}/{identificativo}/annulla', 'DELETE',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def trasmissioni_operatore_num_iscr_sito_identificativo_get(self, num_iscr_sito : Annotated[constr(strict=True), Field(..., description="Numero iscrizione dell'unità locale per cui si vogliono recuperare le trasmissioni")], identificativo : Annotated[StrictStr, Field(..., description="Identificativo della trasmissione")], **kwargs) -> TrasmissioneDatiResult:  # noqa: E501
+        """Dettaglio trasmissione  # noqa: E501
 
+        Recupera le informazioni di dettaglio della trasmissione di dati di FIR digitale corrispondente all'identificativo specificato  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def trasmissioni_operatore_num_iscr_sito_identificativo_get(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True, description="Numero iscrizione dell'unità locale per cui si vogliono recuperare le trasmissioni")],
-        identificativo: Annotated[StrictStr, Field(description="Identificativo della trasmissione")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> TrasmissioneDatiResult:
-        """Dettaglio trasmissione
-
-        Recupera le informazioni di dettaglio della trasmissione di dati di FIR digitale corrispondente all'identificativo specificato
+        >>> thread = api.trasmissioni_operatore_num_iscr_sito_identificativo_get(num_iscr_sito, identificativo, async_req=True)
+        >>> result = thread.get()
 
         :param num_iscr_sito: Numero iscrizione dell'unità locale per cui si vogliono recuperare le trasmissioni (required)
         :type num_iscr_sito: str
         :param identificativo: Identificativo della trasmissione (required)
         :type identificativo: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: TrasmissioneDatiResult
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the trasmissioni_operatore_num_iscr_sito_identificativo_get_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.trasmissioni_operatore_num_iscr_sito_identificativo_get_with_http_info(num_iscr_sito, identificativo, **kwargs)  # noqa: E501
 
-        _param = self._trasmissioni_operatore_num_iscr_sito_identificativo_get_serialize(
-            num_iscr_sito=num_iscr_sito,
-            identificativo=identificativo,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def trasmissioni_operatore_num_iscr_sito_identificativo_get_with_http_info(self, num_iscr_sito : Annotated[constr(strict=True), Field(..., description="Numero iscrizione dell'unità locale per cui si vogliono recuperare le trasmissioni")], identificativo : Annotated[StrictStr, Field(..., description="Identificativo della trasmissione")], **kwargs) -> ApiResponse:  # noqa: E501
+        """Dettaglio trasmissione  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "TrasmissioneDatiResult",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Recupera le informazioni di dettaglio della trasmissione di dati di FIR digitale corrispondente all'identificativo specificato  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def trasmissioni_operatore_num_iscr_sito_identificativo_get_with_http_info(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True, description="Numero iscrizione dell'unità locale per cui si vogliono recuperare le trasmissioni")],
-        identificativo: Annotated[StrictStr, Field(description="Identificativo della trasmissione")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[TrasmissioneDatiResult]:
-        """Dettaglio trasmissione
-
-        Recupera le informazioni di dettaglio della trasmissione di dati di FIR digitale corrispondente all'identificativo specificato
+        >>> thread = api.trasmissioni_operatore_num_iscr_sito_identificativo_get_with_http_info(num_iscr_sito, identificativo, async_req=True)
+        >>> result = thread.get()
 
         :param num_iscr_sito: Numero iscrizione dell'unità locale per cui si vogliono recuperare le trasmissioni (required)
         :type num_iscr_sito: str
         :param identificativo: Identificativo della trasmissione (required)
         :type identificativo: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(TrasmissioneDatiResult, status_code(int), headers(HTTPHeaderDict))
+        """
 
-        _param = self._trasmissioni_operatore_num_iscr_sito_identificativo_get_serialize(
-            num_iscr_sito=num_iscr_sito,
-            identificativo=identificativo,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "TrasmissioneDatiResult",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def trasmissioni_operatore_num_iscr_sito_identificativo_get_without_preload_content(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True, description="Numero iscrizione dell'unità locale per cui si vogliono recuperare le trasmissioni")],
-        identificativo: Annotated[StrictStr, Field(description="Identificativo della trasmissione")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'num_iscr_sito',
+            'identificativo'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """Dettaglio trasmissione
-
-        Recupera le informazioni di dettaglio della trasmissione di dati di FIR digitale corrispondente all'identificativo specificato
-
-        :param num_iscr_sito: Numero iscrizione dell'unità locale per cui si vogliono recuperare le trasmissioni (required)
-        :type num_iscr_sito: str
-        :param identificativo: Identificativo della trasmissione (required)
-        :type identificativo: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._trasmissioni_operatore_num_iscr_sito_identificativo_get_serialize(
-            num_iscr_sito=num_iscr_sito,
-            identificativo=identificativo,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "TrasmissioneDatiResult",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method trasmissioni_operatore_num_iscr_sito_identificativo_get" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    def _trasmissioni_operatore_num_iscr_sito_identificativo_get_serialize(
-        self,
-        num_iscr_sito,
-        identificativo,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if num_iscr_sito is not None:
-            _path_params['num_iscr_sito'] = num_iscr_sito
-        if identificativo is not None:
-            _path_params['identificativo'] = identificativo
+        _path_params = {}
+        if _params['num_iscr_sito'] is not None:
+            _path_params['num_iscr_sito'] = _params['num_iscr_sito']
+
+        if _params['identificativo'] is not None:
+            _path_params['identificativo'] = _params['identificativo']
+
+
         # process the query parameters
+        _query_params = []
         # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
+        _form_params = []
+        _files = {}
         # process the body parameter
-
-
+        _body_params = None
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
-
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='GET',
-            resource_path='/trasmissioni/operatore/{num_iscr_sito}/{identificativo}',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {
+            '200': "TrasmissioneDatiResult",
+            '403': None,
+            '404': None,
+            '429': None,
+            '500': "ProblemDetails",
+        }
+
+        return self.api_client.call_api(
+            '/trasmissioni/operatore/{num_iscr_sito}/{identificativo}', 'GET',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def trasmissioni_operatore_num_iscr_sito_numero_fir_estrai_post(self, num_iscr_sito : constr(strict=True), numero_fir : constr(strict=True), estrai_dati_xfir_model : EstraiDatiXfirModel, x_reply_to : Optional[StrictStr] = None, **kwargs) -> TransazioneModel:  # noqa: E501
+        """🔁[ASYNC] Estrazione dati per FIR digitale  # noqa: E501
 
+        Effettua l'estrazione dei dati che devono essere trasmessi dal file del FIR digitale che viene specificato tra i dati della richiesta.   Il file del FIR digitale inviato deve essere firmato digitalmente e deve essere valido secondo le regole definite dalle specifiche xFIR e verificabile dalla specifica funzione di validazione definita dall'endpoint dell'API.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def trasmissioni_operatore_num_iscr_sito_numero_fir_estrai_post(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True)],
-        numero_fir: Annotated[str, Field(strict=True)],
-        estrai_dati_xfir_model: EstraiDatiXfirModel,
-        x_reply_to: Optional[StrictStr] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> TransazioneModel:
-        """🔁[ASYNC] Estrazione dati per FIR digitale
-
-        Effettua l'estrazione dei dati che devono essere trasmessi dal file del FIR digitale che viene specificato tra i dati della richiesta.   Il file del FIR digitale inviato deve essere firmato digitalmente e deve essere valido secondo le regole definite dalle specifiche xFIR e verificabile dalla specifica funzione di validazione definita dall'endpoint dell'API.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.trasmissioni_operatore_num_iscr_sito_numero_fir_estrai_post(num_iscr_sito, numero_fir, estrai_dati_xfir_model, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param num_iscr_sito:  (required)
         :type num_iscr_sito: str
@@ -2742,81 +1443,33 @@ class TrasmissioneDatiOperatoreApi:
         :type estrai_dati_xfir_model: EstraiDatiXfirModel
         :param x_reply_to: 
         :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: TransazioneModel
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the trasmissioni_operatore_num_iscr_sito_numero_fir_estrai_post_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.trasmissioni_operatore_num_iscr_sito_numero_fir_estrai_post_with_http_info(num_iscr_sito, numero_fir, estrai_dati_xfir_model, x_reply_to, **kwargs)  # noqa: E501
 
-        _param = self._trasmissioni_operatore_num_iscr_sito_numero_fir_estrai_post_serialize(
-            num_iscr_sito=num_iscr_sito,
-            numero_fir=numero_fir,
-            estrai_dati_xfir_model=estrai_dati_xfir_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def trasmissioni_operatore_num_iscr_sito_numero_fir_estrai_post_with_http_info(self, num_iscr_sito : constr(strict=True), numero_fir : constr(strict=True), estrai_dati_xfir_model : EstraiDatiXfirModel, x_reply_to : Optional[StrictStr] = None, **kwargs) -> ApiResponse:  # noqa: E501
+        """🔁[ASYNC] Estrazione dati per FIR digitale  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Effettua l'estrazione dei dati che devono essere trasmessi dal file del FIR digitale che viene specificato tra i dati della richiesta.   Il file del FIR digitale inviato deve essere firmato digitalmente e deve essere valido secondo le regole definite dalle specifiche xFIR e verificabile dalla specifica funzione di validazione definita dall'endpoint dell'API.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def trasmissioni_operatore_num_iscr_sito_numero_fir_estrai_post_with_http_info(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True)],
-        numero_fir: Annotated[str, Field(strict=True)],
-        estrai_dati_xfir_model: EstraiDatiXfirModel,
-        x_reply_to: Optional[StrictStr] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[TransazioneModel]:
-        """🔁[ASYNC] Estrazione dati per FIR digitale
-
-        Effettua l'estrazione dei dati che devono essere trasmessi dal file del FIR digitale che viene specificato tra i dati della richiesta.   Il file del FIR digitale inviato deve essere firmato digitalmente e deve essere valido secondo le regole definite dalle specifiche xFIR e verificabile dalla specifica funzione di validazione definita dall'endpoint dell'API.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+        >>> thread = api.trasmissioni_operatore_num_iscr_sito_numero_fir_estrai_post_with_http_info(num_iscr_sito, numero_fir, estrai_dati_xfir_model, x_reply_to, async_req=True)
+        >>> result = thread.get()
 
         :param num_iscr_sito:  (required)
         :type num_iscr_sito: str
@@ -2826,585 +1479,409 @@ class TrasmissioneDatiOperatoreApi:
         :type estrai_dati_xfir_model: EstraiDatiXfirModel
         :param x_reply_to: 
         :type x_reply_to: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(TransazioneModel, status_code(int), headers(HTTPHeaderDict))
+        """
 
-        _param = self._trasmissioni_operatore_num_iscr_sito_numero_fir_estrai_post_serialize(
-            num_iscr_sito=num_iscr_sito,
-            numero_fir=numero_fir,
-            estrai_dati_xfir_model=estrai_dati_xfir_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def trasmissioni_operatore_num_iscr_sito_numero_fir_estrai_post_without_preload_content(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True)],
-        numero_fir: Annotated[str, Field(strict=True)],
-        estrai_dati_xfir_model: EstraiDatiXfirModel,
-        x_reply_to: Optional[StrictStr] = None,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'num_iscr_sito',
+            'numero_fir',
+            'estrai_dati_xfir_model',
+            'x_reply_to'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """🔁[ASYNC] Estrazione dati per FIR digitale
-
-        Effettua l'estrazione dei dati che devono essere trasmessi dal file del FIR digitale che viene specificato tra i dati della richiesta.   Il file del FIR digitale inviato deve essere firmato digitalmente e deve essere valido secondo le regole definite dalle specifiche xFIR e verificabile dalla specifica funzione di validazione definita dall'endpoint dell'API.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
-
-        :param num_iscr_sito:  (required)
-        :type num_iscr_sito: str
-        :param numero_fir:  (required)
-        :type numero_fir: str
-        :param estrai_dati_xfir_model:  (required)
-        :type estrai_dati_xfir_model: EstraiDatiXfirModel
-        :param x_reply_to: 
-        :type x_reply_to: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._trasmissioni_operatore_num_iscr_sito_numero_fir_estrai_post_serialize(
-            num_iscr_sito=num_iscr_sito,
-            numero_fir=numero_fir,
-            estrai_dati_xfir_model=estrai_dati_xfir_model,
-            x_reply_to=x_reply_to,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '202': "TransazioneModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method trasmissioni_operatore_num_iscr_sito_numero_fir_estrai_post" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    def _trasmissioni_operatore_num_iscr_sito_numero_fir_estrai_post_serialize(
-        self,
-        num_iscr_sito,
-        numero_fir,
-        estrai_dati_xfir_model,
-        x_reply_to,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if num_iscr_sito is not None:
-            _path_params['num_iscr_sito'] = num_iscr_sito
-        if numero_fir is not None:
-            _path_params['numero_fir'] = numero_fir
-        # process the query parameters
-        # process the header parameters
-        if x_reply_to is not None:
-            _header_params['X-ReplyTo'] = x_reply_to
-        # process the form parameters
-        # process the body parameter
-        if estrai_dati_xfir_model is not None:
-            _body_params = estrai_dati_xfir_model
+        _path_params = {}
+        if _params['num_iscr_sito'] is not None:
+            _path_params['num_iscr_sito'] = _params['num_iscr_sito']
 
+        if _params['numero_fir'] is not None:
+            _path_params['numero_fir'] = _params['numero_fir']
+
+
+        # process the query parameters
+        _query_params = []
+        # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
+        if _params['x_reply_to'] is not None:
+            _header_params['X-ReplyTo'] = _params['x_reply_to']
+
+        # process the form parameters
+        _form_params = []
+        _files = {}
+        # process the body parameter
+        _body_params = None
+        if _params['estrai_dati_xfir_model'] is not None:
+            _body_params = _params['estrai_dati_xfir_model']
 
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
 
         # set the HTTP header `Content-Type`
-        if _content_type:
-            _header_params['Content-Type'] = _content_type
-        else:
-            _default_content_type = (
-                self.api_client.select_header_content_type(
-                    [
-                        'application/json'
-                    ]
-                )
-            )
-            if _default_content_type is not None:
-                _header_params['Content-Type'] = _default_content_type
+        _content_types_list = _params.get('_content_type',
+            self.api_client.select_header_content_type(
+                ['application/json']))
+        if _content_types_list:
+                _header_params['Content-Type'] = _content_types_list
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='POST',
-            resource_path='/trasmissioni/operatore/{num_iscr_sito}/{numero_fir}/estrai',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {
+            '202': "TransazioneModel",
+            '400': "ProblemDetails",
+            '403': None,
+            '404': None,
+            '429': None,
+            '500': "ProblemDetails",
+        }
+
+        return self.api_client.call_api(
+            '/trasmissioni/operatore/{num_iscr_sito}/{numero_fir}/estrai', 'POST',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def trasmissioni_operatore_num_iscr_sito_post(self, num_iscr_sito : constr(strict=True), dati_trasmissione_formulario_model : DatiTrasmissioneFormularioModel, **kwargs) -> TrasmissioneFormularioResponse:  # noqa: E501
+        """Trasmette i dati del FIR digitale  # noqa: E501
 
+        Effettua la trasmissione dei dati estratti da un FIR digitale riferibili all'unità locale specificata.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def trasmissioni_operatore_num_iscr_sito_post(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True)],
-        dati_trasmissione_formulario_model: DatiTrasmissioneFormularioModel,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> TrasmissioneFormularioResponse:
-        """Trasmette i dati del FIR digitale
-
-        Effettua la trasmissione dei dati estratti da un FIR digitale riferibili all'unità locale specificata.
+        >>> thread = api.trasmissioni_operatore_num_iscr_sito_post(num_iscr_sito, dati_trasmissione_formulario_model, async_req=True)
+        >>> result = thread.get()
 
         :param num_iscr_sito:  (required)
         :type num_iscr_sito: str
         :param dati_trasmissione_formulario_model:  (required)
         :type dati_trasmissione_formulario_model: DatiTrasmissioneFormularioModel
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: TrasmissioneFormularioResponse
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the trasmissioni_operatore_num_iscr_sito_post_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.trasmissioni_operatore_num_iscr_sito_post_with_http_info(num_iscr_sito, dati_trasmissione_formulario_model, **kwargs)  # noqa: E501
 
-        _param = self._trasmissioni_operatore_num_iscr_sito_post_serialize(
-            num_iscr_sito=num_iscr_sito,
-            dati_trasmissione_formulario_model=dati_trasmissione_formulario_model,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+    @validate_arguments
+    def trasmissioni_operatore_num_iscr_sito_post_with_http_info(self, num_iscr_sito : constr(strict=True), dati_trasmissione_formulario_model : DatiTrasmissioneFormularioModel, **kwargs) -> ApiResponse:  # noqa: E501
+        """Trasmette i dati del FIR digitale  # noqa: E501
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '201': "TrasmissioneFormularioResponse",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
+        Effettua la trasmissione dei dati estratti da un FIR digitale riferibili all'unità locale specificata.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def trasmissioni_operatore_num_iscr_sito_post_with_http_info(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True)],
-        dati_trasmissione_formulario_model: DatiTrasmissioneFormularioModel,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[TrasmissioneFormularioResponse]:
-        """Trasmette i dati del FIR digitale
-
-        Effettua la trasmissione dei dati estratti da un FIR digitale riferibili all'unità locale specificata.
+        >>> thread = api.trasmissioni_operatore_num_iscr_sito_post_with_http_info(num_iscr_sito, dati_trasmissione_formulario_model, async_req=True)
+        >>> result = thread.get()
 
         :param num_iscr_sito:  (required)
         :type num_iscr_sito: str
         :param dati_trasmissione_formulario_model:  (required)
         :type dati_trasmissione_formulario_model: DatiTrasmissioneFormularioModel
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(TrasmissioneFormularioResponse, status_code(int), headers(HTTPHeaderDict))
+        """
 
-        _param = self._trasmissioni_operatore_num_iscr_sito_post_serialize(
-            num_iscr_sito=num_iscr_sito,
-            dati_trasmissione_formulario_model=dati_trasmissione_formulario_model,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '201': "TrasmissioneFormularioResponse",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def trasmissioni_operatore_num_iscr_sito_post_without_preload_content(
-        self,
-        num_iscr_sito: Annotated[str, Field(strict=True)],
-        dati_trasmissione_formulario_model: DatiTrasmissioneFormularioModel,
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'num_iscr_sito',
+            'dati_trasmissione_formulario_model'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """Trasmette i dati del FIR digitale
-
-        Effettua la trasmissione dei dati estratti da un FIR digitale riferibili all'unità locale specificata.
-
-        :param num_iscr_sito:  (required)
-        :type num_iscr_sito: str
-        :param dati_trasmissione_formulario_model:  (required)
-        :type dati_trasmissione_formulario_model: DatiTrasmissioneFormularioModel
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-
-        _param = self._trasmissioni_operatore_num_iscr_sito_post_serialize(
-            num_iscr_sito=num_iscr_sito,
-            dati_trasmissione_formulario_model=dati_trasmissione_formulario_model,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '201': "TrasmissioneFormularioResponse",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method trasmissioni_operatore_num_iscr_sito_post" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    def _trasmissioni_operatore_num_iscr_sito_post_serialize(
-        self,
-        num_iscr_sito,
-        dati_trasmissione_formulario_model,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if num_iscr_sito is not None:
-            _path_params['num_iscr_sito'] = num_iscr_sito
-        # process the query parameters
-        # process the header parameters
-        # process the form parameters
-        # process the body parameter
-        if dati_trasmissione_formulario_model is not None:
-            _body_params = dati_trasmissione_formulario_model
+        _path_params = {}
+        if _params['num_iscr_sito'] is not None:
+            _path_params['num_iscr_sito'] = _params['num_iscr_sito']
 
+
+        # process the query parameters
+        _query_params = []
+        # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
+        # process the form parameters
+        _form_params = []
+        _files = {}
+        # process the body parameter
+        _body_params = None
+        if _params['dati_trasmissione_formulario_model'] is not None:
+            _body_params = _params['dati_trasmissione_formulario_model']
 
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
 
         # set the HTTP header `Content-Type`
-        if _content_type:
-            _header_params['Content-Type'] = _content_type
-        else:
-            _default_content_type = (
-                self.api_client.select_header_content_type(
-                    [
-                        'application/json'
-                    ]
-                )
-            )
-            if _default_content_type is not None:
-                _header_params['Content-Type'] = _default_content_type
+        _content_types_list = _params.get('_content_type',
+            self.api_client.select_header_content_type(
+                ['application/json']))
+        if _content_types_list:
+                _header_params['Content-Type'] = _content_types_list
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='POST',
-            resource_path='/trasmissioni/operatore/{num_iscr_sito}',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {
+            '201': "TrasmissioneFormularioResponse",
+            '400': "ProblemDetails",
+            '403': None,
+            '404': None,
+            '429': None,
+            '500': "ProblemDetails",
+        }
+
+        return self.api_client.call_api(
+            '/trasmissioni/operatore/{num_iscr_sito}', 'POST',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def trasmissioni_transazione_id_result_get(self, transazione_id : Annotated[StrictStr, Field(..., description="Id della richiesta")], **kwargs) -> EsitoTrasmissioneDatiModel:  # noqa: E501
+        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /{transazioneId}/result - Esito transazione  # noqa: E501
 
+        Ottiene l'esito dell'elaborazione di una richiesta di elaborazione per un formulario.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def trasmissioni_transazione_id_result_get(
-        self,
-        transazione_id: Annotated[StrictStr, Field(description="Id della richiesta")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> EsitoTrasmissioneDatiModel:
-        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /{transazioneId}/result - Esito transazione
-
-        Ottiene l'esito dell'elaborazione di una richiesta di elaborazione per un formulario.
+        >>> thread = api.trasmissioni_transazione_id_result_get(transazione_id, async_req=True)
+        >>> result = thread.get()
 
         :param transazione_id: Id della richiesta (required)
         :type transazione_id: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
+        :return: Returns the result object.
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: EsitoTrasmissioneDatiModel
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the trasmissioni_transazione_id_result_get_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.trasmissioni_transazione_id_result_get_with_http_info(transazione_id, **kwargs)  # noqa: E501
+
+    @validate_arguments
+    def trasmissioni_transazione_id_result_get_with_http_info(self, transazione_id : Annotated[StrictStr, Field(..., description="Id della richiesta")], **kwargs) -> ApiResponse:  # noqa: E501
+        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /{transazioneId}/result - Esito transazione  # noqa: E501
+
+        Ottiene l'esito dell'elaborazione di una richiesta di elaborazione per un formulario.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+
+        >>> thread = api.trasmissioni_transazione_id_result_get_with_http_info(transazione_id, async_req=True)
+        >>> result = thread.get()
+
+        :param transazione_id: Id della richiesta (required)
+        :type transazione_id: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: tuple(EsitoTrasmissioneDatiModel, status_code(int), headers(HTTPHeaderDict))
+        """
+
         warnings.warn("GET /trasmissioni/{transazione_id}/result is deprecated.", DeprecationWarning)
 
-        _param = self._trasmissioni_transazione_id_result_get_serialize(
-            transazione_id=transazione_id,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
+        _params = locals()
+
+        _all_params = [
+            'transazione_id'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
+            ]
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method trasmissioni_transazione_id_result_get" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
+
+        _collection_formats = {}
+
+        # process the path parameters
+        _path_params = {}
+        if _params['transazione_id'] is not None:
+            _path_params['transazione_id'] = _params['transazione_id']
+
+
+        # process the query parameters
+        _query_params = []
+        # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
+        # process the form parameters
+        _form_params = []
+        _files = {}
+        # process the body parameter
+        _body_params = None
+        # set the HTTP header `Accept`
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json', 'application/problem+json'])  # noqa: E501
+
+        # authentication setting
+        _auth_settings = ['Bearer']  # noqa: E501
+
+        _response_types_map = {
             '200': "EsitoTrasmissioneDatiModel",
             '400': "ProblemDetails",
             '403': None,
@@ -3412,501 +1889,160 @@ class TrasmissioneDatiOperatoreApi:
             '429': None,
             '500': "ProblemDetails",
         }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
 
-
-    @validate_call
-    def trasmissioni_transazione_id_result_get_with_http_info(
-        self,
-        transazione_id: Annotated[StrictStr, Field(description="Id della richiesta")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[EsitoTrasmissioneDatiModel]:
-        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /{transazioneId}/result - Esito transazione
-
-        Ottiene l'esito dell'elaborazione di una richiesta di elaborazione per un formulario.
-
-        :param transazione_id: Id della richiesta (required)
-        :type transazione_id: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-        warnings.warn("GET /trasmissioni/{transazione_id}/result is deprecated.", DeprecationWarning)
-
-        _param = self._trasmissioni_transazione_id_result_get_serialize(
-            transazione_id=transazione_id,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
-
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "EsitoTrasmissioneDatiModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
-
-
-    @validate_call
-    def trasmissioni_transazione_id_result_get_without_preload_content(
-        self,
-        transazione_id: Annotated[StrictStr, Field(description="Id della richiesta")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /{transazioneId}/result - Esito transazione
-
-        Ottiene l'esito dell'elaborazione di una richiesta di elaborazione per un formulario.
-
-        :param transazione_id: Id della richiesta (required)
-        :type transazione_id: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-        warnings.warn("GET /trasmissioni/{transazione_id}/result is deprecated.", DeprecationWarning)
-
-        _param = self._trasmissioni_transazione_id_result_get_serialize(
-            transazione_id=transazione_id,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
-
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': "EsitoTrasmissioneDatiModel",
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
-
-
-    def _trasmissioni_transazione_id_result_get_serialize(
-        self,
-        transazione_id,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
-
-        # process the path parameters
-        if transazione_id is not None:
-            _path_params['transazione_id'] = transazione_id
-        # process the query parameters
-        # process the header parameters
-        # process the form parameters
-        # process the body parameter
-
-
-        # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/json', 
-                    'application/problem+json'
-                ]
-            )
-
-
-        # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
-
-        return self.api_client.param_serialize(
-            method='GET',
-            resource_path='/trasmissioni/{transazione_id}/result',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        return self.api_client.call_api(
+            '/trasmissioni/{transazione_id}/result', 'GET',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
+            _request_auth=_params.get('_request_auth'))
 
+    @validate_arguments
+    def trasmissioni_transazione_id_status_get(self, transazione_id : Annotated[StrictStr, Field(..., description="Id della richiesta.")], **kwargs) -> None:  # noqa: E501
+        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /{transazioneId}/status - Stato transazione  # noqa: E501
 
+        Ottiene lo stato di elaborazione di una richiesta di elaborazione per un formulario.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
 
-
-    @validate_call
-    def trasmissioni_transazione_id_status_get(
-        self,
-        transazione_id: Annotated[StrictStr, Field(description="Id della richiesta.")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> None:
-        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /{transazioneId}/status - Stato transazione
-
-        Ottiene lo stato di elaborazione di una richiesta di elaborazione per un formulario.
+        >>> thread = api.trasmissioni_transazione_id_status_get(transazione_id, async_req=True)
+        >>> result = thread.get()
 
         :param transazione_id: Id della richiesta. (required)
         :type transazione_id: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _request_timeout: timeout setting for this request.
+               If one number provided, it will be total request
+               timeout. It can also be a pair (tuple) of
+               (connection, read) timeouts.
+        :return: Returns the result object.
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: None
+        """
+        kwargs['_return_http_data_only'] = True
+        if '_preload_content' in kwargs:
+            message = "Error! Please call the trasmissioni_transazione_id_status_get_with_http_info method with `_preload_content` instead and obtain raw data from ApiResponse.raw_data"  # noqa: E501
+            raise ValueError(message)
+        return self.trasmissioni_transazione_id_status_get_with_http_info(transazione_id, **kwargs)  # noqa: E501
+
+    @validate_arguments
+    def trasmissioni_transazione_id_status_get_with_http_info(self, transazione_id : Annotated[StrictStr, Field(..., description="Id della richiesta.")], **kwargs) -> ApiResponse:  # noqa: E501
+        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /{transazioneId}/status - Stato transazione  # noqa: E501
+
+        Ottiene lo stato di elaborazione di una richiesta di elaborazione per un formulario.  # noqa: E501
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+
+        >>> thread = api.trasmissioni_transazione_id_status_get_with_http_info(transazione_id, async_req=True)
+        >>> result = thread.get()
+
+        :param transazione_id: Id della richiesta. (required)
+        :type transazione_id: str
+        :param async_req: Whether to execute the request asynchronously.
+        :type async_req: bool, optional
+        :param _preload_content: if False, the ApiResponse.data will
+                                 be set to none and raw_data will store the
+                                 HTTP response body without reading/decoding.
+                                 Default is True.
+        :type _preload_content: bool, optional
+        :param _return_http_data_only: response data instead of ApiResponse
+                                       object with status code, headers, etc
+        :type _return_http_data_only: bool, optional
         :param _request_timeout: timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
                                  (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
         :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
+                              request; this effectively ignores the authentication
+                              in the spec for a single request.
         :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
+        :type _content_type: string, optional: force content-type for the request
         :return: Returns the result object.
-        """ # noqa: E501
+                 If the method is called asynchronously,
+                 returns the request thread.
+        :rtype: None
+        """
+
         warnings.warn("GET /trasmissioni/{transazione_id}/status is deprecated.", DeprecationWarning)
 
-        _param = self._trasmissioni_transazione_id_status_get_serialize(
-            transazione_id=transazione_id,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
+        _params = locals()
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': None,
-            '303': None,
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        ).data
-
-
-    @validate_call
-    def trasmissioni_transazione_id_status_get_with_http_info(
-        self,
-        transazione_id: Annotated[StrictStr, Field(description="Id della richiesta.")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
+        _all_params = [
+            'transazione_id'
+        ]
+        _all_params.extend(
+            [
+                'async_req',
+                '_return_http_data_only',
+                '_preload_content',
+                '_request_timeout',
+                '_request_auth',
+                '_content_type',
+                '_headers'
             ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> ApiResponse[None]:
-        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /{transazioneId}/status - Stato transazione
-
-        Ottiene lo stato di elaborazione di una richiesta di elaborazione per un formulario.
-
-        :param transazione_id: Id della richiesta. (required)
-        :type transazione_id: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-        warnings.warn("GET /trasmissioni/{transazione_id}/status is deprecated.", DeprecationWarning)
-
-        _param = self._trasmissioni_transazione_id_status_get_serialize(
-            transazione_id=transazione_id,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
         )
 
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': None,
-            '303': None,
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        response_data.read()
-        return self.api_client.response_deserialize(
-            response_data=response_data,
-            response_types_map=_response_types_map,
-        )
+        # validate the arguments
+        for _key, _val in _params['kwargs'].items():
+            if _key not in _all_params:
+                raise ApiTypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method trasmissioni_transazione_id_status_get" % _key
+                )
+            _params[_key] = _val
+        del _params['kwargs']
 
-
-    @validate_call
-    def trasmissioni_transazione_id_status_get_without_preload_content(
-        self,
-        transazione_id: Annotated[StrictStr, Field(description="Id della richiesta.")],
-        _request_timeout: Union[
-            None,
-            Annotated[StrictFloat, Field(gt=0)],
-            Tuple[
-                Annotated[StrictFloat, Field(gt=0)],
-                Annotated[StrictFloat, Field(gt=0)]
-            ]
-        ] = None,
-        _request_auth: Optional[Dict[StrictStr, Any]] = None,
-        _content_type: Optional[StrictStr] = None,
-        _headers: Optional[Dict[StrictStr, Any]] = None,
-        _host_index: Annotated[StrictInt, Field(ge=0, le=0)] = 0,
-    ) -> RESTResponseType:
-        """(Deprecated) ⚠️[DEPRECATO] - utilizzare /{transazioneId}/status - Stato transazione
-
-        Ottiene lo stato di elaborazione di una richiesta di elaborazione per un formulario.
-
-        :param transazione_id: Id della richiesta. (required)
-        :type transazione_id: str
-        :param _request_timeout: timeout setting for this request. If one
-                                 number provided, it will be total request
-                                 timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
-        :type _request_timeout: int, tuple(int, int), optional
-        :param _request_auth: set to override the auth_settings for an a single
-                              request; this effectively ignores the
-                              authentication in the spec for a single request.
-        :type _request_auth: dict, optional
-        :param _content_type: force content-type for the request.
-        :type _content_type: str, Optional
-        :param _headers: set to override the headers for a single
-                         request; this effectively ignores the headers
-                         in the spec for a single request.
-        :type _headers: dict, optional
-        :param _host_index: set to override the host_index for a single
-                            request; this effectively ignores the host_index
-                            in the spec for a single request.
-        :type _host_index: int, optional
-        :return: Returns the result object.
-        """ # noqa: E501
-        warnings.warn("GET /trasmissioni/{transazione_id}/status is deprecated.", DeprecationWarning)
-
-        _param = self._trasmissioni_transazione_id_status_get_serialize(
-            transazione_id=transazione_id,
-            _request_auth=_request_auth,
-            _content_type=_content_type,
-            _headers=_headers,
-            _host_index=_host_index
-        )
-
-        _response_types_map: Dict[str, Optional[str]] = {
-            '200': None,
-            '303': None,
-            '400': "ProblemDetails",
-            '403': None,
-            '404': None,
-            '429': None,
-            '500': "ProblemDetails",
-        }
-        response_data = self.api_client.call_api(
-            *_param,
-            _request_timeout=_request_timeout
-        )
-        return response_data.response
-
-
-    def _trasmissioni_transazione_id_status_get_serialize(
-        self,
-        transazione_id,
-        _request_auth,
-        _content_type,
-        _headers,
-        _host_index,
-    ) -> RequestSerialized:
-
-        _host = None
-
-        _collection_formats: Dict[str, str] = {
-        }
-
-        _path_params: Dict[str, str] = {}
-        _query_params: List[Tuple[str, str]] = []
-        _header_params: Dict[str, Optional[str]] = _headers or {}
-        _form_params: List[Tuple[str, str]] = []
-        _files: Dict[
-            str, Union[str, bytes, List[str], List[bytes], List[Tuple[str, bytes]]]
-        ] = {}
-        _body_params: Optional[bytes] = None
+        _collection_formats = {}
 
         # process the path parameters
-        if transazione_id is not None:
-            _path_params['transazione_id'] = transazione_id
+        _path_params = {}
+        if _params['transazione_id'] is not None:
+            _path_params['transazione_id'] = _params['transazione_id']
+
+
         # process the query parameters
+        _query_params = []
         # process the header parameters
+        _header_params = dict(_params.get('_headers', {}))
         # process the form parameters
+        _form_params = []
+        _files = {}
         # process the body parameter
-
-
+        _body_params = None
         # set the HTTP header `Accept`
-        if 'Accept' not in _header_params:
-            _header_params['Accept'] = self.api_client.select_header_accept(
-                [
-                    'application/problem+json'
-                ]
-            )
-
+        _header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/problem+json'])  # noqa: E501
 
         # authentication setting
-        _auth_settings: List[str] = [
-            'Bearer'
-        ]
+        _auth_settings = ['Bearer']  # noqa: E501
 
-        return self.api_client.param_serialize(
-            method='GET',
-            resource_path='/trasmissioni/{transazione_id}/status',
-            path_params=_path_params,
-            query_params=_query_params,
-            header_params=_header_params,
+        _response_types_map = {}
+
+        return self.api_client.call_api(
+            '/trasmissioni/{transazione_id}/status', 'GET',
+            _path_params,
+            _query_params,
+            _header_params,
             body=_body_params,
             post_params=_form_params,
             files=_files,
+            response_types_map=_response_types_map,
             auth_settings=_auth_settings,
+            async_req=_params.get('async_req'),
+            _return_http_data_only=_params.get('_return_http_data_only'),  # noqa: E501
+            _preload_content=_params.get('_preload_content', True),
+            _request_timeout=_params.get('_request_timeout'),
             collection_formats=_collection_formats,
-            _host=_host,
-            _request_auth=_request_auth
-        )
-
-
+            _request_auth=_params.get('_request_auth'))

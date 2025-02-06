@@ -18,82 +18,65 @@ import pprint
 import re  # noqa: F401
 import json
 
-from pydantic import BaseModel, ConfigDict, Field
-from typing import Any, ClassVar, Dict, List, Optional
-from typing_extensions import Annotated
+
+from typing import Optional
+from pydantic import BaseModel, Field, constr
 from rentri_formulari.models.dati_firma_result import DatiFirmaResult
-from typing import Optional, Set
-from typing_extensions import Self
 
 class DatiAnnotazioneResultModel(BaseModel):
     """
     DatiAnnotazioneResultModel
-    """ # noqa: E501
+    """
     dati_firma: Optional[DatiFirmaResult] = None
-    annotazione: Annotated[str, Field(min_length=1, strict=True)]
-    identificativo_soggetto: Annotated[str, Field(min_length=1, strict=True)] = Field(description="Il codice fiscale del soggetto per cui viene richiesta l'aggiunta dell'annotazione al formulario.  Deve coincidere con quello di uno dei soggetti coinvolti nel formulario. L'identità con cui viene eseguita l'operazione deve avere visibilità su (o coincidere con) questo soggetto.")
-    __properties: ClassVar[List[str]] = ["dati_firma", "annotazione", "identificativo_soggetto"]
+    annotazione: constr(strict=True, min_length=1) = Field(...)
+    identificativo_soggetto: constr(strict=True, min_length=1) = Field(default=..., description="Il codice fiscale del soggetto per cui viene richiesta l'aggiunta dell'annotazione al formulario.  Deve coincidere con quello di uno dei soggetti coinvolti nel formulario. L'identità con cui viene eseguita l'operazione deve avere visibilità su (o coincidere con) questo soggetto.")
+    __properties = ["dati_firma", "annotazione", "identificativo_soggetto"]
 
-    model_config = ConfigDict(
-        populate_by_name=True,
-        validate_assignment=True,
-        protected_namespaces=(),
-    )
-
+    class Config:
+        """Pydantic configuration"""
+        allow_population_by_field_name = True
+        validate_assignment = True
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""
-        return pprint.pformat(self.model_dump(by_alias=True))
+        return pprint.pformat(self.dict(by_alias=True))
 
     def to_json(self) -> str:
         """Returns the JSON representation of the model using alias"""
-        # TODO: pydantic v2: use .model_dump_json(by_alias=True, exclude_unset=True) instead
         return json.dumps(self.to_dict())
 
     @classmethod
-    def from_json(cls, json_str: str) -> Optional[Self]:
+    def from_json(cls, json_str: str) -> DatiAnnotazioneResultModel:
         """Create an instance of DatiAnnotazioneResultModel from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
-    def to_dict(self) -> Dict[str, Any]:
-        """Return the dictionary representation of the model using alias.
-
-        This has the following differences from calling pydantic's
-        `self.model_dump(by_alias=True)`:
-
-        * `None` is only added to the output dict for nullable fields that
-          were set at model initialization. Other fields with value `None`
-          are ignored.
-        """
-        excluded_fields: Set[str] = set([
-        ])
-
-        _dict = self.model_dump(
-            by_alias=True,
-            exclude=excluded_fields,
-            exclude_none=True,
-        )
+    def to_dict(self):
+        """Returns the dictionary representation of the model using alias"""
+        _dict = self.dict(by_alias=True,
+                          exclude={
+                          },
+                          exclude_none=True)
         # override the default output from pydantic by calling `to_dict()` of dati_firma
         if self.dati_firma:
             _dict['dati_firma'] = self.dati_firma.to_dict()
         # set to None if dati_firma (nullable) is None
-        # and model_fields_set contains the field
-        if self.dati_firma is None and "dati_firma" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.dati_firma is None and "dati_firma" in self.__fields_set__:
             _dict['dati_firma'] = None
 
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
+    def from_dict(cls, obj: dict) -> DatiAnnotazioneResultModel:
         """Create an instance of DatiAnnotazioneResultModel from a dict"""
         if obj is None:
             return None
 
         if not isinstance(obj, dict):
-            return cls.model_validate(obj)
+            return DatiAnnotazioneResultModel.parse_obj(obj)
 
-        _obj = cls.model_validate({
-            "dati_firma": DatiFirmaResult.from_dict(obj["dati_firma"]) if obj.get("dati_firma") is not None else None,
+        _obj = DatiAnnotazioneResultModel.parse_obj({
+            "dati_firma": DatiFirmaResult.from_dict(obj.get("dati_firma")) if obj.get("dati_firma") is not None else None,
             "annotazione": obj.get("annotazione"),
             "identificativo_soggetto": obj.get("identificativo_soggetto")
         })

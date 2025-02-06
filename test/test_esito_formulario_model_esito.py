@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.esito_formulario_model_esito import EsitoFormularioModelEsito
+from rentri_formulari.models.esito_formulario_model_esito import EsitoFormularioModelEsito  # noqa: E501
 
 class TestEsitoFormularioModelEsito(unittest.TestCase):
     """EsitoFormularioModelEsito unit test stubs"""
@@ -28,12 +29,12 @@ class TestEsitoFormularioModelEsito(unittest.TestCase):
 
     def make_instance(self, include_optional) -> EsitoFormularioModelEsito:
         """Test EsitoFormularioModelEsito
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `EsitoFormularioModelEsito`
         """
-        model = EsitoFormularioModelEsito()
+        model = EsitoFormularioModelEsito()  # noqa: E501
         if include_optional:
             return EsitoFormularioModelEsito(
                 numero_fir = '',

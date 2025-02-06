@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **trasportatore_id** | **int** | Id del trasportatore all&#39;interno dei dati che vengono trasmessi | 
@@ -22,7 +21,7 @@ json = "{}"
 # create an instance of DatiTrasportatoreTrasmissioneModel from a JSON string
 dati_trasportatore_trasmissione_model_instance = DatiTrasportatoreTrasmissioneModel.from_json(json)
 # print the JSON string representation of the object
-print(DatiTrasportatoreTrasmissioneModel.to_json())
+print DatiTrasportatoreTrasmissioneModel.to_json()
 
 # convert the object into a dict
 dati_trasportatore_trasmissione_model_dict = dati_trasportatore_trasmissione_model_instance.to_dict()

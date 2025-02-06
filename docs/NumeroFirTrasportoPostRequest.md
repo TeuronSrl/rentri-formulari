@@ -3,7 +3,6 @@
 Dati del trasporto base
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **conducente** | [**ConducenteModel**](ConducenteModel.md) | Conducente | 
@@ -28,7 +27,7 @@ json = "{}"
 # create an instance of NumeroFirTrasportoPostRequest from a JSON string
 numero_fir_trasporto_post_request_instance = NumeroFirTrasportoPostRequest.from_json(json)
 # print the JSON string representation of the object
-print(NumeroFirTrasportoPostRequest.to_json())
+print NumeroFirTrasportoPostRequest.to_json()
 
 # convert the object into a dict
 numero_fir_trasporto_post_request_dict = numero_fir_trasporto_post_request_instance.to_dict()

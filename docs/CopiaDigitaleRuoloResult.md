@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **codice_fiscale** | **str** | Codice fiscale del soggetto a cui viene resa disponibile la copia del FIR digitale | [optional] 
@@ -23,7 +22,7 @@ json = "{}"
 # create an instance of CopiaDigitaleRuoloResult from a JSON string
 copia_digitale_ruolo_result_instance = CopiaDigitaleRuoloResult.from_json(json)
 # print the JSON string representation of the object
-print(CopiaDigitaleRuoloResult.to_json())
+print CopiaDigitaleRuoloResult.to_json()
 
 # convert the object into a dict
 copia_digitale_ruolo_result_dict = copia_digitale_ruolo_result_instance.to_dict()

@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **codice** | **str** |  | [optional] 
@@ -21,7 +20,7 @@ json = "{}"
 # create an instance of ControlloSchemaResult from a JSON string
 controllo_schema_result_instance = ControlloSchemaResult.from_json(json)
 # print the JSON string representation of the object
-print(ControlloSchemaResult.to_json())
+print ControlloSchemaResult.to_json()
 
 # convert the object into a dict
 controllo_schema_result_dict = controllo_schema_result_instance.to_dict()

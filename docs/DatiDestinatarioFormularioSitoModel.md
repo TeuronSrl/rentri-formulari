@@ -3,7 +3,6 @@
 Dati destinatario
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **num_iscr_sito** | **str** | Numero di iscrizione al RENTRI | 
@@ -21,7 +20,7 @@ json = "{}"
 # create an instance of DatiDestinatarioFormularioSitoModel from a JSON string
 dati_destinatario_formulario_sito_model_instance = DatiDestinatarioFormularioSitoModel.from_json(json)
 # print the JSON string representation of the object
-print(DatiDestinatarioFormularioSitoModel.to_json())
+print DatiDestinatarioFormularioSitoModel.to_json()
 
 # convert the object into a dict
 dati_destinatario_formulario_sito_model_dict = dati_destinatario_formulario_sito_model_instance.to_dict()

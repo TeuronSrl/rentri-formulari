@@ -19,16 +19,14 @@ import re  # noqa: F401
 import json
 
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict, StrictBool, StrictStr
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import List, Optional
+from pydantic import BaseModel, StrictBool, StrictStr, conlist
 from rentri_formulari.models.copia_digitale_ruolo_item_result import CopiaDigitaleRuoloItemResult
-from typing import Optional, Set
-from typing_extensions import Self
 
 class CopiaDigitaleItemResult(BaseModel):
     """
     CopiaDigitaleItemResult
-    """ # noqa: E501
+    """
     identificativo: Optional[StrictStr] = None
     numero_fir: Optional[StrictStr] = None
     data_emissione: Optional[datetime] = None
@@ -36,132 +34,117 @@ class CopiaDigitaleItemResult(BaseModel):
     is_confermata: Optional[StrictBool] = None
     note: Optional[StrictStr] = None
     produttore: Optional[CopiaDigitaleRuoloItemResult] = None
-    trasportatori: Optional[List[CopiaDigitaleRuoloItemResult]] = None
-    intermediari: Optional[List[CopiaDigitaleRuoloItemResult]] = None
-    __properties: ClassVar[List[str]] = ["identificativo", "numero_fir", "data_emissione", "data_caricamento", "is_confermata", "note", "produttore", "trasportatori", "intermediari"]
+    trasportatori: Optional[conlist(CopiaDigitaleRuoloItemResult)] = None
+    intermediari: Optional[conlist(CopiaDigitaleRuoloItemResult)] = None
+    __properties = ["identificativo", "numero_fir", "data_emissione", "data_caricamento", "is_confermata", "note", "produttore", "trasportatori", "intermediari"]
 
-    model_config = ConfigDict(
-        populate_by_name=True,
-        validate_assignment=True,
-        protected_namespaces=(),
-    )
-
+    class Config:
+        """Pydantic configuration"""
+        allow_population_by_field_name = True
+        validate_assignment = True
 
     def to_str(self) -> str:
         """Returns the string representation of the model using alias"""
-        return pprint.pformat(self.model_dump(by_alias=True))
+        return pprint.pformat(self.dict(by_alias=True))
 
     def to_json(self) -> str:
         """Returns the JSON representation of the model using alias"""
-        # TODO: pydantic v2: use .model_dump_json(by_alias=True, exclude_unset=True) instead
         return json.dumps(self.to_dict())
 
     @classmethod
-    def from_json(cls, json_str: str) -> Optional[Self]:
+    def from_json(cls, json_str: str) -> CopiaDigitaleItemResult:
         """Create an instance of CopiaDigitaleItemResult from a JSON string"""
         return cls.from_dict(json.loads(json_str))
 
-    def to_dict(self) -> Dict[str, Any]:
-        """Return the dictionary representation of the model using alias.
-
-        This has the following differences from calling pydantic's
-        `self.model_dump(by_alias=True)`:
-
-        * `None` is only added to the output dict for nullable fields that
-          were set at model initialization. Other fields with value `None`
-          are ignored.
-        """
-        excluded_fields: Set[str] = set([
-        ])
-
-        _dict = self.model_dump(
-            by_alias=True,
-            exclude=excluded_fields,
-            exclude_none=True,
-        )
+    def to_dict(self):
+        """Returns the dictionary representation of the model using alias"""
+        _dict = self.dict(by_alias=True,
+                          exclude={
+                          },
+                          exclude_none=True)
         # override the default output from pydantic by calling `to_dict()` of produttore
         if self.produttore:
             _dict['produttore'] = self.produttore.to_dict()
         # override the default output from pydantic by calling `to_dict()` of each item in trasportatori (list)
         _items = []
         if self.trasportatori:
-            for _item_trasportatori in self.trasportatori:
-                if _item_trasportatori:
-                    _items.append(_item_trasportatori.to_dict())
+            for _item in self.trasportatori:
+                if _item:
+                    _items.append(_item.to_dict())
             _dict['trasportatori'] = _items
         # override the default output from pydantic by calling `to_dict()` of each item in intermediari (list)
         _items = []
         if self.intermediari:
-            for _item_intermediari in self.intermediari:
-                if _item_intermediari:
-                    _items.append(_item_intermediari.to_dict())
+            for _item in self.intermediari:
+                if _item:
+                    _items.append(_item.to_dict())
             _dict['intermediari'] = _items
         # set to None if identificativo (nullable) is None
-        # and model_fields_set contains the field
-        if self.identificativo is None and "identificativo" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.identificativo is None and "identificativo" in self.__fields_set__:
             _dict['identificativo'] = None
 
         # set to None if numero_fir (nullable) is None
-        # and model_fields_set contains the field
-        if self.numero_fir is None and "numero_fir" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.numero_fir is None and "numero_fir" in self.__fields_set__:
             _dict['numero_fir'] = None
 
         # set to None if data_emissione (nullable) is None
-        # and model_fields_set contains the field
-        if self.data_emissione is None and "data_emissione" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.data_emissione is None and "data_emissione" in self.__fields_set__:
             _dict['data_emissione'] = None
 
         # set to None if data_caricamento (nullable) is None
-        # and model_fields_set contains the field
-        if self.data_caricamento is None and "data_caricamento" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.data_caricamento is None and "data_caricamento" in self.__fields_set__:
             _dict['data_caricamento'] = None
 
         # set to None if is_confermata (nullable) is None
-        # and model_fields_set contains the field
-        if self.is_confermata is None and "is_confermata" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.is_confermata is None and "is_confermata" in self.__fields_set__:
             _dict['is_confermata'] = None
 
         # set to None if note (nullable) is None
-        # and model_fields_set contains the field
-        if self.note is None and "note" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.note is None and "note" in self.__fields_set__:
             _dict['note'] = None
 
         # set to None if produttore (nullable) is None
-        # and model_fields_set contains the field
-        if self.produttore is None and "produttore" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.produttore is None and "produttore" in self.__fields_set__:
             _dict['produttore'] = None
 
         # set to None if trasportatori (nullable) is None
-        # and model_fields_set contains the field
-        if self.trasportatori is None and "trasportatori" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.trasportatori is None and "trasportatori" in self.__fields_set__:
             _dict['trasportatori'] = None
 
         # set to None if intermediari (nullable) is None
-        # and model_fields_set contains the field
-        if self.intermediari is None and "intermediari" in self.model_fields_set:
+        # and __fields_set__ contains the field
+        if self.intermediari is None and "intermediari" in self.__fields_set__:
             _dict['intermediari'] = None
 
         return _dict
 
     @classmethod
-    def from_dict(cls, obj: Optional[Dict[str, Any]]) -> Optional[Self]:
+    def from_dict(cls, obj: dict) -> CopiaDigitaleItemResult:
         """Create an instance of CopiaDigitaleItemResult from a dict"""
         if obj is None:
             return None
 
         if not isinstance(obj, dict):
-            return cls.model_validate(obj)
+            return CopiaDigitaleItemResult.parse_obj(obj)
 
-        _obj = cls.model_validate({
+        _obj = CopiaDigitaleItemResult.parse_obj({
             "identificativo": obj.get("identificativo"),
             "numero_fir": obj.get("numero_fir"),
             "data_emissione": obj.get("data_emissione"),
             "data_caricamento": obj.get("data_caricamento"),
             "is_confermata": obj.get("is_confermata"),
             "note": obj.get("note"),
-            "produttore": CopiaDigitaleRuoloItemResult.from_dict(obj["produttore"]) if obj.get("produttore") is not None else None,
-            "trasportatori": [CopiaDigitaleRuoloItemResult.from_dict(_item) for _item in obj["trasportatori"]] if obj.get("trasportatori") is not None else None,
-            "intermediari": [CopiaDigitaleRuoloItemResult.from_dict(_item) for _item in obj["intermediari"]] if obj.get("intermediari") is not None else None
+            "produttore": CopiaDigitaleRuoloItemResult.from_dict(obj.get("produttore")) if obj.get("produttore") is not None else None,
+            "trasportatori": [CopiaDigitaleRuoloItemResult.from_dict(_item) for _item in obj.get("trasportatori")] if obj.get("trasportatori") is not None else None,
+            "intermediari": [CopiaDigitaleRuoloItemResult.from_dict(_item) for _item in obj.get("intermediari")] if obj.get("intermediari") is not None else None
         })
         return _obj
 

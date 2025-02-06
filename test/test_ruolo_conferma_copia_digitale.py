@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.ruolo_conferma_copia_digitale import RuoloConfermaCopiaDigitale
+from rentri_formulari.models.ruolo_conferma_copia_digitale import RuoloConfermaCopiaDigitale  # noqa: E501
 
 class TestRuoloConfermaCopiaDigitale(unittest.TestCase):
     """RuoloConfermaCopiaDigitale unit test stubs"""

@@ -3,7 +3,6 @@
 Dati del trasporto base
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **data_ora_inizio_trasporto** | **datetime** | Data e ora inizio trasporto (formato ISO 8601 UTC) | 
@@ -19,7 +18,7 @@ json = "{}"
 # create an instance of DatiTrasportoBaseModel from a JSON string
 dati_trasporto_base_model_instance = DatiTrasportoBaseModel.from_json(json)
 # print the JSON string representation of the object
-print(DatiTrasportoBaseModel.to_json())
+print DatiTrasportoBaseModel.to_json()
 
 # convert the object into a dict
 dati_trasporto_base_model_dict = dati_trasporto_base_model_instance.to_dict()

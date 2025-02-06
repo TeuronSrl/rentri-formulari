@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.dati_sosta_tecnica_result_model import DatiSostaTecnicaResultModel
+from rentri_formulari.models.dati_sosta_tecnica_result_model import DatiSostaTecnicaResultModel  # noqa: E501
 
 class TestDatiSostaTecnicaResultModel(unittest.TestCase):
     """DatiSostaTecnicaResultModel unit test stubs"""
@@ -28,12 +29,12 @@ class TestDatiSostaTecnicaResultModel(unittest.TestCase):
 
     def make_instance(self, include_optional) -> DatiSostaTecnicaResultModel:
         """Test DatiSostaTecnicaResultModel
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `DatiSostaTecnicaResultModel`
         """
-        model = DatiSostaTecnicaResultModel()
+        model = DatiSostaTecnicaResultModel()  # noqa: E501
         if include_optional:
             return DatiSostaTecnicaResultModel(
                 data_ora_trasbordo = datetime.datetime.strptime('2013-10-20 19:20:30.00', '%Y-%m-%d %H:%M:%S.%f'),

@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.dati_allegato_model import DatiAllegatoModel
+from rentri_formulari.models.dati_allegato_model import DatiAllegatoModel  # noqa: E501
 
 class TestDatiAllegatoModel(unittest.TestCase):
     """DatiAllegatoModel unit test stubs"""
@@ -28,12 +29,12 @@ class TestDatiAllegatoModel(unittest.TestCase):
 
     def make_instance(self, include_optional) -> DatiAllegatoModel:
         """Test DatiAllegatoModel
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `DatiAllegatoModel`
         """
-        model = DatiAllegatoModel()
+        model = DatiAllegatoModel()  # noqa: E501
         if include_optional:
             return DatiAllegatoModel(
                 content_type = '0',

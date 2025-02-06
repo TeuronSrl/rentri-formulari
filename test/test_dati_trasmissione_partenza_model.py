@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.dati_trasmissione_partenza_model import DatiTrasmissionePartenzaModel
+from rentri_formulari.models.dati_trasmissione_partenza_model import DatiTrasmissionePartenzaModel  # noqa: E501
 
 class TestDatiTrasmissionePartenzaModel(unittest.TestCase):
     """DatiTrasmissionePartenzaModel unit test stubs"""
@@ -28,15 +29,15 @@ class TestDatiTrasmissionePartenzaModel(unittest.TestCase):
 
     def make_instance(self, include_optional) -> DatiTrasmissionePartenzaModel:
         """Test DatiTrasmissionePartenzaModel
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `DatiTrasmissionePartenzaModel`
         """
-        model = DatiTrasmissionePartenzaModel()
+        model = DatiTrasmissionePartenzaModel()  # noqa: E501
         if include_optional:
             return DatiTrasmissionePartenzaModel(
-                numero_fir = 'WPQZYQ ) ._),,#_**&,\"%\"* - *- !\'# 1757701929816286488291663/.$\'\"&(_#+% #\"&%-/*- )!./ !),+#/)B0',
+                numero_fir = 'WPQZYQ ) ._),,#_**&,\"%\"* - *- !'# 1757701929816286488291663/.$'\"&(_#+% #\"&%-/*- )!./ !),+#/)B0',
                 produttore = rentri_formulari.models.dati_produttore_formulario_model.DatiProduttoreFormularioModel(
                     denominazione = '0', 
                     codice_fiscale = '01234', 
@@ -72,14 +73,14 @@ class TestDatiTrasmissionePartenzaModel(unittest.TestCase):
                     numero_colli = '', 
                     rinfusa = True, ),
                 trasbordo_parziale_origine = rentri_formulari.models.dati_trasbordo_parziale_origine_model.DatiTrasbordoParzialeOrigineModel(
-                    numero_fir_origine = 'WPQZYQ ) ._),,#_**&,\"%\"* - *- !\'# 1757701929816286488291663/.$\'\"&(_#+% #\"&%-/*- )!./ !),+#/)B0', 
+                    numero_fir_origine = 'WPQZYQ ) ._),,#_**&,\"%\"* - *- !'# 1757701929816286488291663/.$'\"&(_#+% #\"&%-/*- )!./ !),+#/)B0', 
                     produttore_originario = null, 
                     causale = '0', ),
                 annotazioni = ''
             )
         else:
             return DatiTrasmissionePartenzaModel(
-                numero_fir = 'WPQZYQ ) ._),,#_**&,\"%\"* - *- !\'# 1757701929816286488291663/.$\'\"&(_#+% #\"&%-/*- )!./ !),+#/)B0',
+                numero_fir = 'WPQZYQ ) ._),,#_**&,\"%\"* - *- !'# 1757701929816286488291663/.$'\"&(_#+% #\"&%-/*- )!./ !),+#/)B0',
                 produttore = rentri_formulari.models.dati_produttore_formulario_model.DatiProduttoreFormularioModel(
                     denominazione = '0', 
                     codice_fiscale = '01234', 

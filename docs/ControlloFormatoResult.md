@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **codice** | **str** |  | [optional] 
@@ -21,7 +20,7 @@ json = "{}"
 # create an instance of ControlloFormatoResult from a JSON string
 controllo_formato_result_instance = ControlloFormatoResult.from_json(json)
 # print the JSON string representation of the object
-print(ControlloFormatoResult.to_json())
+print ControlloFormatoResult.to_json()
 
 # convert the object into a dict
 controllo_formato_result_dict = controllo_formato_result_instance.to_dict()

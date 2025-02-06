@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.autorizzazione_model import AutorizzazioneModel
+from rentri_formulari.models.autorizzazione_model import AutorizzazioneModel  # noqa: E501
 
 class TestAutorizzazioneModel(unittest.TestCase):
     """AutorizzazioneModel unit test stubs"""
@@ -28,12 +29,12 @@ class TestAutorizzazioneModel(unittest.TestCase):
 
     def make_instance(self, include_optional) -> AutorizzazioneModel:
         """Test AutorizzazioneModel
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `AutorizzazioneModel`
         """
-        model = AutorizzazioneModel()
+        model = AutorizzazioneModel()  # noqa: E501
         if include_optional:
             return AutorizzazioneModel(
                 numero = '',

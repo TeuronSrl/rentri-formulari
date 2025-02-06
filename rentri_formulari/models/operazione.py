@@ -13,10 +13,13 @@
 """  # noqa: E501
 
 
-from __future__ import annotations
 import json
-from enum import Enum
-from typing_extensions import Self
+import pprint
+import re  # noqa: F401
+from aenum import Enum, no_arg
+
+
+
 
 
 class Operazione(str, Enum):
@@ -57,8 +60,8 @@ class Operazione(str, Enum):
     ACQUISIZIONEFIRMAACCETTAZIONESUCCESSIVA = 'AcquisizioneFirmaAccettazioneSuccessiva'
 
     @classmethod
-    def from_json(cls, json_str: str) -> Self:
+    def from_json(cls, json_str: str) -> Operazione:
         """Create an instance of Operazione from a JSON string"""
-        return cls(json.loads(json_str))
+        return Operazione(json.loads(json_str))
 
 

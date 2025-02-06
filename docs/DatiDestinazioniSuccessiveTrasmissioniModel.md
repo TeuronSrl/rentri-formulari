@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **destinatario** | [**DatiDestinatarioFormularioModel1**](DatiDestinatarioFormularioModel1.md) |  | [optional] 
@@ -18,7 +17,7 @@ json = "{}"
 # create an instance of DatiDestinazioniSuccessiveTrasmissioniModel from a JSON string
 dati_destinazioni_successive_trasmissioni_model_instance = DatiDestinazioniSuccessiveTrasmissioniModel.from_json(json)
 # print the JSON string representation of the object
-print(DatiDestinazioniSuccessiveTrasmissioniModel.to_json())
+print DatiDestinazioniSuccessiveTrasmissioniModel.to_json()
 
 # convert the object into a dict
 dati_destinazioni_successive_trasmissioni_model_dict = dati_destinazioni_successive_trasmissioni_model_instance.to_dict()

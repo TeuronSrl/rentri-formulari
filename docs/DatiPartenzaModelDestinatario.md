@@ -3,7 +3,6 @@
 Destinatario
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **denominazione** | **str** | Denominazione del soggetto | 
@@ -25,7 +24,7 @@ json = "{}"
 # create an instance of DatiPartenzaModelDestinatario from a JSON string
 dati_partenza_model_destinatario_instance = DatiPartenzaModelDestinatario.from_json(json)
 # print the JSON string representation of the object
-print(DatiPartenzaModelDestinatario.to_json())
+print DatiPartenzaModelDestinatario.to_json()
 
 # convert the object into a dict
 dati_partenza_model_destinatario_dict = dati_partenza_model_destinatario_instance.to_dict()

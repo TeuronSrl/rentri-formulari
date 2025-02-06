@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.azioni_result import AzioniResult
+from rentri_formulari.models.azioni_result import AzioniResult  # noqa: E501
 
 class TestAzioniResult(unittest.TestCase):
     """AzioniResult unit test stubs"""
@@ -28,12 +29,12 @@ class TestAzioniResult(unittest.TestCase):
 
     def make_instance(self, include_optional) -> AzioniResult:
         """Test AzioniResult
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `AzioniResult`
         """
-        model = AzioniResult()
+        model = AzioniResult()  # noqa: E501
         if include_optional:
             return AzioniResult(
                 versione = 56,

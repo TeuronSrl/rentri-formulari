@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.tipo_ricerca import TipoRicerca
+from rentri_formulari.models.tipo_ricerca import TipoRicerca  # noqa: E501
 
 class TestTipoRicerca(unittest.TestCase):
     """TipoRicerca unit test stubs"""

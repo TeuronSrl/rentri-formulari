@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **esito** | [**EsitoCaricaCopiaDigitaleModel**](EsitoCaricaCopiaDigitaleModel.md) | Esito | [optional] 
@@ -21,7 +20,7 @@ json = "{}"
 # create an instance of EsitoCopiaDigitaleModel from a JSON string
 esito_copia_digitale_model_instance = EsitoCopiaDigitaleModel.from_json(json)
 # print the JSON string representation of the object
-print(EsitoCopiaDigitaleModel.to_json())
+print EsitoCopiaDigitaleModel.to_json()
 
 # convert the object into a dict
 esito_copia_digitale_model_dict = esito_copia_digitale_model_instance.to_dict()

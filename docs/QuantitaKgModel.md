@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **valore** | **float** | Quantità (parte intera: 10, parte decimale: 4) compresa tra 0.0000 e 9999999999.9999. | 
@@ -17,7 +16,7 @@ json = "{}"
 # create an instance of QuantitaKgModel from a JSON string
 quantita_kg_model_instance = QuantitaKgModel.from_json(json)
 # print the JSON string representation of the object
-print(QuantitaKgModel.to_json())
+print QuantitaKgModel.to_json()
 
 # convert the object into a dict
 quantita_kg_model_dict = quantita_kg_model_instance.to_dict()

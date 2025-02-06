@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.analisi_classificazione_model import AnalisiClassificazioneModel
+from rentri_formulari.models.analisi_classificazione_model import AnalisiClassificazioneModel  # noqa: E501
 
 class TestAnalisiClassificazioneModel(unittest.TestCase):
     """AnalisiClassificazioneModel unit test stubs"""
@@ -28,12 +29,12 @@ class TestAnalisiClassificazioneModel(unittest.TestCase):
 
     def make_instance(self, include_optional) -> AnalisiClassificazioneModel:
         """Test AnalisiClassificazioneModel
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `AnalisiClassificazioneModel`
         """
-        model = AnalisiClassificazioneModel()
+        model = AnalisiClassificazioneModel()  # noqa: E501
         if include_optional:
             return AnalisiClassificazioneModel(
                 tipo = 'Analisi',

@@ -14,8 +14,9 @@
 
 
 import unittest
+import datetime
 
-from rentri_formulari.models.dati_annotazione_model import DatiAnnotazioneModel
+from rentri_formulari.models.dati_annotazione_model import DatiAnnotazioneModel  # noqa: E501
 
 class TestDatiAnnotazioneModel(unittest.TestCase):
     """DatiAnnotazioneModel unit test stubs"""
@@ -28,12 +29,12 @@ class TestDatiAnnotazioneModel(unittest.TestCase):
 
     def make_instance(self, include_optional) -> DatiAnnotazioneModel:
         """Test DatiAnnotazioneModel
-            include_optional is a boolean, when False only required
+            include_option is a boolean, when False only required
             params are included, when True both required and
             optional params are included """
         # uncomment below to create an instance of `DatiAnnotazioneModel`
         """
-        model = DatiAnnotazioneModel()
+        model = DatiAnnotazioneModel()  # noqa: E501
         if include_optional:
             return DatiAnnotazioneModel(
                 annotazione = '0',

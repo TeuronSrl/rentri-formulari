@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **formulario** | [**DatiTrasmissioneFormularioModel**](DatiTrasmissioneFormularioModel.md) |  | [optional] 
@@ -17,7 +16,7 @@ json = "{}"
 # create an instance of EsitoEstraiDatiXfirModel from a JSON string
 esito_estrai_dati_xfir_model_instance = EsitoEstraiDatiXfirModel.from_json(json)
 # print the JSON string representation of the object
-print(EsitoEstraiDatiXfirModel.to_json())
+print EsitoEstraiDatiXfirModel.to_json()
 
 # convert the object into a dict
 esito_estrai_dati_xfir_model_dict = esito_estrai_dati_xfir_model_instance.to_dict()

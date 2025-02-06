@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **luogo_stazionamento** | **str** |  | 
@@ -19,7 +18,7 @@ json = "{}"
 # create an instance of DatiSostaTecnicaModel from a JSON string
 dati_sosta_tecnica_model_instance = DatiSostaTecnicaModel.from_json(json)
 # print the JSON string representation of the object
-print(DatiSostaTecnicaModel.to_json())
+print DatiSostaTecnicaModel.to_json()
 
 # convert the object into a dict
 dati_sosta_tecnica_model_dict = dati_sosta_tecnica_model_instance.to_dict()

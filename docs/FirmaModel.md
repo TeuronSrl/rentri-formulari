@@ -2,7 +2,6 @@
 
 
 ## Properties
-
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **certificato** | **str** | Certificato in base64 | 
@@ -20,7 +19,7 @@ json = "{}"
 # create an instance of FirmaModel from a JSON string
 firma_model_instance = FirmaModel.from_json(json)
 # print the JSON string representation of the object
-print(FirmaModel.to_json())
+print FirmaModel.to_json()
 
 # convert the object into a dict
 firma_model_dict = firma_model_instance.to_dict()
