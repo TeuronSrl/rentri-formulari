@@ -9,7 +9,7 @@ info:
   x-summary: Servizio Formulari RENTRI
   x-api-id: rentrigov.formulari
 servers:
-  - url: 'https://demoapi.rentri.gov.it/formulari/v1.0'
+  - url: 'https://api.rentri.gov.it/formulari/v1.0'
     description: Demo
 paths:
   /:

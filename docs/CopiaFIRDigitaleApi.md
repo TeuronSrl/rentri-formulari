@@ -1,6 +1,6 @@
 # rentri_formulari.CopiaFIRDigitaleApi
 
-All URIs are relative to *https://demoapi.rentri.gov.it/formulari/v1.0*
+All URIs are relative to *https://api.rentri.gov.it/formulari/v1.0*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
@@ -35,10 +35,10 @@ from rentri_formulari.models.copia_digitale_item_result import CopiaDigitaleItem
 from rentri_formulari.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to https://demoapi.rentri.gov.it/formulari/v1.0
+# Defining the host is optional and defaults to https://api.rentri.gov.it/formulari/v1.0
 # See configuration.py for a list of all supported configuration parameters.
 configuration = rentri_formulari.Configuration(
-    host = "https://demoapi.rentri.gov.it/formulari/v1.0"
+    host = "https://api.rentri.gov.it/formulari/v1.0"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -135,10 +135,10 @@ import rentri_formulari
 from rentri_formulari.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to https://demoapi.rentri.gov.it/formulari/v1.0
+# Defining the host is optional and defaults to https://api.rentri.gov.it/formulari/v1.0
 # See configuration.py for a list of all supported configuration parameters.
 configuration = rentri_formulari.Configuration(
-    host = "https://demoapi.rentri.gov.it/formulari/v1.0"
+    host = "https://api.rentri.gov.it/formulari/v1.0"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -217,10 +217,10 @@ from rentri_formulari.models.downloadable_base_response import DownloadableBaseR
 from rentri_formulari.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to https://demoapi.rentri.gov.it/formulari/v1.0
+# Defining the host is optional and defaults to https://api.rentri.gov.it/formulari/v1.0
 # See configuration.py for a list of all supported configuration parameters.
 configuration = rentri_formulari.Configuration(
-    host = "https://demoapi.rentri.gov.it/formulari/v1.0"
+    host = "https://api.rentri.gov.it/formulari/v1.0"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -300,10 +300,10 @@ from rentri_formulari.models.copia_digitale_result import CopiaDigitaleResult
 from rentri_formulari.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to https://demoapi.rentri.gov.it/formulari/v1.0
+# Defining the host is optional and defaults to https://api.rentri.gov.it/formulari/v1.0
 # See configuration.py for a list of all supported configuration parameters.
 configuration = rentri_formulari.Configuration(
-    host = "https://demoapi.rentri.gov.it/formulari/v1.0"
+    host = "https://api.rentri.gov.it/formulari/v1.0"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -385,10 +385,10 @@ from rentri_formulari.models.transazione_model import TransazioneModel
 from rentri_formulari.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to https://demoapi.rentri.gov.it/formulari/v1.0
+# Defining the host is optional and defaults to https://api.rentri.gov.it/formulari/v1.0
 # See configuration.py for a list of all supported configuration parameters.
 configuration = rentri_formulari.Configuration(
-    host = "https://demoapi.rentri.gov.it/formulari/v1.0"
+    host = "https://api.rentri.gov.it/formulari/v1.0"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -471,10 +471,10 @@ from rentri_formulari.models.copia_digitale_item_result import CopiaDigitaleItem
 from rentri_formulari.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to https://demoapi.rentri.gov.it/formulari/v1.0
+# Defining the host is optional and defaults to https://api.rentri.gov.it/formulari/v1.0
 # See configuration.py for a list of all supported configuration parameters.
 configuration = rentri_formulari.Configuration(
-    host = "https://demoapi.rentri.gov.it/formulari/v1.0"
+    host = "https://api.rentri.gov.it/formulari/v1.0"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -574,10 +574,10 @@ from rentri_formulari.models.downloadable_base_response import DownloadableBaseR
 from rentri_formulari.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to https://demoapi.rentri.gov.it/formulari/v1.0
+# Defining the host is optional and defaults to https://api.rentri.gov.it/formulari/v1.0
 # See configuration.py for a list of all supported configuration parameters.
 configuration = rentri_formulari.Configuration(
-    host = "https://demoapi.rentri.gov.it/formulari/v1.0"
+    host = "https://api.rentri.gov.it/formulari/v1.0"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -657,10 +657,10 @@ from rentri_formulari.models.copia_digitale_result import CopiaDigitaleResult
 from rentri_formulari.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to https://demoapi.rentri.gov.it/formulari/v1.0
+# Defining the host is optional and defaults to https://api.rentri.gov.it/formulari/v1.0
 # See configuration.py for a list of all supported configuration parameters.
 configuration = rentri_formulari.Configuration(
-    host = "https://demoapi.rentri.gov.it/formulari/v1.0"
+    host = "https://api.rentri.gov.it/formulari/v1.0"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -737,10 +737,10 @@ import rentri_formulari
 from rentri_formulari.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to https://demoapi.rentri.gov.it/formulari/v1.0
+# Defining the host is optional and defaults to https://api.rentri.gov.it/formulari/v1.0
 # See configuration.py for a list of all supported configuration parameters.
 configuration = rentri_formulari.Configuration(
-    host = "https://demoapi.rentri.gov.it/formulari/v1.0"
+    host = "https://api.rentri.gov.it/formulari/v1.0"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -822,10 +822,10 @@ from rentri_formulari.models.esito_copia_digitale_model import EsitoCopiaDigital
 from rentri_formulari.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to https://demoapi.rentri.gov.it/formulari/v1.0
+# Defining the host is optional and defaults to https://api.rentri.gov.it/formulari/v1.0
 # See configuration.py for a list of all supported configuration parameters.
 configuration = rentri_formulari.Configuration(
-    host = "https://demoapi.rentri.gov.it/formulari/v1.0"
+    host = "https://api.rentri.gov.it/formulari/v1.0"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -903,10 +903,10 @@ import rentri_formulari
 from rentri_formulari.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to https://demoapi.rentri.gov.it/formulari/v1.0
+# Defining the host is optional and defaults to https://api.rentri.gov.it/formulari/v1.0
 # See configuration.py for a list of all supported configuration parameters.
 configuration = rentri_formulari.Configuration(
-    host = "https://demoapi.rentri.gov.it/formulari/v1.0"
+    host = "https://api.rentri.gov.it/formulari/v1.0"
 )
 
 # The client must configure the authentication and authorization parameters
