@@ -334,10 +334,3 @@ Authentication schemes defined for the API:
 ### Bearer
 
 - **Type**: Bearer authentication (JWT)
-
-
-## Author
-
-techref@rentri.it
-
-
