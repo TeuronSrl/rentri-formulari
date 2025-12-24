@@ -7,7 +7,7 @@ Dati richiesti per l'annullamento di un FIR
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **note** | **str** | Note di annullamento | 
-**codice_fiscale_soggetto** | **str** | Codice fiscale del soggetto. | 
+**codice_fiscale_soggetto** | **str** | Il soggetto che può annullare può essere solamente il titolare della vidimazione. | [optional] 
 
 ## Example
 

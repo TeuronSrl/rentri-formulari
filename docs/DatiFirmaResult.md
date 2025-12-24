@@ -5,11 +5,12 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**denominazione_firmatario** | **str** |  | [optional] 
-**identificativo_firmatario** | **str** |  | [optional] 
+**denominazione_firmatario** | **str** | Nome intestatario certificato di firma | [optional] 
+**identificativo_firmatario** | **str** | Codice fiscale estratto dal certificato di firma | [optional] 
 **data_firma** | **datetime** |  | [optional] 
-**identificativo_utente** | **str** |  | [optional] 
-**credentials_id** | **str** |  | [optional] 
+**identificativo_utente** | **str** | Utente a cui è da attribuire l&#39;operazione di firma | [optional] 
+**credentials_id** | **str** | Identificativo delle credenziali che hanno autorizzato la firma | [optional] 
+**nome_certificato_ca** | **str** | Distinguished Name (DN) della CA che ha rilasciato il certificato di firma | [optional] 
 
 ## Example
 

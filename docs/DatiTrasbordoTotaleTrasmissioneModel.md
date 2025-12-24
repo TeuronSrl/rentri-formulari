@@ -5,7 +5,8 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id_trasportatore_trasbordo** | **int** | Id del trasportatore definito all&#39;interno dei dati che vengono trasmessi a cui è riferito il trasbordo | 
+**trasportatore_id** | **int** | Id del trasportatore definito all&#39;interno dei dati che vengono trasmessi a cui è riferito il trasbordo | 
+**id_trasportatore_trasbordo** | **int** | Id del trasportatore definito all&#39;interno dei dati che vengono trasmessi a cui è riferito il trasbordo       ⚠️ Deprecato: utilizzare \&quot;trasportatore_id\&quot; | [optional] 
 **trasportatore** | [**DatiTrasportatoreTrasmissioneModel**](DatiTrasportatoreTrasmissioneModel.md) |  | 
 **presa_in_carico** | [**DatiTrasportoTrasmissioneBaseModel1**](DatiTrasportoTrasmissioneBaseModel1.md) |  | 
 

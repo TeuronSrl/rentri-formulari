@@ -5,8 +5,9 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**produttore** | [**DatiProduttoreFormularioModel**](DatiProduttoreFormularioModel.md) | Dati produttore | [optional] 
-**destinatario** | [**DatiDestinatarioFormularioModel2**](DatiDestinatarioFormularioModel2.md) |  | [optional] 
+**data_emissione** | **datetime** | Data di emissione del formulario | [optional] 
+**produttore** | [**DatiProduttoreFormularioResultModel**](DatiProduttoreFormularioResultModel.md) |  | [optional] 
+**destinatario** | [**DatiDestinatarioFormularioResultModel**](DatiDestinatarioFormularioResultModel.md) |  | [optional] 
 **trasportatori** | [**List[DatiTrasportatoreFormularioResultModel]**](DatiTrasportatoreFormularioResultModel.md) |  | [optional] 
 **intermediari** | [**List[DatiIntermediariFormularioModel]**](DatiIntermediariFormularioModel.md) |  | [optional] 
 **rifiuto** | [**DatiRifiutoModel**](DatiRifiutoModel.md) | Identificazione del rifiuto | [optional] 

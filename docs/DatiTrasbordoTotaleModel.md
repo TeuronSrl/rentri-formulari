@@ -6,7 +6,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **trasportatore** | [**DatiPartenzaModelTrasportatoriInner**](DatiPartenzaModelTrasportatoriInner.md) |  | 
-**presa_in_carico** | [**DatiTrasportoTerrestreModel1**](DatiTrasportoTerrestreModel1.md) |  | 
+**presa_in_carico** | [**DatiTrasportoTerrestreModel**](DatiTrasportoTerrestreModel.md) | Dati del trasporto terrestre | 
 
 ## Example
 

@@ -7,9 +7,9 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **trasportatore_id** | **int** | Id del trasportatore definito all&#39;interno dei dati che vengono trasmessi | 
 **trasportatore** | [**DatiTrasportatoreTrasbordoModel**](DatiTrasportatoreTrasbordoModel.md) | Dati trasportatore per il trasbordo parziale | 
-**numero_fir** | **str** |  | 
-**quantita_residua** | [**QuantitaModel**](QuantitaModel.md) |  | 
-**causale** | **str** |  | 
+**numero_fir** | **str** | Numero FIR del formulario in cui viene trasbordato parzialmente il rifiuto | 
+**quantita_residua** | [**QuantitaModel**](QuantitaModel.md) | Quantità residua del rifiuto nel formulario di origine | 
+**causale** | **str** | Causale del trasbordo parziale | 
 
 ## Example
 

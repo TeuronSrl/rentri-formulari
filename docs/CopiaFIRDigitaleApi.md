@@ -1,14 +1,14 @@
 # rentri_formulari.CopiaFIRDigitaleApi
 
-All URIs are relative to *https://demoapi.rentri.gov.it/formulari/v1.0*
+All URIs are relative to *https://api.rentri.gov.it/formulari/v1.0*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**copia_digitale_caricamento_num_iscr_sito_get**](CopiaFIRDigitaleApi.md#copia_digitale_caricamento_num_iscr_sito_get) | **GET** /copia-digitale/caricamento/{num_iscr_sito} | Copie FIR digitali disponibili
+[**copia_digitale_caricamento_num_iscr_sito_get**](CopiaFIRDigitaleApi.md#copia_digitale_caricamento_num_iscr_sito_get) | **GET** /copia-digitale/caricamento/{num_iscr_sito} | Copie FIR digitali caricate
 [**copia_digitale_caricamento_num_iscr_sito_identificativo_delete**](CopiaFIRDigitaleApi.md#copia_digitale_caricamento_num_iscr_sito_identificativo_delete) | **DELETE** /copia-digitale/caricamento/{num_iscr_sito}/{identificativo} | Cancella copia FIR digitale
 [**copia_digitale_caricamento_num_iscr_sito_identificativo_documento_get**](CopiaFIRDigitaleApi.md#copia_digitale_caricamento_num_iscr_sito_identificativo_documento_get) | **GET** /copia-digitale/caricamento/{num_iscr_sito}/{identificativo}/documento | Documento copia FIR digitale
 [**copia_digitale_caricamento_num_iscr_sito_identificativo_get**](CopiaFIRDigitaleApi.md#copia_digitale_caricamento_num_iscr_sito_identificativo_get) | **GET** /copia-digitale/caricamento/{num_iscr_sito}/{identificativo} | Dettaglio copia FIR digitale
-[**copia_digitale_caricamento_numero_fir_post**](CopiaFIRDigitaleApi.md#copia_digitale_caricamento_numero_fir_post) | **POST** /copia-digitale/caricamento/{numero_fir} | 🔁[ASYNC] Carica copia digitale xFIR
+[**copia_digitale_caricamento_numero_fir_post**](CopiaFIRDigitaleApi.md#copia_digitale_caricamento_numero_fir_post) | **POST** /copia-digitale/caricamento/{numero_fir} | 🔁[ASYNC] Carica copia FIR digitale
 [**copia_digitale_conferma_identificativo_soggetto_get**](CopiaFIRDigitaleApi.md#copia_digitale_conferma_identificativo_soggetto_get) | **GET** /copia-digitale/conferma/{identificativo_soggetto} | Copie FIR digitali disponibili
 [**copia_digitale_conferma_identificativo_soggetto_identificativo_documento_get**](CopiaFIRDigitaleApi.md#copia_digitale_conferma_identificativo_soggetto_identificativo_documento_get) | **GET** /copia-digitale/conferma/{identificativo_soggetto}/{identificativo}/documento | Documento copia FIR digitale disponibile
 [**copia_digitale_conferma_identificativo_soggetto_identificativo_get**](CopiaFIRDigitaleApi.md#copia_digitale_conferma_identificativo_soggetto_identificativo_get) | **GET** /copia-digitale/conferma/{identificativo_soggetto}/{identificativo} | Dettaglio copia digitale FIR disponibile
@@ -20,9 +20,9 @@ Method | HTTP request | Description
 # **copia_digitale_caricamento_num_iscr_sito_get**
 > List[CopiaDigitaleItemResult] copia_digitale_caricamento_num_iscr_sito_get(num_iscr_sito, numero_fir=numero_fir, tipo_accettazione=tipo_accettazione, confermate=confermate, comune_id=comune_id, data_emissione_da=data_emissione_da, data_emissione_a=data_emissione_a, codice_eer=codice_eer, ruolo=ruolo, paging_page=paging_page, paging_page_size=paging_page_size)
 
-Copie FIR digitali disponibili
+Copie FIR digitali caricate
 
-Ottiene la lista delle copie dei FIR digitali caricate e disponibili per il soggetto specificato.
+Ottiene la lista delle copie dei FIR digitali caricate dal destinatario e rese disponibili agli altri soggetti del FIR.<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota).</i><hr/>
 
 ### Example
 
@@ -34,10 +34,10 @@ from rentri_formulari.models.copia_digitale_item_result import CopiaDigitaleItem
 from rentri_formulari.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to https://demoapi.rentri.gov.it/formulari/v1.0
+# Defining the host is optional and defaults to https://api.rentri.gov.it/formulari/v1.0
 # See configuration.py for a list of all supported configuration parameters.
 configuration = rentri_formulari.Configuration(
-    host = "https://demoapi.rentri.gov.it/formulari/v1.0"
+    host = "https://api.rentri.gov.it/formulari/v1.0"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -54,7 +54,7 @@ configuration = rentri_formulari.Configuration(
 with rentri_formulari.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = rentri_formulari.CopiaFIRDigitaleApi(api_client)
-    num_iscr_sito = 'num_iscr_sito_example' # str | Codice fiscale del soggetto per cui richiedere l'elenco delle copie dei FIR digitali disponibili
+    num_iscr_sito = 'num_iscr_sito_example' # str | Numero iscrizione unità locale del destinatario che ha caricato le copie dei FIR digitali
     numero_fir = 'numero_fir_example' # str | Numero FIR della copia del FIR digitale (optional)
     tipo_accettazione = rentri_formulari.TipiAccettazione() # TipiAccettazione | Filtra le copia dei FIR digitali per tipo di accettazione del destinatario (optional)
     confermate = True # bool | Filtra le copie dei FIR digitali confermate o non confermate. (optional)
@@ -67,7 +67,7 @@ with rentri_formulari.ApiClient(configuration) as api_client:
     paging_page_size = 100 # int | Valore per l'header Paging-PageSize (optional) (default to 100)
 
     try:
-        # Copie FIR digitali disponibili
+        # Copie FIR digitali caricate
         api_response = api_instance.copia_digitale_caricamento_num_iscr_sito_get(num_iscr_sito, numero_fir=numero_fir, tipo_accettazione=tipo_accettazione, confermate=confermate, comune_id=comune_id, data_emissione_da=data_emissione_da, data_emissione_a=data_emissione_a, codice_eer=codice_eer, ruolo=ruolo, paging_page=paging_page, paging_page_size=paging_page_size)
         print("The response of CopiaFIRDigitaleApi->copia_digitale_caricamento_num_iscr_sito_get:\n")
         pprint(api_response)
@@ -82,7 +82,7 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **num_iscr_sito** | **str**| Codice fiscale del soggetto per cui richiedere l&#39;elenco delle copie dei FIR digitali disponibili | 
+ **num_iscr_sito** | **str**| Numero iscrizione unità locale del destinatario che ha caricato le copie dei FIR digitali | 
  **numero_fir** | **str**| Numero FIR della copia del FIR digitale | [optional] 
  **tipo_accettazione** | [**TipiAccettazione**](.md)| Filtra le copia dei FIR digitali per tipo di accettazione del destinatario | [optional] 
  **confermate** | **bool**| Filtra le copie dei FIR digitali confermate o non confermate. | [optional] 
@@ -114,7 +114,8 @@ Name | Type | Description  | Notes
 **200** | OK |  * Paging-PageCount - Numero totale di pagine. <br>  * Paging-Page - Numero di pagina. <br>  * Paging-PageSize - Dimensione della pagina. <br>  * Paging-TotalRecordCount - Numero totale di record. <br>  |
 **403** | Forbidden |  -  |
 **404** | Not Found |  -  |
-**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5s, in caso occorre attendere 10s per effettuare una nuova richiesta. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
+**423** | Sono state eseguite troppe richieste non valide.        Questa risposta viene restituita quando viene rilevato un numero eccessivo di richieste concorrenti, autenticate ma non valide.        In questo caso, le eventuali richieste valide continueranno ad essere accettate, mentre solo le richieste non valide verranno bloccate applicando un meccanismo di \&quot;ban\&quot; a livello di chiamante (Issuer).        Il servizio di assistenza per l&#39;interoperabilità RENTRI potrà essere contattato dal fruitore del servizio per i chiarimenti relativi alle richieste non valide, al fine di apportare le correzioni necessarie ai client. |  -  |
+**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5 secondi. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
 **500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -124,7 +125,7 @@ Name | Type | Description  | Notes
 
 Cancella copia FIR digitale
 
-Elimina il caricamento della copia del FIR digitale. L'operazione è possibile solo se nessuno dei soggetti a cui è stata resa disponibile la copia del FIR digitale l'ha già presa in carico con l'operazione di conferma.
+Elimina il caricamento della copia del FIR digitale. L'operazione è possibile solo se nessuno dei soggetti a cui è stata resa disponibile la copia del FIR digitale ne ha già preso visione con l'operazione di conferma.<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre un codice di stato 422).</i><hr/>
 
 ### Example
 
@@ -135,10 +136,10 @@ import rentri_formulari
 from rentri_formulari.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to https://demoapi.rentri.gov.it/formulari/v1.0
+# Defining the host is optional and defaults to https://api.rentri.gov.it/formulari/v1.0
 # See configuration.py for a list of all supported configuration parameters.
 configuration = rentri_formulari.Configuration(
-    host = "https://demoapi.rentri.gov.it/formulari/v1.0"
+    host = "https://api.rentri.gov.it/formulari/v1.0"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -155,7 +156,7 @@ configuration = rentri_formulari.Configuration(
 with rentri_formulari.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = rentri_formulari.CopiaFIRDigitaleApi(api_client)
-    num_iscr_sito = 'num_iscr_sito_example' # str | Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR digitale.             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\"
+    num_iscr_sito = 'num_iscr_sito_example' # str | Numero iscrizione unità locale del destinatario che ha caricato la copia del FIR digitale.             Per recuperare i numeri di iscrizione attribuiti alle unità locali è possibile utilizzare /anagrafiche/v1.0/operatore/{num_iscr}/siti.
     identificativo = 'identificativo_example' # str | Identificativo della copia del FIR digitale da cancellare
 
     try:
@@ -172,7 +173,7 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **num_iscr_sito** | **str**| Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR digitale.             Per recuperare il numero iscrizione unità locale consultare l&#39;operazione \&quot;Elenco Unità Locali iscritte\&quot; nell&#39;area riservata Operatori dove è presente la voce \&quot;Numero iscrizione unità locale\&quot; | 
+ **num_iscr_sito** | **str**| Numero iscrizione unità locale del destinatario che ha caricato la copia del FIR digitale.             Per recuperare i numeri di iscrizione attribuiti alle unità locali è possibile utilizzare /anagrafiche/v1.0/operatore/{num_iscr}/siti. | 
  **identificativo** | **str**| Identificativo della copia del FIR digitale da cancellare | 
 
 ### Return type
@@ -196,7 +197,8 @@ void (empty response body)
 **400** | Bad Request |  -  |
 **403** | Forbidden |  -  |
 **404** | Not Found |  -  |
-**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5s, in caso occorre attendere 10s per effettuare una nuova richiesta. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
+**423** | Sono state eseguite troppe richieste non valide.        Questa risposta viene restituita quando viene rilevato un numero eccessivo di richieste concorrenti, autenticate ma non valide.        In questo caso, le eventuali richieste valide continueranno ad essere accettate, mentre solo le richieste non valide verranno bloccate applicando un meccanismo di \&quot;ban\&quot; a livello di chiamante (Issuer).        Il servizio di assistenza per l&#39;interoperabilità RENTRI potrà essere contattato dal fruitore del servizio per i chiarimenti relativi alle richieste non valide, al fine di apportare le correzioni necessarie ai client. |  -  |
+**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5 secondi. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
 **500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -206,7 +208,7 @@ void (empty response body)
 
 Documento copia FIR digitale
 
-Restituisce il file contenente la copia del FIR digitale caricata.
+Restituisce il file xFIR precedentemente caricato dal destinatario stesso.<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota).</i><hr/>
 
 ### Example
 
@@ -218,10 +220,10 @@ from rentri_formulari.models.downloadable_base_response import DownloadableBaseR
 from rentri_formulari.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to https://demoapi.rentri.gov.it/formulari/v1.0
+# Defining the host is optional and defaults to https://api.rentri.gov.it/formulari/v1.0
 # See configuration.py for a list of all supported configuration parameters.
 configuration = rentri_formulari.Configuration(
-    host = "https://demoapi.rentri.gov.it/formulari/v1.0"
+    host = "https://api.rentri.gov.it/formulari/v1.0"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -238,7 +240,7 @@ configuration = rentri_formulari.Configuration(
 with rentri_formulari.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = rentri_formulari.CopiaFIRDigitaleApi(api_client)
-    num_iscr_sito = 'num_iscr_sito_example' # str | Numero iscrizione unità locale del destinatario che ha caricato la copia del FIR digitale.             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\"
+    num_iscr_sito = 'num_iscr_sito_example' # str | Numero iscrizione unità locale del destinatario che ha caricato la copia del FIR digitale.             Per recuperare i numeri di iscrizione attribuiti alle unità locali è possibile utilizzare /anagrafiche/v1.0/operatore/{num_iscr}/siti.
     identificativo = 'identificativo_example' # str | Identificativo della copia del FIR digitale della quale restituire il documento caricato
 
     try:
@@ -257,7 +259,7 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **num_iscr_sito** | **str**| Numero iscrizione unità locale del destinatario che ha caricato la copia del FIR digitale.             Per recuperare il numero iscrizione unità locale consultare l&#39;operazione \&quot;Elenco Unità Locali iscritte\&quot; nell&#39;area riservata Operatori dove è presente la voce \&quot;Numero iscrizione unità locale\&quot; | 
+ **num_iscr_sito** | **str**| Numero iscrizione unità locale del destinatario che ha caricato la copia del FIR digitale.             Per recuperare i numeri di iscrizione attribuiti alle unità locali è possibile utilizzare /anagrafiche/v1.0/operatore/{num_iscr}/siti. | 
  **identificativo** | **str**| Identificativo della copia del FIR digitale della quale restituire il documento caricato | 
 
 ### Return type
@@ -278,9 +280,11 @@ Name | Type | Description  | Notes
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | OK |  -  |
+**204** | No Content |  -  |
 **403** | Forbidden |  -  |
 **404** | Not Found |  -  |
-**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5s, in caso occorre attendere 10s per effettuare una nuova richiesta. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
+**423** | Sono state eseguite troppe richieste non valide.        Questa risposta viene restituita quando viene rilevato un numero eccessivo di richieste concorrenti, autenticate ma non valide.        In questo caso, le eventuali richieste valide continueranno ad essere accettate, mentre solo le richieste non valide verranno bloccate applicando un meccanismo di \&quot;ban\&quot; a livello di chiamante (Issuer).        Il servizio di assistenza per l&#39;interoperabilità RENTRI potrà essere contattato dal fruitore del servizio per i chiarimenti relativi alle richieste non valide, al fine di apportare le correzioni necessarie ai client. |  -  |
+**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5 secondi. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
 **500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -290,7 +294,7 @@ Name | Type | Description  | Notes
 
 Dettaglio copia FIR digitale
 
-Recupera le informazioni di dettaglio del caricamento della copia del FIR digitale specificata.
+Recupera le informazioni di dettaglio del caricamento della copia del FIR digitale.<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota).</i><hr/>
 
 ### Example
 
@@ -302,10 +306,10 @@ from rentri_formulari.models.copia_digitale_result import CopiaDigitaleResult
 from rentri_formulari.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to https://demoapi.rentri.gov.it/formulari/v1.0
+# Defining the host is optional and defaults to https://api.rentri.gov.it/formulari/v1.0
 # See configuration.py for a list of all supported configuration parameters.
 configuration = rentri_formulari.Configuration(
-    host = "https://demoapi.rentri.gov.it/formulari/v1.0"
+    host = "https://api.rentri.gov.it/formulari/v1.0"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -322,7 +326,7 @@ configuration = rentri_formulari.Configuration(
 with rentri_formulari.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = rentri_formulari.CopiaFIRDigitaleApi(api_client)
-    num_iscr_sito = 'num_iscr_sito_example' # str | Numero iscrizione unità locale del destinatario che ha caricato la copia del FIR digitale             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\"
+    num_iscr_sito = 'num_iscr_sito_example' # str | Numero iscrizione unità locale del destinatario che ha caricato la copia del FIR digitale.             Per recuperare i numeri di iscrizione attribuiti alle unità locali è possibile utilizzare /anagrafiche/v1.0/operatore/{num_iscr}/siti.
     identificativo = 'identificativo_example' # str | Identificativo della copia del FIR digitale
 
     try:
@@ -341,7 +345,7 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **num_iscr_sito** | **str**| Numero iscrizione unità locale del destinatario che ha caricato la copia del FIR digitale             Per recuperare il numero iscrizione unità locale consultare l&#39;operazione \&quot;Elenco Unità Locali iscritte\&quot; nell&#39;area riservata Operatori dove è presente la voce \&quot;Numero iscrizione unità locale\&quot; | 
+ **num_iscr_sito** | **str**| Numero iscrizione unità locale del destinatario che ha caricato la copia del FIR digitale.             Per recuperare i numeri di iscrizione attribuiti alle unità locali è possibile utilizzare /anagrafiche/v1.0/operatore/{num_iscr}/siti. | 
  **identificativo** | **str**| Identificativo della copia del FIR digitale | 
 
 ### Return type
@@ -365,7 +369,8 @@ Name | Type | Description  | Notes
 **400** | Bad Request |  -  |
 **403** | Forbidden |  -  |
 **404** | Not Found |  -  |
-**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5s, in caso occorre attendere 10s per effettuare una nuova richiesta. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
+**423** | Sono state eseguite troppe richieste non valide.        Questa risposta viene restituita quando viene rilevato un numero eccessivo di richieste concorrenti, autenticate ma non valide.        In questo caso, le eventuali richieste valide continueranno ad essere accettate, mentre solo le richieste non valide verranno bloccate applicando un meccanismo di \&quot;ban\&quot; a livello di chiamante (Issuer).        Il servizio di assistenza per l&#39;interoperabilità RENTRI potrà essere contattato dal fruitore del servizio per i chiarimenti relativi alle richieste non valide, al fine di apportare le correzioni necessarie ai client. |  -  |
+**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5 secondi. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
 **500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -373,9 +378,9 @@ Name | Type | Description  | Notes
 # **copia_digitale_caricamento_numero_fir_post**
 > TransazioneModel copia_digitale_caricamento_numero_fir_post(numero_fir, copia_digitale_model, x_reply_to=x_reply_to)
 
-🔁[ASYNC] Carica copia digitale xFIR
+🔁[ASYNC] Carica copia FIR digitale
 
-Chiusura del ciclo del FIR digitale.  Acquisisce la richiesta di chiusura del ciclo di vita del FIR mediante invio, da parte del destinatario del formulario, del file xFIR che ne contiene le informazioni.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+Acquisisce la richiesta di chiusura del ciclo di vita del FIR mediante invio, da parte del destinatario del formulario, del file xFIR che ne contiene le informazioni.  L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) il soggetto operatore a cui afferisce il numero di iscrizione dell'unità locale indicato nel parametro <b>num_iscr_sito</b>.  L'unità locale specificata nel parametro <b>num_iscr_sito</b> deve essere iscritta con attività di <i>Recupero</i> o <i>Smaltimento</i> o <i>Centro di raccolta</i> e deve risultare come il soggetto destinatario del formulario.  Il formulario caricato deve essere nello stato <i>Accettato</i> o <i>RespintoAccettatoParzialmente</i>.  Il file xFIR inviato deve essere valido secondo le regole definite nella <i>Guida tecnica alla compilazione del FIR digitale</i>  e verificabile dalla specifica funzione di validazione definita dall'endpoint <i>Validazione xFIR</i> delle API \"Formulario digitale\".  La dimensione massima accettata del file xFIR è 3 MB.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito. <hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre un codice di stato 422).</i><hr/><br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
 
 ### Example
 
@@ -388,10 +393,10 @@ from rentri_formulari.models.transazione_model import TransazioneModel
 from rentri_formulari.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to https://demoapi.rentri.gov.it/formulari/v1.0
+# Defining the host is optional and defaults to https://api.rentri.gov.it/formulari/v1.0
 # See configuration.py for a list of all supported configuration parameters.
 configuration = rentri_formulari.Configuration(
-    host = "https://demoapi.rentri.gov.it/formulari/v1.0"
+    host = "https://api.rentri.gov.it/formulari/v1.0"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -413,7 +418,7 @@ with rentri_formulari.ApiClient(configuration) as api_client:
     x_reply_to = 'x_reply_to_example' # str | URL di callback alla quale verrà inviata la notifica di fine elaborazione (optional)
 
     try:
-        # 🔁[ASYNC] Carica copia digitale xFIR
+        # 🔁[ASYNC] Carica copia FIR digitale
         api_response = api_instance.copia_digitale_caricamento_numero_fir_post(numero_fir, copia_digitale_model, x_reply_to=x_reply_to)
         print("The response of CopiaFIRDigitaleApi->copia_digitale_caricamento_numero_fir_post:\n")
         pprint(api_response)
@@ -449,11 +454,12 @@ Name | Type | Description  | Notes
 
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-**202** | Richiesta accettata |  * Location - URL per verificare lo stato dell&#39;elaborazione. Restituito solo se non viene specificata una URL di callback nell&#39;header X-ReplyTo. <br>  |
+**202** | Richiesta accettata |  * Location - URL per verificare lo stato dell&#39;elaborazione. Restituito solo se non viene specificata una URL di callback nell&#39;header &lt;i&gt;X-ReplyTo&lt;/i&gt;. <br>  |
 **400** | Dettaglio degli errori di validazione in caso di modello dati non valido |  -  |
 **403** | Forbidden |  -  |
 **404** | Not Found |  -  |
-**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5s, in caso occorre attendere 10s per effettuare una nuova richiesta. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
+**423** | Sono state eseguite troppe richieste non valide.        Questa risposta viene restituita quando viene rilevato un numero eccessivo di richieste concorrenti, autenticate ma non valide.        In questo caso, le eventuali richieste valide continueranno ad essere accettate, mentre solo le richieste non valide verranno bloccate applicando un meccanismo di \&quot;ban\&quot; a livello di chiamante (Issuer).        Il servizio di assistenza per l&#39;interoperabilità RENTRI potrà essere contattato dal fruitore del servizio per i chiarimenti relativi alle richieste non valide, al fine di apportare le correzioni necessarie ai client. |  -  |
+**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5 secondi. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
 **500** | Errore non gestito (contattare l&#39;assistenza) |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -463,7 +469,7 @@ Name | Type | Description  | Notes
 
 Copie FIR digitali disponibili
 
-Ottiene la lista delle copie dei FIR digitali, disponibili per la conferma o già confermati, per il soggetto specificato.
+Ottiene la lista delle copie dei FIR digitali, disponibili per la conferma o già confermati, per il soggetto specificato.<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota).</i><hr/>
 
 ### Example
 
@@ -475,10 +481,10 @@ from rentri_formulari.models.copia_digitale_item_result import CopiaDigitaleItem
 from rentri_formulari.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to https://demoapi.rentri.gov.it/formulari/v1.0
+# Defining the host is optional and defaults to https://api.rentri.gov.it/formulari/v1.0
 # See configuration.py for a list of all supported configuration parameters.
 configuration = rentri_formulari.Configuration(
-    host = "https://demoapi.rentri.gov.it/formulari/v1.0"
+    host = "https://api.rentri.gov.it/formulari/v1.0"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -557,7 +563,8 @@ Name | Type | Description  | Notes
 **200** | OK |  * Paging-PageCount - Numero totale di pagine. <br>  * Paging-Page - Numero di pagina. <br>  * Paging-PageSize - Dimensione della pagina. <br>  * Paging-TotalRecordCount - Numero totale di record. <br>  |
 **403** | Forbidden |  -  |
 **404** | Not Found |  -  |
-**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5s, in caso occorre attendere 10s per effettuare una nuova richiesta. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
+**423** | Sono state eseguite troppe richieste non valide.        Questa risposta viene restituita quando viene rilevato un numero eccessivo di richieste concorrenti, autenticate ma non valide.        In questo caso, le eventuali richieste valide continueranno ad essere accettate, mentre solo le richieste non valide verranno bloccate applicando un meccanismo di \&quot;ban\&quot; a livello di chiamante (Issuer).        Il servizio di assistenza per l&#39;interoperabilità RENTRI potrà essere contattato dal fruitore del servizio per i chiarimenti relativi alle richieste non valide, al fine di apportare le correzioni necessarie ai client. |  -  |
+**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5 secondi. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
 **500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -567,7 +574,7 @@ Name | Type | Description  | Notes
 
 Documento copia FIR digitale disponibile
 
-Restituisce il documento della copia del FIR digitale specificata caricata dal destinatario.
+Restituisce il file xFIR che rappresenta la copia del FIR digitale caricata dal destinatario.<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota).</i><hr/>
 
 ### Example
 
@@ -579,10 +586,10 @@ from rentri_formulari.models.downloadable_base_response import DownloadableBaseR
 from rentri_formulari.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to https://demoapi.rentri.gov.it/formulari/v1.0
+# Defining the host is optional and defaults to https://api.rentri.gov.it/formulari/v1.0
 # See configuration.py for a list of all supported configuration parameters.
 configuration = rentri_formulari.Configuration(
-    host = "https://demoapi.rentri.gov.it/formulari/v1.0"
+    host = "https://api.rentri.gov.it/formulari/v1.0"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -599,8 +606,8 @@ configuration = rentri_formulari.Configuration(
 with rentri_formulari.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = rentri_formulari.CopiaFIRDigitaleApi(api_client)
-    identificativo_soggetto = 'identificativo_soggetto_example' # str | Codice fiscale del soggetto per il quale si richiede il documento della copia del FIR cartaceo
-    identificativo = 'identificativo_example' # str | Identificativo della copia del FIR cartaceo caricata dal trasportatore
+    identificativo_soggetto = 'identificativo_soggetto_example' # str | Codice fiscale del soggetto per il quale si richiede il documento della copia del FIR digitale
+    identificativo = 'identificativo_example' # str | Identificativo della copia del FIR digitale caricata dal trasportatore
 
     try:
         # Documento copia FIR digitale disponibile
@@ -618,8 +625,8 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **identificativo_soggetto** | **str**| Codice fiscale del soggetto per il quale si richiede il documento della copia del FIR cartaceo | 
- **identificativo** | **str**| Identificativo della copia del FIR cartaceo caricata dal trasportatore | 
+ **identificativo_soggetto** | **str**| Codice fiscale del soggetto per il quale si richiede il documento della copia del FIR digitale | 
+ **identificativo** | **str**| Identificativo della copia del FIR digitale caricata dal trasportatore | 
 
 ### Return type
 
@@ -639,9 +646,11 @@ Name | Type | Description  | Notes
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | OK |  -  |
+**204** | No Content |  -  |
 **403** | Forbidden |  -  |
 **404** | Not Found |  -  |
-**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5s, in caso occorre attendere 10s per effettuare una nuova richiesta. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
+**423** | Sono state eseguite troppe richieste non valide.        Questa risposta viene restituita quando viene rilevato un numero eccessivo di richieste concorrenti, autenticate ma non valide.        In questo caso, le eventuali richieste valide continueranno ad essere accettate, mentre solo le richieste non valide verranno bloccate applicando un meccanismo di \&quot;ban\&quot; a livello di chiamante (Issuer).        Il servizio di assistenza per l&#39;interoperabilità RENTRI potrà essere contattato dal fruitore del servizio per i chiarimenti relativi alle richieste non valide, al fine di apportare le correzioni necessarie ai client. |  -  |
+**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5 secondi. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
 **500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -651,7 +660,7 @@ Name | Type | Description  | Notes
 
 Dettaglio copia digitale FIR disponibile
 
-Restituisce il dettaglio dei dati di caricamento della copia digitale del FIR caricata.
+Restituisce il dettaglio dei dati di caricamento della copia digitale del FIR caricata.<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota).</i><hr/>
 
 ### Example
 
@@ -663,10 +672,10 @@ from rentri_formulari.models.copia_digitale_result import CopiaDigitaleResult
 from rentri_formulari.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to https://demoapi.rentri.gov.it/formulari/v1.0
+# Defining the host is optional and defaults to https://api.rentri.gov.it/formulari/v1.0
 # See configuration.py for a list of all supported configuration parameters.
 configuration = rentri_formulari.Configuration(
-    host = "https://demoapi.rentri.gov.it/formulari/v1.0"
+    host = "https://api.rentri.gov.it/formulari/v1.0"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -725,7 +734,8 @@ Name | Type | Description  | Notes
 **200** | OK |  -  |
 **403** | Forbidden |  -  |
 **404** | Not Found |  -  |
-**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5s, in caso occorre attendere 10s per effettuare una nuova richiesta. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
+**423** | Sono state eseguite troppe richieste non valide.        Questa risposta viene restituita quando viene rilevato un numero eccessivo di richieste concorrenti, autenticate ma non valide.        In questo caso, le eventuali richieste valide continueranno ad essere accettate, mentre solo le richieste non valide verranno bloccate applicando un meccanismo di \&quot;ban\&quot; a livello di chiamante (Issuer).        Il servizio di assistenza per l&#39;interoperabilità RENTRI potrà essere contattato dal fruitore del servizio per i chiarimenti relativi alle richieste non valide, al fine di apportare le correzioni necessarie ai client. |  -  |
+**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5 secondi. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
 **500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -734,6 +744,8 @@ Name | Type | Description  | Notes
 > copia_digitale_conferma_num_iscr_sito_identificativo_put(num_iscr_sito, identificativo, ruolo=ruolo, respingi=respingi)
 
 Conferma copia FIR digitale disponibile
+
+Permette al soggetto a cui è stata resa disponibile la copia del FIR digitale di impostarne la stato di presa visione.<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre un codice di stato 422).</i><hr/>
 
 ### Example
 
@@ -744,10 +756,10 @@ import rentri_formulari
 from rentri_formulari.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to https://demoapi.rentri.gov.it/formulari/v1.0
+# Defining the host is optional and defaults to https://api.rentri.gov.it/formulari/v1.0
 # See configuration.py for a list of all supported configuration parameters.
 configuration = rentri_formulari.Configuration(
-    host = "https://demoapi.rentri.gov.it/formulari/v1.0"
+    host = "https://api.rentri.gov.it/formulari/v1.0"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -764,8 +776,8 @@ configuration = rentri_formulari.Configuration(
 with rentri_formulari.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = rentri_formulari.CopiaFIRDigitaleApi(api_client)
-    num_iscr_sito = 'num_iscr_sito_example' # str | Numero iscrizione unità locale del soggetto che conferma la presa visione della copia del FIR digitale.             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\"
-    identificativo = 'identificativo_example' # str | Identificativo della copia del FIR digitale della quale restituire il documento caricato
+    num_iscr_sito = 'num_iscr_sito_example' # str | Numero iscrizione unità locale del soggetto che conferma la presa visione della copia del FIR digitale.             Per recuperare i numeri di iscrizione attribuiti alle unità locali è possibile utilizzare /anagrafiche/v1.0/operatore/{num_iscr}/siti.
+    identificativo = 'identificativo_example' # str | Identificativo della copia del FIR digitale della quale restituire il file xFIR caricato
     ruolo = rentri_formulari.RuoloConfermaCopiaDigitale() # RuoloConfermaCopiaDigitale | Ruolo all'interno del FIR del soggetto per cui si effettua l'operazione di conferma di presa visione.              In caso di ambiguità (lo stesso soggetto a cui si riferisce l'unità locale \"numIscrSito\" appare con più ruoli all'interno del FIR) il parametro è obbligatorio (optional)
     respingi = True # bool | Se valorizzato a true annulla una eventuale precedente operazione di presa visione per i parametri specificati (optional)
 
@@ -783,8 +795,8 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **num_iscr_sito** | **str**| Numero iscrizione unità locale del soggetto che conferma la presa visione della copia del FIR digitale.             Per recuperare il numero iscrizione unità locale consultare l&#39;operazione \&quot;Elenco Unità Locali iscritte\&quot; nell&#39;area riservata Operatori dove è presente la voce \&quot;Numero iscrizione unità locale\&quot; | 
- **identificativo** | **str**| Identificativo della copia del FIR digitale della quale restituire il documento caricato | 
+ **num_iscr_sito** | **str**| Numero iscrizione unità locale del soggetto che conferma la presa visione della copia del FIR digitale.             Per recuperare i numeri di iscrizione attribuiti alle unità locali è possibile utilizzare /anagrafiche/v1.0/operatore/{num_iscr}/siti. | 
+ **identificativo** | **str**| Identificativo della copia del FIR digitale della quale restituire il file xFIR caricato | 
  **ruolo** | [**RuoloConfermaCopiaDigitale**](.md)| Ruolo all&#39;interno del FIR del soggetto per cui si effettua l&#39;operazione di conferma di presa visione.              In caso di ambiguità (lo stesso soggetto a cui si riferisce l&#39;unità locale \&quot;numIscrSito\&quot; appare con più ruoli all&#39;interno del FIR) il parametro è obbligatorio | [optional] 
  **respingi** | **bool**| Se valorizzato a true annulla una eventuale precedente operazione di presa visione per i parametri specificati | [optional] 
 
@@ -808,7 +820,8 @@ void (empty response body)
 **204** | No Content |  -  |
 **403** | Forbidden |  -  |
 **404** | Not Found |  -  |
-**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5s, in caso occorre attendere 10s per effettuare una nuova richiesta. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
+**423** | Sono state eseguite troppe richieste non valide.        Questa risposta viene restituita quando viene rilevato un numero eccessivo di richieste concorrenti, autenticate ma non valide.        In questo caso, le eventuali richieste valide continueranno ad essere accettate, mentre solo le richieste non valide verranno bloccate applicando un meccanismo di \&quot;ban\&quot; a livello di chiamante (Issuer).        Il servizio di assistenza per l&#39;interoperabilità RENTRI potrà essere contattato dal fruitore del servizio per i chiarimenti relativi alle richieste non valide, al fine di apportare le correzioni necessarie ai client. |  -  |
+**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5 secondi. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
 **500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -818,7 +831,7 @@ void (empty response body)
 
 ⚠️[DEPRECATO] - utilizzare /{transazioneId}/result - Esito transazione
 
-Ottiene l'esito dell'elaborazione di una richiesta asincrona.
+Ottiene l'esito dell'elaborazione di una richiesta asincrona.<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota).</i><hr/>
 
 ### Example
 
@@ -830,10 +843,10 @@ from rentri_formulari.models.esito_copia_digitale_model import EsitoCopiaDigital
 from rentri_formulari.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to https://demoapi.rentri.gov.it/formulari/v1.0
+# Defining the host is optional and defaults to https://api.rentri.gov.it/formulari/v1.0
 # See configuration.py for a list of all supported configuration parameters.
 configuration = rentri_formulari.Configuration(
-    host = "https://demoapi.rentri.gov.it/formulari/v1.0"
+    host = "https://api.rentri.gov.it/formulari/v1.0"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -891,7 +904,8 @@ Name | Type | Description  | Notes
 **400** | Richiesta non ancora elaborata. |  -  |
 **403** | Operazione non consentita. |  -  |
 **404** | Richiesta non trovata. |  -  |
-**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5s, in caso occorre attendere 10s per effettuare una nuova richiesta. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
+**423** | Sono state eseguite troppe richieste non valide.        Questa risposta viene restituita quando viene rilevato un numero eccessivo di richieste concorrenti, autenticate ma non valide.        In questo caso, le eventuali richieste valide continueranno ad essere accettate, mentre solo le richieste non valide verranno bloccate applicando un meccanismo di \&quot;ban\&quot; a livello di chiamante (Issuer).        Il servizio di assistenza per l&#39;interoperabilità RENTRI potrà essere contattato dal fruitore del servizio per i chiarimenti relativi alle richieste non valide, al fine di apportare le correzioni necessarie ai client. |  -  |
+**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5 secondi. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
 **500** | Errore non gestito (contattare l&#39;assistenza). |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -901,7 +915,7 @@ Name | Type | Description  | Notes
 
 ⚠️[DEPRECATO] - utilizzare /{transazioneId}/status - Stato transazione
 
-
+Ottiene lo stato di elaborazione di una richiesta di caricamento di una copia di un FIR digitale.<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota).</i><hr/>
 
 ### Example
 
@@ -912,10 +926,10 @@ import rentri_formulari
 from rentri_formulari.rest import ApiException
 from pprint import pprint
 
-# Defining the host is optional and defaults to https://demoapi.rentri.gov.it/formulari/v1.0
+# Defining the host is optional and defaults to https://api.rentri.gov.it/formulari/v1.0
 # See configuration.py for a list of all supported configuration parameters.
 configuration = rentri_formulari.Configuration(
-    host = "https://demoapi.rentri.gov.it/formulari/v1.0"
+    host = "https://api.rentri.gov.it/formulari/v1.0"
 )
 
 # The client must configure the authentication and authorization parameters
@@ -968,11 +982,12 @@ void (empty response body)
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | Richiesta non ancora elaborata. |  -  |
-**303** | La richiesta è stata elaborata e l&#39;URL per il recupero dell&#39;esito si trova nell&#39;header Location. |  * Location - URL per verificare lo stato dell&#39;elaborazione. Restituito solo se non viene specificata una URL di callback nell&#39;header X-ReplyTo. <br>  |
+**303** | La richiesta è stata elaborata e l&#39;URL per il recupero dell&#39;esito si trova nell&#39;header Location. |  * Location - URL per verificare lo stato dell&#39;elaborazione. Restituito solo se non viene specificata una URL di callback nell&#39;header &lt;i&gt;X-ReplyTo&lt;/i&gt;. <br>  |
 **400** | Bad Request |  -  |
 **403** | Operazione non consentita. |  -  |
 **404** | Richiesta non trovata. |  -  |
-**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5s, in caso occorre attendere 10s per effettuare una nuova richiesta. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
+**423** | Sono state eseguite troppe richieste non valide.        Questa risposta viene restituita quando viene rilevato un numero eccessivo di richieste concorrenti, autenticate ma non valide.        In questo caso, le eventuali richieste valide continueranno ad essere accettate, mentre solo le richieste non valide verranno bloccate applicando un meccanismo di \&quot;ban\&quot; a livello di chiamante (Issuer).        Il servizio di assistenza per l&#39;interoperabilità RENTRI potrà essere contattato dal fruitore del servizio per i chiarimenti relativi alle richieste non valide, al fine di apportare le correzioni necessarie ai client. |  -  |
+**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5 secondi. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
 **500** | Errore non gestito (contattare l&#39;assistenza). |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

@@ -1,12 +1,13 @@
 # TrasbordoParzialeOrigineResult
 
+Rifierimenti al FIR originario per i formulari che nascono da operazioni di trasbordo parziale
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**numero_fir_origine** | **str** |  | [optional] 
-**produttore_origine** | [**SoggettoItemResult**](SoggettoItemResult.md) |  | [optional] 
+**numero_fir_origine** | **str** | Numero FIR del formulario di origine | [optional] 
+**produttore_origine** | [**SoggettoItemResult**](SoggettoItemResult.md) | Dati anagrafici del produttore/detentore del formulario di origine | [optional] 
 
 ## Example
 

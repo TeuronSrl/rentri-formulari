@@ -5,11 +5,11 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**identificativo** | **str** |  | [optional] 
-**denominazione** | **str** |  | [optional] 
-**num_iscr_sito** | **str** |  | [optional] 
-**nome_sito** | **str** |  | [optional] 
-**data_conferma** | **datetime** |  | [optional] 
+**identificativo** | **str** | Identificativo del soggetto | [optional] 
+**denominazione** | **str** | Denominazione del soggetto | [optional] 
+**num_iscr_sito** | **str** | Eventuale numero di iscrizione dell&#39;unità locale indicata per il soggetto | [optional] 
+**nome_sito** | **str** | Eventuale nome del comune dell&#39;unità locale indicata per il soggetto | [optional] 
+**data_conferma** | **datetime** | Data dell&#39;avvenuta presa visione da parte del soggetto | [optional] 
 
 ## Example
 

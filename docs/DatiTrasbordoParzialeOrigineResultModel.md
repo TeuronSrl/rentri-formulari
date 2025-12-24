@@ -5,9 +5,9 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**numero_fir_origine** | **str** |  | [optional] 
-**produttore_originario** | [**DatiProduttoreOriginarioModel**](DatiProduttoreOriginarioModel.md) |  | [optional] 
-**causale** | **str** |  | [optional] 
+**numero_fir_origine** | **str** | Numero FIR dal quale ha avuto origine questo FIR a seguito del trasbordo parziale | [optional] 
+**produttore_originario** | [**DatiProduttoreOriginarioModel**](DatiProduttoreOriginarioModel.md) | Produttore indicato nel FIR dal quale ha avuto origine questo FIR a seguito del trasbordo parziale | [optional] 
+**causale** | **str** | Causale del trasbordo parziale da cui ha avuto origine questo FIR | [optional] 
 
 ## Example
 

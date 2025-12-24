@@ -5,7 +5,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**destinatario** | [**DestinatarioSuccessivoResultModel**](DestinatarioSuccessivoResultModel.md) |  | [optional] 
+**destinatario** | [**DatiDestinatarioSuccessivoResultModel**](DatiDestinatarioSuccessivoResultModel.md) |  | [optional] 
 **accettazione** | [**DatiAccettazioneResultModel**](DatiAccettazioneResultModel.md) |  | [optional] 
 
 ## Example

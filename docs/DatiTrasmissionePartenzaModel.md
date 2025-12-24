@@ -6,13 +6,13 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **numero_fir** | **str** |  | 
-**produttore** | [**DatiProduttoreFormularioModel**](DatiProduttoreFormularioModel.md) | Dati produttore | 
-**destinatario** | [**DatiDestinatarioFormularioModel3**](DatiDestinatarioFormularioModel3.md) |  | 
+**produttore** | [**DatiProduttoreTrasmissioneModel**](DatiProduttoreTrasmissioneModel.md) |  | [optional] 
+**trasbordo_parziale_origine** | [**DatiTrasbordoParzialeOrigineModel**](DatiTrasbordoParzialeOrigineModel.md) |  | [optional] 
+**destinatario** | [**DatiDestinatarioTrasmissioneModel**](DatiDestinatarioTrasmissioneModel.md) |  | 
 **trasportatori** | [**List[DatiTrasportatoreTrasmissioneModel]**](DatiTrasportatoreTrasmissioneModel.md) |  | 
 **data_emissione** | **datetime** |  | 
 **intermediari** | [**List[DatiIntermediariFormularioModel]**](DatiIntermediariFormularioModel.md) | Intermediari | [optional] 
 **rifiuto** | [**DatiRifiutoModel**](DatiRifiutoModel.md) | Caratteristiche del rifiuto | 
-**trasbordo_parziale_origine** | [**DatiTrasbordoParzialeOrigineModel**](DatiTrasbordoParzialeOrigineModel.md) | Dati relativi al trasbordo parziale da cui prende origine il formulario. Il dato deve essere valorizzato solo se il formulario prende origine da un trasbordo parziale. Se il dato viene valorizzato, la proprietà \&quot;produttore\&quot; non deve essere valorizzata. | [optional] 
 **annotazioni** | **str** | Annotazioni | [optional] 
 
 ## Example
