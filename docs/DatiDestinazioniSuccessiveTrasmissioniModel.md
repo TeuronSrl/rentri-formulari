@@ -5,7 +5,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**destinatario** | [**DatiDestinatarioFormularioModel1**](DatiDestinatarioFormularioModel1.md) |  | [optional] 
+**destinatario** | [**DatiDestinatarioFormularioModel**](DatiDestinatarioFormularioModel.md) | Dati destinatario | [optional] 
 **accettazione** | [**DatiAccettazioneModel**](DatiAccettazioneModel.md) | Dati accettazione | [optional] 
 
 ## Example

@@ -7,7 +7,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **trasportatore** | [**DatiTrasportatoreFormularioResultModel**](DatiTrasportatoreFormularioResultModel.md) |  | [optional] 
 **presa_in_carico** | [**DatiTrasportoTerrestreResultModel**](DatiTrasportoTerrestreResultModel.md) |  | [optional] 
-**trasportatore_id** | **int** |  | [optional] 
+**trasportatore_id** | **int** | Riferimento al trasportatore che ha effettuato il trasbordo totale nel contesto del FIR | [optional] 
 
 ## Example
 

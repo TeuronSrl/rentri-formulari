@@ -7,7 +7,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **tipo_trasporto** | [**TipoTrasporto**](TipoTrasporto.md) |  | [optional] 
 **dati_firma_trasportatore** | [**DatiFirmaResult**](DatiFirmaResult.md) |  | [optional] 
-**trasportatore_id** | **int** |  | [optional] 
+**trasportatore_id** | **int** | Riferimento al trasportatore nel contesto del FIR a cui sono da attribuire i dati di trasporto | [optional] 
 **nave** | **str** |  | 
 **imdg** | **bool** |  | [optional] 
 **data_ora_inizio_trasporto** | **datetime** | Data e ora inizio trasporto (formato ISO 8601 UTC) | 

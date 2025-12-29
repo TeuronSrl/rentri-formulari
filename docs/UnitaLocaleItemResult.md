@@ -1,5 +1,6 @@
 # UnitaLocaleItemResult
 
+Dati anagrafici riassuntivi riferiti ad una unità locale
 
 ## Properties
 

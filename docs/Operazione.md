@@ -23,6 +23,8 @@
 
 * `ANNULLA` (value: `'Annulla'`)
 
+* `NOTEANNULLAMENTO` (value: `'NoteAnnullamento'`)
+
 * `HASH` (value: `'Hash'`)
 
 * `TRASBORDOTOTALE` (value: `'TrasbordoTotale'`)
@@ -45,8 +47,6 @@
 
 * `ACQUISIZIONEFIRMADESTINATARIO` (value: `'AcquisizioneFirmaDestinatario'`)
 
-* `ACQUISIZIONEFIRMAALLEGATO` (value: `'AcquisizioneFirmaAllegato'`)
-
 * `ACQUISIZIONEFIRMAANNOTAZIONE` (value: `'AcquisizioneFirmaAnnotazione'`)
 
 * `ACQUISIZIONEFIRMATRASBORDOTOTALE` (value: `'AcquisizioneFirmaTrasbordoTotale'`)
@@ -58,6 +58,8 @@
 * `ACQUISIZIONEFIRMADESTINATARIOSUCCESSIVO` (value: `'AcquisizioneFirmaDestinatarioSuccessivo'`)
 
 * `ACQUISIZIONEFIRMAACCETTAZIONESUCCESSIVA` (value: `'AcquisizioneFirmaAccettazioneSuccessiva'`)
+
+* `ROLLBACKFIRMA` (value: `'RollbackFirma'`)
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

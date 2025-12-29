@@ -5,11 +5,10 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**codice** | **str** |  | [optional] 
-**esito** | [**EsitoValidazione**](EsitoValidazione.md) |  | [optional] 
-**controllo** | **str** |  | [optional] 
-**dettaglio** | **str** |  | [optional] 
-**nome_file** | **str** |  | [optional] 
+**codice** | **str** | Codice identificativo del controllo | [optional] 
+**esito** | [**EsitoValidazione**](EsitoValidazione.md) | Esito del controllo | [optional] 
+**dettaglio** | **str** | Eventuali dati di dettaglio considerati nel controllo | [optional] 
+**nome_file** | **str** | Nome del file oggetto del controllo | [optional] 
 
 ## Example
 

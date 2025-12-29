@@ -5,11 +5,10 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**dati_firma** | [**DatiFirmaResult**](DatiFirmaResult.md) |  | [optional] 
-**content_type** | **str** |  | 
-**nome_file** | **str** |  | 
-**contenuto** | **bytearray** |  | 
-**identificativo_soggetto** | **str** |  | 
+**allegato_id** | **int** | Identificatore dell&#39;allegato nel contesto del FIR | [optional] 
+**content_type** | **str** | Tipo del documento Valori ammessi: “application/pdf” | 
+**nome_file** | **str** | Nome del file | 
+**identificativo_soggetto** | **str** | Codice fiscale del soggetto, tra quelli indicati nel formulario, a cui è da riferirsi l&#39;allegato | 
 **descrizione** | **str** |  | [optional] 
 
 ## Example
