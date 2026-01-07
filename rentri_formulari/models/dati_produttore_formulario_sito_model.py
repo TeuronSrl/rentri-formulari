@@ -131,6 +131,7 @@ class DatiProduttoreFormularioSitoModel(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
+            "num_iscr_sito": obj.get('num_iscr_sito'),
             "luogo_produzione": IndirizzoModel.from_dict(obj["luogo_produzione"]) if obj.get("luogo_produzione") is not None else None,
             "autorizzazione": AutorizzazioneModel.from_dict(obj["autorizzazione"]) if obj.get("autorizzazione") is not None else None,
             "detentore": obj.get("detentore"),

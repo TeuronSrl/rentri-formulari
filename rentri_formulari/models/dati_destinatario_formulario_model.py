@@ -119,6 +119,10 @@ class DatiDestinatarioFormularioModel(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
+            "denominazione": obj.get('denominazione'),
+            "codice_fiscale": obj.get('codice_fiscale'),
+            "nazione_id": obj.get('nazione_id'),
+            "indirizzo": IndirizzoModel.from_dict(obj["indirizzo"]) if obj.get("indirizzo") is not None else None,
             "autorizzazione": AutorizzazioneModel.from_dict(obj["autorizzazione"]) if obj.get("autorizzazione") is not None else None,
             "attivita": obj.get("attivita"),
             "numero_iscrizione_albo": obj.get("numero_iscrizione_albo")

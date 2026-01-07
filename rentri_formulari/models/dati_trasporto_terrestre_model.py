@@ -95,6 +95,11 @@ class DatiTrasportoTerrestreModel(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
+            "conducente": ConducenteModel.from_dict(obj["conducente"]) if obj.get("conducente") is not None else None,
+            "targa_automezzo": obj.get("targa_automezzo"),
+            "targa_rimorchio": obj.get("targa_rimorchio"),
+            "percorso": obj.get("percorso"),
+            "presa_in_carico_rimorchio_precedente": obj.get("presa_in_carico_rimorchio_precedente"),
             "data_ora_inizio_trasporto": obj.get("data_ora_inizio_trasporto"),
             "annotazioni": obj.get("annotazioni")
         })

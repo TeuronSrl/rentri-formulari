@@ -82,6 +82,7 @@ class EsitoEstraiDatiXfirModel(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
+            "formulario": DatiTrasmissioneFormularioModel.from_dict(obj.get("formulario")) if obj.get("formulario") is not None else None
         })
         return _obj
 

@@ -130,6 +130,8 @@ class DestinatarioSuccessivoResultModel(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
+            "id_destinatario": obj.get("id_destinatario"),
+            "dati_firma": DatiFirmaResult.from_dict(obj.get("dati_firma")) if obj.get("dati_firma") is not None else None,
             "denominazione": obj.get("denominazione"),
             "codice_fiscale": obj.get("codice_fiscale"),
             "nazione_id": obj.get("nazione_id"),

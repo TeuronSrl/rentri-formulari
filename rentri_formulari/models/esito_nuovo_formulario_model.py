@@ -81,6 +81,7 @@ class EsitoNuovoFormularioModel(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
+            "numero_fir": obj.get("numero_fir")
         })
         return _obj
 

@@ -82,7 +82,9 @@ class ComuneModel(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
+            'comune_id': obj.get('comune_id')
         })
+        
         return _obj
 
 

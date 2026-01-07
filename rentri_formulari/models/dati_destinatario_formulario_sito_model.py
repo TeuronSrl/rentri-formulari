@@ -122,6 +122,7 @@ class DatiDestinatarioFormularioSitoModel(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
+            "num_iscr_sito": obj.get('num_iscr_sito'),
             "autorizzazione": AutorizzazioneModel.from_dict(obj["autorizzazione"]) if obj.get("autorizzazione") is not None else None,
             "attivita": obj.get("attivita"),
             "numero_iscrizione_albo": obj.get("numero_iscrizione_albo")

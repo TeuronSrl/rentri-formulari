@@ -92,6 +92,8 @@ class DatiTrasportoMarittimoTrasmissioneModel(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
+            "nave": obj.get("nave"),
+            "imdg": obj.get("imdg"),
             "trasportatore_id": obj.get("trasportatore_id"),
             "data_ora_inizio_trasporto": obj.get("data_ora_inizio_trasporto"),
             "annotazioni": obj.get("annotazioni")

@@ -92,6 +92,9 @@ class DatiTrasportoFerroviarioModel(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
+            "treno": obj.get('treno'),
+            "rid": obj.get('rid'),
+            "tratta": obj.get('tratta'),
             "data_ora_inizio_trasporto": obj.get("data_ora_inizio_trasporto"),
             "annotazioni": obj.get("annotazioni")
         })

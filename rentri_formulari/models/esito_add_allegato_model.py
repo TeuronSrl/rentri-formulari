@@ -81,6 +81,7 @@ class EsitoAddAllegatoModel(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
+            "allegato_id": obj.get("allegato_id")
         })
         return _obj
 

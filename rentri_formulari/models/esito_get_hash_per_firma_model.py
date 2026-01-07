@@ -84,6 +84,10 @@ class EsitoGetHashPerFirmaModel(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
+            "hash_algorithm": obj.get("hash_algorithm"),
+            "digest_to_sign": obj.get("digest_to_sign"),
+            "token": obj.get("token"),
+            "versione": obj.get("versione")
         })
         return _obj
 
