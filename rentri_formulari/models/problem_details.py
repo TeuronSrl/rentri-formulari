@@ -122,7 +122,7 @@ class ProblemDetails(BaseModel):
             "title": obj.get("title"),
             "status": obj.get("status"),
             "detail": obj.get("detail"),
-            "instance": obj.get("instance")
+            "instance": obj.get("instance"),
         })
         # store additional fields in additional_properties
         for _key in obj.keys():

@@ -107,6 +107,7 @@ class DatiTrasportatoreFormularioSitoModel(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
+            "num_iscr_sito": obj.get('num_iscr_sito'),
             "tipo_trasporto": obj.get("tipo_trasporto"),
             "numero_iscrizione_albo": obj.get("numero_iscrizione_albo")
         })

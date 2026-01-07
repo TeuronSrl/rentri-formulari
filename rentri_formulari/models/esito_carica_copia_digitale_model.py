@@ -81,6 +81,7 @@ class EsitoCaricaCopiaDigitaleModel(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
+            "identificativo": obj.get("identificativo")
         })
         return _obj
 

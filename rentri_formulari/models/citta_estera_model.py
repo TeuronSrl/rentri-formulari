@@ -90,6 +90,8 @@ class CittaEsteraModel(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
+            'nazione_id': obj.get('nazione_id'),
+            'nome_citta': obj.get('nome_citta')
         })
         return _obj
 

@@ -82,6 +82,7 @@ class EsitoValidaXfirModel(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
+            "result": ValidazioneXfirResult.from_dict(obj.get("result")) if obj.get("result") is not None else None
         })
         return _obj
 

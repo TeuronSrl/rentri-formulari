@@ -82,6 +82,7 @@ class EsitoUploadXfirModel(BaseModel):
             return cls.model_validate(obj)
 
         _obj = cls.model_validate({
+            "result": obj.get("result")
         })
         return _obj
 
