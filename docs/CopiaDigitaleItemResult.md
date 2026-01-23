@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 **data_emissione** | **datetime** | Data di emissione indicata nel FIR digitale | [optional] 
 **data_caricamento** | **datetime** | Data di caricamento | [optional] 
 **tipo_accettazione** | [**TipiAccettazione**](TipiAccettazione.md) | Tipo di accettazione del destinatario&lt;p&gt;Valori ammessi:&lt;ul style&#x3D;\&quot;margin:0\&quot;&gt;&lt;li&gt;&lt;i&gt;A&lt;/i&gt; - Accettato per intero&lt;/li&gt;&lt;li&gt;&lt;i&gt;P&lt;/i&gt; - Accettato parzialmente&lt;/li&gt;&lt;li&gt;&lt;i&gt;R&lt;/i&gt; - Respinto&lt;/li&gt;&lt;/ul&gt;&lt;/p&gt; | [optional] 
-**is_confermata** | **bool** | Indica se per la copia digitale è già stata confermata la presa visione | [optional] 
+**is_confermata** | **bool** | Indica se per la copia digitale è già stata confermata da parte di tutti i soggetti a cui è stata resa disponibile. Valorizzata solo quando la richiesta di elencazione riguarda le copie digitali caricate dal destinatario. | [optional] 
 **note** | **str** | Eventuali note aggiunte dal destinatario in fase di caricamento | [optional] 
 **produttore** | [**CopiaDigitaleRuoloItemResult**](CopiaDigitaleRuoloItemResult.md) | Dati del produttore indicati nel FIR digitale | [optional] 
 **trasportatori** | [**List[CopiaDigitaleRuoloItemResult]**](CopiaDigitaleRuoloItemResult.md) | Dati dei trasportatori indicati nel FIR digitale | [optional] 

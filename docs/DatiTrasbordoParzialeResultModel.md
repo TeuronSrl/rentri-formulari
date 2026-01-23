@@ -5,9 +5,9 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**trasportatore** | [**DatiTrasportatoreModel**](DatiTrasportatoreModel.md) |  | [optional] 
+**trasportatore** | [**DatiTrasportatoreModel**](DatiTrasportatoreModel.md) | Dati del trasportatore che prende parzialmente in carico il rifiuto | [optional] 
 **trasportatore_id** | **int** | Riferimento al trasportatore che ha effettuato il trasbordo parziale nel contesto del FIR | [optional] 
-**dati_firma** | [**DatiFirmaResult**](DatiFirmaResult.md) |  | [optional] 
+**dati_firma** | [**DatiFirmaResult**](DatiFirmaResult.md) | Dati di firma del trasportatore che registra il trasbordo parziale | [optional] 
 **numero_fir** | **str** | Numero FIR del formulario in cui viene trasbordato parzialmente il rifiuto | 
 **quantita_residua** | [**QuantitaModel**](QuantitaModel.md) | Quantità residua del rifiuto nel formulario di origine | 
 **causale** | **str** | Causale del trasbordo parziale | 
