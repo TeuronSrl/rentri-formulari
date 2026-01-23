@@ -5,8 +5,8 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**destinatario** | [**DatiDestinatarioSuccessivoResultModel**](DatiDestinatarioSuccessivoResultModel.md) |  | [optional] 
-**accettazione** | [**DatiAccettazioneResultModel**](DatiAccettazioneResultModel.md) |  | [optional] 
+**destinatario** | [**DatiDestinatarioSuccessivoResultModel**](DatiDestinatarioSuccessivoResultModel.md) | Dati del nuovo destinatario | [optional] 
+**accettazione** | [**DatiAccettazioneResultModel**](DatiAccettazioneResultModel.md) | Dati di accettazione del rifiuto del nuovo destinatario | [optional] 
 
 ## Example
 

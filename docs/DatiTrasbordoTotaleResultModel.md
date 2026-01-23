@@ -5,8 +5,8 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**trasportatore** | [**DatiTrasportatoreFormularioResultModel**](DatiTrasportatoreFormularioResultModel.md) |  | [optional] 
-**presa_in_carico** | [**DatiTrasportoTerrestreResultModel**](DatiTrasportoTerrestreResultModel.md) |  | [optional] 
+**trasportatore** | [**DatiTrasportatoreFormularioResultModel**](DatiTrasportatoreFormularioResultModel.md) | Dati del nuovo trasportatore | [optional] 
+**presa_in_carico** | [**DatiTrasportoTerrestreResultModel**](DatiTrasportoTerrestreResultModel.md) | Dati relativi alla firma sui dati di trasporto | [optional] 
 **trasportatore_id** | **int** | Riferimento al trasportatore che ha effettuato il trasbordo totale nel contesto del FIR | [optional] 
 
 ## Example

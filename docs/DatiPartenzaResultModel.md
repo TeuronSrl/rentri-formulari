@@ -6,13 +6,13 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **data_emissione** | **datetime** | Data di emissione del formulario | [optional] 
-**produttore** | [**DatiProduttoreFormularioResultModel**](DatiProduttoreFormularioResultModel.md) |  | [optional] 
-**destinatario** | [**DatiDestinatarioFormularioResultModel**](DatiDestinatarioFormularioResultModel.md) |  | [optional] 
-**trasportatori** | [**List[DatiTrasportatoreFormularioResultModel]**](DatiTrasportatoreFormularioResultModel.md) |  | [optional] 
-**intermediari** | [**List[DatiIntermediariFormularioModel]**](DatiIntermediariFormularioModel.md) |  | [optional] 
-**rifiuto** | [**DatiRifiutoModel**](DatiRifiutoModel.md) | Identificazione del rifiuto | [optional] 
-**trasbordo_parziale_origine** | [**DatiTrasbordoParzialeOrigineResultModel**](DatiTrasbordoParzialeOrigineResultModel.md) |  | [optional] 
-**dati_firma_produttore** | [**DatiFirmaResult**](DatiFirmaResult.md) |  | [optional] 
+**produttore** | [**DatiProduttoreFormularioResultModel**](DatiProduttoreFormularioResultModel.md) | Dati del produttore | [optional] 
+**destinatario** | [**DatiDestinatarioFormularioResultModel**](DatiDestinatarioFormularioResultModel.md) | Dati del destinatario | [optional] 
+**trasportatori** | [**List[DatiTrasportatoreFormularioResultModel]**](DatiTrasportatoreFormularioResultModel.md) | Dati dei trasportatori | [optional] 
+**intermediari** | [**List[DatiIntermediariFormularioModel]**](DatiIntermediariFormularioModel.md) | Dati degli intermediari | [optional] 
+**rifiuto** | [**DatiRifiutoModel**](DatiRifiutoModel.md) | Dati del rifiuto | [optional] 
+**trasbordo_parziale_origine** | [**DatiTrasbordoParzialeOrigineResultModel**](DatiTrasbordoParzialeOrigineResultModel.md) | Dati del produttore originario indicato nel caso di creazione del formulario a seguito di un trasbordo parziale | [optional] 
+**dati_firma_produttore** | [**DatiFirmaResult**](DatiFirmaResult.md) | Dati relativi alla firma del produttore | [optional] 
 **numero_fir** | **str** | Numero di vidimazione da attribuire al nuovo FIR digitale. Qualora non venga specificato, il sistema ne assegnerà uno automaticamente. | [optional] 
 **annotazioni** | **str** | Annotazioni | [optional] 
 

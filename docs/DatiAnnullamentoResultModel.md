@@ -5,8 +5,8 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**data_annullamento** | **datetime** |  | [optional] 
-**dati_firma** | [**DatiFirmaResult**](DatiFirmaResult.md) |  | [optional] 
+**data_annullamento** | **datetime** | Data dell&#39;annullamento | [optional] 
+**dati_firma** | [**DatiFirmaResult**](DatiFirmaResult.md) | Dati relativi alla firma sulla nota di annullamento | [optional] 
 **note** | **str** | Note di annullamento | 
 **codice_fiscale_soggetto** | **str** | Il soggetto che può annullare può essere solamente il titolare della vidimazione. | [optional] 
 
