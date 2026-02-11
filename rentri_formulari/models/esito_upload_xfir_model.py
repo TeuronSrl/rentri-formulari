@@ -70,6 +70,12 @@ class EsitoUploadXfirModel(BaseModel):
             exclude=excluded_fields,
             exclude_none=True,
         )
+
+        if self.result:
+            _dict['result'] = self.result.to_dict()
+        if self.result is None and "result" in self.model_fields_set:
+            _dict['result'] = None
+
         return _dict
 
     @classmethod

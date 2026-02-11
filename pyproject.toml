@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "rentri_formulari"
-version = "1.0.0"
+version = "1.0.2"
 description = "formulari"
 authors = ["OpenAPI Generator Community <techref@rentri.it>"]
 license = "NoLicense"

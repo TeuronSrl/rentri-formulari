@@ -83,6 +83,9 @@ class DatiTrasportoTerrestreModel(BaseModel):
         if self.annotazioni is None and "annotazioni" in self.model_fields_set:
             _dict['annotazioni'] = None
 
+        if self.conducente:
+            _dict['conducente'] = self.conducente.to_dict()
+        
         return _dict
 
     @classmethod

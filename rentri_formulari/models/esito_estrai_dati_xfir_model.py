@@ -70,6 +70,12 @@ class EsitoEstraiDatiXfirModel(BaseModel):
             exclude=excluded_fields,
             exclude_none=True,
         )
+
+        if self.formulario:
+            _dict['formulario'] = self.formulario.to_dict()
+        if self.formulario is None and "formulario" in self.model_fields_set:
+            _dict['formulario'] = None
+
         return _dict
 
     @classmethod
