@@ -107,6 +107,9 @@ class DatiDestinatarioFormularioModel(BaseModel):
         if self.numero_iscrizione_albo is None and "numero_iscrizione_albo" in self.model_fields_set:
             _dict['numero_iscrizione_albo'] = None
 
+        if self.indirizzo:
+            _dict['indirizzo'] = self.indirizzo.to_dict()
+
         return _dict
 
     @classmethod

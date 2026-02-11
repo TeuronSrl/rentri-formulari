@@ -32,7 +32,7 @@ class DatiAnnullamentoResultModel(BaseModel):
     """ # noqa: E501
     data_annullamento: Optional[datetime] = Field(default=None, description="Data dell'annullamento")
     dati_firma: Optional[DatiFirmaResult] = Field(default=None, description="Dati relativi alla firma sulla nota di annullamento")
-    note: Annotated[str, Field(min_length=1, strict=True, max_length=1024)] = Field(description="Note di annullamento")
+    note: Optional[Annotated[str, Field(min_length=1, strict=True, max_length=1024)]] = Field(default=None, description="Note di annullamento")
     codice_fiscale_soggetto: Optional[StrictStr] = Field(default=None, description="Il soggetto che può annullare può essere solamente il titolare della vidimazione.")
     __properties: ClassVar[List[str]] = ["data_annullamento", "dati_firma", "note", "codice_fiscale_soggetto"]
 

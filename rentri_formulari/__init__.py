@@ -15,7 +15,7 @@
 """  # noqa: E501
 
 
-__version__ = "1.0.0"
+__version__ = "1.0.2"
 
 # import apis into sdk package
 from rentri_formulari.api.copia_fir_cartaceo_api import CopiaFIRCartaceoApi
