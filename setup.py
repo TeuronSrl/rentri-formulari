@@ -36,7 +36,6 @@ setup(
     version=VERSION,
     description="formulari",
     author="OpenAPI Generator community",
-    author_email="techref@rentri.it",
     url="",
     keywords=["OpenAPI", "OpenAPI-Generator", "formulari"],
     install_requires=REQUIRES,
