@@ -115,6 +115,10 @@ class DatiProduttoreFormularioModel(BaseModel):
         if self.numero_iscrizione_albo is None and "numero_iscrizione_albo" in self.model_fields_set:
             _dict['numero_iscrizione_albo'] = None
 
+        # override the default output from pydantic by calling `to_dict()` of indirizzo
+        if self.indirizzo:
+            _dict['indirizzo'] = self.indirizzo.to_dict()
+
         return _dict
 
     @classmethod
