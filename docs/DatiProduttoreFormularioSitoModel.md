@@ -1,16 +1,15 @@
 # DatiProduttoreFormularioSitoModel
 
-Dati produttore
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**num_iscr_sito** | **str** | Numero di iscrizione al RENTRI | 
 **luogo_produzione** | [**IndirizzoModel**](IndirizzoModel.md) | Luogo di produzione se diverso da indirizzo | [optional] 
 **autorizzazione** | [**AutorizzazioneModel**](AutorizzazioneModel.md) | Autorizzazione | [optional] 
 **detentore** | **bool** | Specifica se il dato del produttore è riferito al detentore del rifiuto | [optional] 
 **numero_iscrizione_albo** | **str** | Iscrizione Albo | [optional] 
+**num_iscr_sito** | **str** | Numero di iscrizione al RENTRI | 
 
 ## Example
 

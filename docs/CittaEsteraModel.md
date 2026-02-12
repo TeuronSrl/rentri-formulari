@@ -1,6 +1,5 @@
 # CittaEsteraModel
 
-Città estera
 
 ## Properties
 

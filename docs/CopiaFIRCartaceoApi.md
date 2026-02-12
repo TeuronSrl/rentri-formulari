@@ -113,7 +113,8 @@ Name | Type | Description  | Notes
 
 Cancella copia FIR cartaceo
 
-Elimina il caricamento della copia del FIR cartaceo. L'operazione è possibile solo se nessuno dei soggetti a cui è stata resa disponibile la copia del FIR cartaceo l'ha già presa in carico con l'operazione di conferma.
+Elimina il caricamento della copia del FIR cartaceo.
+L'operazione è possibile solo se nessuno dei soggetti a cui è stata resa disponibile la copia del FIR cartaceo l'ha già presa in carico con l'operazione di conferma.
 
 ### Example
 
@@ -368,7 +369,14 @@ Name | Type | Description  | Notes
 
 🔁[ASYNC] Carica copia FIR cartaceo
 
-Acquisisce la richiesta di restituzione della copia del FIR cartaceo che consente al Trasportatore di renderla disponibile ai soggetti specificati.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.   Il file caricato deve essere in uno dei seguenti formati: PDF, JPG, PNG.  Il file non deve superare la dimensione di 5 MB. <br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+Acquisisce la richiesta di restituzione della copia del FIR cartaceo che consente al Trasportatore di renderla disponibile ai soggetti specificati.
+
+Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.
+
+
+Il file caricato deve essere in uno dei seguenti formati: PDF, JPG, PNG. 
+Il file non deve superare la dimensione di 5 MB.
+<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
 
 ### Example
 
@@ -494,7 +502,7 @@ with rentri_formulari.ApiClient(configuration) as api_client:
     confermate = True # bool | Filtra le copie dei FIR digitali confermate o non confermate. (optional)
     data_emissione_da = '2013-10-20T19:20:30+01:00' # datetime | Data di emissione a partire dalla quale si richiedono le copie dei FIR digitali (formato ISO 8601 UTC) (optional)
     data_emissione_a = '2013-10-20T19:20:30+01:00' # datetime | Data massima di emissione entro la quale si richiedono le copie dei FIR digitali (formato ISO 8601 UTC) (optional)
-    num_iscr_sito = 'num_iscr_sito_example' # str | Eventuale numero di iscrizione dell'unità locale per la quale si richiedeono le copie cartacee dei FIR. Se non indicato ma si richiedono le sole copie cartacee confermate, verranno restituite solo le copie cartacee che sono state confermate senza essere associate ad alcuna unità locale (optional)
+    num_iscr_sito = 'num_iscr_sito_example' # str | Eventuale numero di iscrizione dell'unità locale per la quale si richiedono le copie cartacee dei FIR. Se non indicato ma si richiedono le sole copie cartacee confermate, verranno restituite solo le copie cartacee che sono state confermate senza essere associate ad alcuna unità locale (optional)
     ruolo = rentri_formulari.RuoloConfermaCopiaCartacea() # RuoloConfermaCopiaCartacea | Specifica il ruolo per cui si richiedono le copie cartacee dei FIR.  Se non indicato ma si indica una unità locale, vengono considerati tutti i ruoli associati all'unità locale specificata. (optional)
     paging_page = 1 # int | Valore per l'header Paging-Page (optional) (default to 1)
     paging_page_size = 100 # int | Valore per l'header Paging-PageSize (optional) (default to 100)
@@ -520,7 +528,7 @@ Name | Type | Description  | Notes
  **confermate** | **bool**| Filtra le copie dei FIR digitali confermate o non confermate. | [optional] 
  **data_emissione_da** | **datetime**| Data di emissione a partire dalla quale si richiedono le copie dei FIR digitali (formato ISO 8601 UTC) | [optional] 
  **data_emissione_a** | **datetime**| Data massima di emissione entro la quale si richiedono le copie dei FIR digitali (formato ISO 8601 UTC) | [optional] 
- **num_iscr_sito** | **str**| Eventuale numero di iscrizione dell&#39;unità locale per la quale si richiedeono le copie cartacee dei FIR. Se non indicato ma si richiedono le sole copie cartacee confermate, verranno restituite solo le copie cartacee che sono state confermate senza essere associate ad alcuna unità locale | [optional] 
+ **num_iscr_sito** | **str**| Eventuale numero di iscrizione dell&#39;unità locale per la quale si richiedono le copie cartacee dei FIR. Se non indicato ma si richiedono le sole copie cartacee confermate, verranno restituite solo le copie cartacee che sono state confermate senza essere associate ad alcuna unità locale | [optional] 
  **ruolo** | [**RuoloConfermaCopiaCartacea**](.md)| Specifica il ruolo per cui si richiedono le copie cartacee dei FIR.  Se non indicato ma si indica una unità locale, vengono considerati tutti i ruoli associati all&#39;unità locale specificata. | [optional] 
  **paging_page** | **int**| Valore per l&#39;header Paging-Page | [optional] [default to 1]
  **paging_page_size** | **int**| Valore per l&#39;header Paging-PageSize | [optional] [default to 100]
@@ -727,7 +735,7 @@ Name | Type | Description  | Notes
 
 Conferma copia FIR cartaceo disponibile
 
-Pone in stato \"confermata\" la copia del FIR cartaceo specificata associandola all'unità locale specificata.
+Pone in stato "confermata" la copia del FIR cartaceo specificata associandola all'unità locale specificata.
 
 ### Example
 
@@ -843,7 +851,7 @@ configuration = rentri_formulari.Configuration(
 with rentri_formulari.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = rentri_formulari.CopiaFIRCartaceoApi(api_client)
-    transazione_id = 'transazione_id_example' # str | Id della richiesta
+    transazione_id = UUID('38400000-8cf0-11bd-b23e-10b96e4ef00d') # UUID | Id della richiesta
 
     try:
         # ⚠️[DEPRECATO] - utilizzare /{transazioneId}/result - Esito transazione
@@ -861,7 +869,7 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **transazione_id** | **str**| Id della richiesta | 
+ **transazione_id** | **UUID**| Id della richiesta | 
 
 ### Return type
 
@@ -926,7 +934,7 @@ configuration = rentri_formulari.Configuration(
 with rentri_formulari.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = rentri_formulari.CopiaFIRCartaceoApi(api_client)
-    transazione_id = 'transazione_id_example' # str | Id della richiesta
+    transazione_id = UUID('38400000-8cf0-11bd-b23e-10b96e4ef00d') # UUID | Id della richiesta
 
     try:
         # ⚠️[DEPRECATO] - utilizzare /{transazioneId}/status - Stato transazione
@@ -942,7 +950,7 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **transazione_id** | **str**| Id della richiesta | 
+ **transazione_id** | **UUID**| Id della richiesta | 
 
 ### Return type
 

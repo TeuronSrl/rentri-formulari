@@ -23,7 +23,7 @@ Method | HTTP request | Description
 
 ⚠️[DEPRECATO] - utilizzare /trasmissioni/operatore/{numIscrSito} - Trasmissioni effettuate
 
-Ottiene la lista delle trasmissioni di dati di FIR digitali effettuate per l'unità locale specificata.<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota).</i><hr/>
+Ottiene la lista delle trasmissioni di dati di FIR digitali effettuate per l'unità locale specificata.
 
 ### Example
 
@@ -124,7 +124,9 @@ Name | Type | Description  | Notes
 
 ⚠️[DEPRECATO] - utilizzare public/trasmissioni/operatore/{numIscrSito}/{identificativo}/annulla - Annulla trasmissione di dati del FIR digitale
 
-Pone in stato \"annullata\" la trasmissione di dati del FIR digitale specificata.  L'operazione non è reversibile.<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre un codice di stato 422).</i><hr/>
+Pone in stato "annullata" la trasmissione di dati del FIR digitale specificata.
+
+L'operazione non è reversibile.
 
 ### Example
 
@@ -207,7 +209,7 @@ void (empty response body)
 
 ⚠️[DEPRECATO] - utilizzare /trasmissioni/operatore/{numIscrSito}/{identificativo} - Dettaglio trasmissione
 
-Recupera le informazioni di dettaglio della trasmissione di dati di FIR digitale corrispondente all'identificativo specificato<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota).</i><hr/>
+Recupera le informazioni di dettaglio della trasmissione di dati di FIR digitale corrispondente all'identificativo specificato
 
 ### Example
 
@@ -292,7 +294,18 @@ Name | Type | Description  | Notes
 
 🔁[ASYNC] ⚠️[DEPRECATO] - utilizzare /trasmissioni/operatore/{numIscrSito}/{numeroFir}/estrai - Estrazione dati per FIR digitale
 
-Effettua l'estrazione dei dati che devono essere trasmessi dal file del FIR digitale che viene specificato tra i dati della richiesta.   L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) il soggetto operatore a cui afferisce il numero di iscrizione dell'unità locale indicato nel parametro <b>num_iscr_sito</b>.  Il file xFIR inviato deve essere valido secondo le regole definite nella <i>Guida tecnica alla compilazione del FIR digitale</i>  e verificabile dalla specifica funzione di validazione definita dall'endpoint <i>Validazione xFIR</i> delle API \"Formulario digitale\".  Il file xFIR non deve contenere dati pertinenti al formulario non firmati digitalmente.   La dimensione massima accettata del file xFIR da cui estrarre i dati è 3 MB.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre un codice di stato 422).</i><hr/><br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+Effettua l'estrazione dei dati che devono essere trasmessi dal file del FIR digitale che viene specificato tra i dati della richiesta. 
+
+L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) il soggetto operatore a cui afferisce il numero di iscrizione dell'unità locale indicato nel parametro <b>num_iscr_sito</b>.
+
+Il file xFIR inviato deve essere valido secondo le regole definite nella <i>Guida tecnica alla compilazione del FIR digitale</i> 
+e verificabile dalla specifica funzione di validazione definita dall'endpoint <i>Validazione xFIR</i> delle API "Formulario digitale".
+
+Il file xFIR non deve contenere dati pertinenti al formulario non firmati digitalmente. 
+
+La dimensione massima accettata del file xFIR da cui estrarre i dati è 3 MB.
+
+Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
 
 ### Example
 
@@ -383,7 +396,18 @@ Name | Type | Description  | Notes
 
 ⚠️[DEPRECATO] - utilizzare /trasmissioni/operatore/{numIscrSito} - Trasmette i dati del FIR digitale
 
-Effettua la trasmissione dei dati estratti da un FIR digitale riferibile all'unità locale specificata in <b>num_iscr_sito</b>.   L'operazione può essere richiesta solo da un'utenza che abbia incarichi per (o coincida con) il soggetto operatore a cui afferisce il numero di iscrizione dell'unità locale indicato nel parametro <b>num_iscr_sito</b>. Tale soggetto deve essere uno dei soggetti coinvolti nel formulario che viene trasmesso.  Se viene specificato il parametro <b>num_iscr_sito_produttore</b>, l'operazione di trasmissione è intesa come effettuata dal trasportatore per conto del produttore,  il cui numero di iscrizione dell'unità locale deve essere indicato come valore di questo parametro.  In questo caso viene varificato che <b>num_iscr_sito</b> afferisca al soggetto indicato come primo trasportatore nel modello dati di input, e <b>num_iscr_sito_produttore</b> afferisca al soggetto indicato come produttore. La trasmissione dei dati del FIR digitale effettuata dal trasportatore per conto del produttore è possibile solo se il numero FIR è stato vidimato al soggetto trasportatore.  È possibile trasmettere più volte i dati dello stesso formulario relativamente ad una stessa unità locale.  In caso di trasmissioni ripetute per numero FIR e unità locale, l'ultima trasmissione dati effettuata in ordine temporale annulla e sostituisce le precedenti<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre un codice di stato 422).</i><hr/>
+Effettua la trasmissione dei dati estratti da un FIR digitale riferibile all'unità locale specificata in <b>num_iscr_sito</b>. 
+
+L'operazione può essere richiesta solo da un'utenza che abbia incarichi per (o coincida con) il soggetto operatore a cui afferisce il numero di iscrizione dell'unità locale indicato nel parametro <b>num_iscr_sito</b>.
+Tale soggetto deve essere uno dei soggetti coinvolti nel formulario che viene trasmesso.
+
+Se viene specificato il parametro <b>num_iscr_sito_produttore</b>, l'operazione di trasmissione è intesa come effettuata dal trasportatore per conto del produttore, 
+il cui numero di iscrizione dell'unità locale deve essere indicato come valore di questo parametro. 
+In questo caso viene varificato che <b>num_iscr_sito</b> afferisca al soggetto indicato come primo trasportatore nel modello dati di input, e <b>num_iscr_sito_produttore</b> afferisca al soggetto indicato come produttore.
+La trasmissione dei dati del FIR digitale effettuata dal trasportatore per conto del produttore è possibile solo se il numero FIR è stato vidimato al soggetto trasportatore.
+
+È possibile trasmettere più volte i dati dello stesso formulario relativamente ad una stessa unità locale. 
+In caso di trasmissioni ripetute per numero FIR e unità locale, l'ultima trasmissione dati effettuata in ordine temporale annulla e sostituisce le precedenti
 
 ### Example
 
@@ -472,7 +496,7 @@ Name | Type | Description  | Notes
 
 Trasmissioni effettuate
 
-Ottiene la lista delle trasmissioni di dati di FIR digitali effettuate per l'unità locale specificata.<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota).</i><hr/>
+Ottiene la lista delle trasmissioni di dati di FIR digitali effettuate per l'unità locale specificata.
 
 ### Example
 
@@ -573,7 +597,9 @@ Name | Type | Description  | Notes
 
 Annulla trasmissione di dati del FIR digitale
 
-Pone in stato \"annullata\" la trasmissione di dati del FIR digitale specificata.  L'operazione non è reversibile.<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre un codice di stato 422).</i><hr/>
+Pone in stato "annullata" la trasmissione di dati del FIR digitale specificata.
+
+L'operazione non è reversibile.
 
 ### Example
 
@@ -656,7 +682,7 @@ void (empty response body)
 
 Dettaglio trasmissione
 
-Recupera le informazioni di dettaglio della trasmissione di dati di FIR digitale corrispondente all'identificativo specificato<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota).</i><hr/>
+Recupera le informazioni di dettaglio della trasmissione di dati di FIR digitale corrispondente all'identificativo specificato
 
 ### Example
 
@@ -741,7 +767,18 @@ Name | Type | Description  | Notes
 
 🔁[ASYNC] Estrazione dati per FIR digitale
 
-Effettua l'estrazione dei dati che devono essere trasmessi dal file del FIR digitale che viene specificato tra i dati della richiesta.   L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) il soggetto operatore a cui afferisce il numero di iscrizione dell'unità locale indicato nel parametro <b>num_iscr_sito</b>.  Il file xFIR inviato deve essere valido secondo le regole definite nella <i>Guida tecnica alla compilazione del FIR digitale</i>  e verificabile dalla specifica funzione di validazione definita dall'endpoint <i>Validazione xFIR</i> delle API \"Formulario digitale\".  Il file xFIR non deve contenere dati pertinenti al formulario non firmati digitalmente.   La dimensione massima accettata del file xFIR da cui estrarre i dati è 3 MB.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre un codice di stato 422).</i><hr/><br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+Effettua l'estrazione dei dati che devono essere trasmessi dal file del FIR digitale che viene specificato tra i dati della richiesta. 
+
+L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) il soggetto operatore a cui afferisce il numero di iscrizione dell'unità locale indicato nel parametro <b>num_iscr_sito</b>.
+
+Il file xFIR inviato deve essere valido secondo le regole definite nella <i>Guida tecnica alla compilazione del FIR digitale</i> 
+e verificabile dalla specifica funzione di validazione definita dall'endpoint <i>Validazione xFIR</i> delle API "Formulario digitale".
+
+Il file xFIR non deve contenere dati pertinenti al formulario non firmati digitalmente. 
+
+La dimensione massima accettata del file xFIR da cui estrarre i dati è 3 MB.
+
+Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
 
 ### Example
 
@@ -832,7 +869,18 @@ Name | Type | Description  | Notes
 
 Trasmette i dati del FIR digitale
 
-Effettua la trasmissione dei dati estratti da un FIR digitale riferibile all'unità locale specificata in <b>num_iscr_sito</b>.   L'operazione può essere richiesta solo da un'utenza che abbia incarichi per (o coincida con) il soggetto operatore a cui afferisce il numero di iscrizione dell'unità locale indicato nel parametro <b>num_iscr_sito</b>. Tale soggetto deve essere uno dei soggetti coinvolti nel formulario che viene trasmesso.  Se viene specificato il parametro <b>num_iscr_sito_produttore</b>, l'operazione di trasmissione è intesa come effettuata dal trasportatore per conto del produttore,  il cui numero di iscrizione dell'unità locale deve essere indicato come valore di questo parametro.  In questo caso viene varificato che <b>num_iscr_sito</b> afferisca al soggetto indicato come primo trasportatore nel modello dati di input, e <b>num_iscr_sito_produttore</b> afferisca al soggetto indicato come produttore. La trasmissione dei dati del FIR digitale effettuata dal trasportatore per conto del produttore è possibile solo se il numero FIR è stato vidimato al soggetto trasportatore.  È possibile trasmettere più volte i dati dello stesso formulario relativamente ad una stessa unità locale.  In caso di trasmissioni ripetute per numero FIR e unità locale, l'ultima trasmissione dati effettuata in ordine temporale annulla e sostituisce le precedenti<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre un codice di stato 422).</i><hr/>
+Effettua la trasmissione dei dati estratti da un FIR digitale riferibile all'unità locale specificata in <b>num_iscr_sito</b>. 
+
+L'operazione può essere richiesta solo da un'utenza che abbia incarichi per (o coincida con) il soggetto operatore a cui afferisce il numero di iscrizione dell'unità locale indicato nel parametro <b>num_iscr_sito</b>.
+Tale soggetto deve essere uno dei soggetti coinvolti nel formulario che viene trasmesso.
+
+Se viene specificato il parametro <b>num_iscr_sito_produttore</b>, l'operazione di trasmissione è intesa come effettuata dal trasportatore per conto del produttore, 
+il cui numero di iscrizione dell'unità locale deve essere indicato come valore di questo parametro. 
+In questo caso viene varificato che <b>num_iscr_sito</b> afferisca al soggetto indicato come primo trasportatore nel modello dati di input, e <b>num_iscr_sito_produttore</b> afferisca al soggetto indicato come produttore.
+La trasmissione dei dati del FIR digitale effettuata dal trasportatore per conto del produttore è possibile solo se il numero FIR è stato vidimato al soggetto trasportatore.
+
+È possibile trasmettere più volte i dati dello stesso formulario relativamente ad una stessa unità locale. 
+In caso di trasmissioni ripetute per numero FIR e unità locale, l'ultima trasmissione dati effettuata in ordine temporale annulla e sostituisce le precedenti
 
 ### Example
 
@@ -921,7 +969,7 @@ Name | Type | Description  | Notes
 
 ⚠️[DEPRECATO] - utilizzare /{transazioneId}/result - Esito transazione
 
-Ottiene l'esito dell'elaborazione di una richiesta di elaborazione per un formulario.<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota).</i><hr/>
+Ottiene l'esito dell'elaborazione di una richiesta di elaborazione per un formulario.
 
 ### Example
 
@@ -953,7 +1001,7 @@ configuration = rentri_formulari.Configuration(
 with rentri_formulari.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = rentri_formulari.TrasmissioneDatiOperatoreApi(api_client)
-    transazione_id = 'transazione_id_example' # str | Id della richiesta
+    transazione_id = UUID('38400000-8cf0-11bd-b23e-10b96e4ef00d') # UUID | Id della richiesta
 
     try:
         # ⚠️[DEPRECATO] - utilizzare /{transazioneId}/result - Esito transazione
@@ -971,7 +1019,7 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **transazione_id** | **str**| Id della richiesta | 
+ **transazione_id** | **UUID**| Id della richiesta | 
 
 ### Return type
 
@@ -1005,7 +1053,7 @@ Name | Type | Description  | Notes
 
 ⚠️[DEPRECATO] - utilizzare /{transazioneId}/status - Stato transazione
 
-Ottiene lo stato di elaborazione di una richiesta di elaborazione per un formulario.<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota).</i><hr/>
+Ottiene lo stato di elaborazione di una richiesta di elaborazione per un formulario.
 
 ### Example
 
@@ -1036,7 +1084,7 @@ configuration = rentri_formulari.Configuration(
 with rentri_formulari.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = rentri_formulari.TrasmissioneDatiOperatoreApi(api_client)
-    transazione_id = 'transazione_id_example' # str | Id della richiesta.
+    transazione_id = UUID('38400000-8cf0-11bd-b23e-10b96e4ef00d') # UUID | Id della richiesta.
 
     try:
         # ⚠️[DEPRECATO] - utilizzare /{transazioneId}/status - Stato transazione
@@ -1052,7 +1100,7 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **transazione_id** | **str**| Id della richiesta. | 
+ **transazione_id** | **UUID**| Id della richiesta. | 
 
 ### Return type
 

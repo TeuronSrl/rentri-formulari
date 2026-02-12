@@ -1,14 +1,13 @@
 # DatiTrasportatoreFormularioSitoModel
 
-Dati trasportatore
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**num_iscr_sito** | **str** | Numero di iscrizione al RENTRI | 
 **tipo_trasporto** | [**TipoTrasporto**](TipoTrasporto.md) |  | 
 **numero_iscrizione_albo** | **str** | Iscrizione Albo | [optional] 
+**num_iscr_sito** | **str** | Numero di iscrizione al RENTRI | 
 
 ## Example
 

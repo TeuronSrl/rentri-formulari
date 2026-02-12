@@ -5,10 +5,10 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**nave** | **str** |  | 
-**imdg** | **bool** |  | [optional] 
 **data_ora_inizio_trasporto** | **datetime** | Data e ora inizio trasporto (formato ISO 8601 UTC) | 
 **annotazioni** | **str** | Annotazioni | [optional] 
+**nave** | **str** |  | 
+**imdg** | **bool** |  | [optional] 
 
 ## Example
 
