@@ -4,13 +4,12 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**trasportatore** | [**DatiTrasportatoreModel**](DatiTrasportatoreModel.md) |  | 
-**data_ora_trasbordo** | **datetime** | Formato ISO 8601 UTC | [optional] 
-**trasportatore_id** | **int** |  | [optional] 
-**dati_firma** | [**DatiFirmaResult**](DatiFirmaResult.md) |  | [optional] 
-**numero_fir** | **str** |  | 
-**quantita_residua** | [**QuantitaModel**](QuantitaModel.md) |  | 
-**causale** | **str** |  | 
+**trasportatore** | [**DatiTrasportatoreModel**](DatiTrasportatoreModel.md) | Dati del trasportatore che prende parzialmente in carico il rifiuto | [optional] 
+**trasportatore_id** | **int** | Riferimento al trasportatore che ha effettuato il trasbordo parziale nel contesto del FIR | [optional] 
+**dati_firma** | [**DatiFirmaResult**](DatiFirmaResult.md) | Dati di firma del trasportatore che registra il trasbordo parziale | [optional] 
+**numero_fir** | **str** | Numero FIR del formulario in cui viene trasbordato parzialmente il rifiuto | 
+**quantita_residua** | [**QuantitaModel**](QuantitaModel.md) | Quantità residua del rifiuto nel formulario di origine | 
+**causale** | **str** | Causale del trasbordo parziale | 
 
 ## Example
 

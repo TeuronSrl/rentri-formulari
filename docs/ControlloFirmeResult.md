@@ -4,13 +4,12 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**data_firma** | **datetime** |  | [optional] 
-**riferimenti** | **List[str]** |  | [optional] 
-**codice** | **str** |  | [optional] 
-**esito** | [**EsitoValidazione**](EsitoValidazione.md) |  | [optional] 
-**controllo** | **str** |  | [optional] 
-**dettaglio** | **str** |  | [optional] 
-**nome_file** | **str** |  | [optional] 
+**data_firma** | **datetime** | Data dichiarata nella firma digitale | [optional] 
+**riferimenti** | **List[str]** | Riferimenti ai file coperti dalla firma | [optional] 
+**codice** | **str** | Codice identificativo del controllo | [optional] 
+**esito** | [**EsitoValidazione**](EsitoValidazione.md) | Esito del controllo | [optional] 
+**dettaglio** | **str** | Eventuali dati di dettaglio considerati nel controllo | [optional] 
+**nome_file** | **str** | Nome del file oggetto del controllo | [optional] 
 
 ## Example
 

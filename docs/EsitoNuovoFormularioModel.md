@@ -4,7 +4,7 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**numero_fir** | **str** |  | [optional] 
+**numero_fir** | **str** | Numero FIR | [optional] 
 
 ## Example
 

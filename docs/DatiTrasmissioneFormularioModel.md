@@ -5,7 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **dati_partenza** | [**DatiTrasmissionePartenzaModel**](DatiTrasmissionePartenzaModel.md) |  | 
-**dati_trasporto** | [**List[DatiTrasportoTrasmissioneBaseModel1]**](DatiTrasportoTrasmissioneBaseModel1.md) |  | [optional] 
+**dati_trasporto** | [**List[DatiTrasportoTrasmissioneBaseModel2]**](DatiTrasportoTrasmissioneBaseModel2.md) |  | [optional] 
 **dati_accettazione** | [**DatiAccettazioneModel**](DatiAccettazioneModel.md) | Dati accettazione | [optional] 
 **dati_annotazioni** | [**List[DatiAnnotazioneModel]**](DatiAnnotazioneModel.md) |  | [optional] 
 **dati_trasbordo_totale** | [**DatiTrasbordoTotaleTrasmissioneModel**](DatiTrasbordoTotaleTrasmissioneModel.md) |  | [optional] 

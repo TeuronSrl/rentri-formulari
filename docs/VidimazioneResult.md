@@ -4,8 +4,8 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**codice_fiscale** | **str** |  | [optional] 
-**denominazione** | **str** |  | [optional] 
+**codice_fiscale** | **str** | Codice fiscale del soggetto a cui è riconducibile la vidimazione del numero FIR | [optional] 
+**denominazione** | **str** | Denominazione del soggetto a cui è riconducibile la vidimazione del numero FIR | [optional] 
 
 ## Example
 

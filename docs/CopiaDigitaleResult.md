@@ -19,6 +19,7 @@ Name | Type | Description | Notes
 **denominazione_caricamento** | **str** | Denominazione del soggetto che ha effettuato il caricamento | [optional] 
 **emesso_da_identificativo** | **str** | Codice fiscale del soggetto intestatario del numero FIR | [optional] 
 **emesso_da_denominazione** | **str** | Denominazione del soggetto intestatario del numero FIR | [optional] 
+**accettazione** | [**CopiaDigitaleAccettazioneResult**](CopiaDigitaleAccettazioneResult.md) | Dati di accettazione del destinatario | [optional] 
 
 ## Example
 

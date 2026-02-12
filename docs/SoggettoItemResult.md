@@ -1,5 +1,6 @@
 # SoggettoItemResult
 
+Dati anagrafici riassuntivi riferiti ad un soggetto
 
 ## Properties
 Name | Type | Description | Notes
