@@ -4,8 +4,10 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**quantita** | [**QuantitaModel**](QuantitaModel.md) |  | 
-**verificato_in_partenza** | **bool** |  | [optional] 
+**quantita** | [**QuantitaModel**](QuantitaModel.md) | Quantità | 
+**verificato_in_partenza** | **bool** | Verificato in partenza | [optional] 
+**numero_colli** | **str** | Numero di colli.  Specificare un valore in caso non si imposti \&quot;rinfusa\&quot; a &lt;i&gt;true&lt;/i&gt; | [optional] 
+**rinfusa** | **bool** | Rinfusa.  Se valorizzato a &lt;i&gt;true&lt;/i&gt; indica che il rifiuto non è partizionato in colli. | [optional] 
 
 ## Example
 

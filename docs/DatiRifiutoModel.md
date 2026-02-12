@@ -16,8 +16,8 @@ Name | Type | Description | Notes
 **trasporto_adr** | **bool** | Trasporto ADR | [optional] 
 **dati_adr** | [**NormativaADRModel**](NormativaADRModel.md) | Dati ADR.  Il dato non deve essere indicato se la proprietà \&quot;trasporto_adr\&quot; è diversa da true. | [optional] 
 **analisi_classificazione** | [**AnalisiClassificazioneModel**](AnalisiClassificazioneModel.md) | Analisi/Classificazione | [optional] 
-**numero_colli** | **str** | Numero di colli | [optional] 
-**rinfusa** | **bool** | Rinfusa | [optional] 
+**numero_colli** | **str** | Numero di colli.  Specificare un valore in caso non si imposti \&quot;rinfusa\&quot; a &lt;i&gt;true&lt;/i&gt; | [optional] 
+**rinfusa** | **bool** | Rinfusa.  Se valorizzato a &lt;i&gt;true&lt;/i&gt; indica che il rifiuto non è partizionato in colli. | [optional] 
 
 ## Example
 

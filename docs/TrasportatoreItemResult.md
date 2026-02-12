@@ -1,5 +1,6 @@
 # TrasportatoreItemResult
 
+Dati anagrafici riassuntivi riferiti ad un trasportatore
 
 ## Properties
 Name | Type | Description | Notes

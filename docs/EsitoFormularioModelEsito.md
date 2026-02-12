@@ -5,10 +5,12 @@ Esito
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**numero_fir** | **str** |  | [optional] 
-**hash_algorithm** | **str** |  | [optional] 
-**digest_to_sign** | **str** |  | [optional] 
-**token** | **str** |  | [optional] 
+**numero_fir** | **str** | Numero FIR | [optional] 
+**hash_algorithm** | **str** | Sigla dell&#39;algoritmo di hashing con cui è stato calcolato il codice hash | [optional] 
+**digest_to_sign** | **str** | Valore del codice hash su cui calcolare la firma crittografica | [optional] 
+**token** | **str** | Struttura dati \&quot;opaca\&quot;, richiesta come input nell&#39;endpoint di acquisizione della firma crittografica,  utilizzata dal backend per collegare le due operazioni | [optional] 
+**versione** | **int** | Versione di modifica del formulario su cui è stato calcolato il codice hash da firmare. Se diverso dal valore di cui si è presa visione è consigliabile che il flusso di chiamata preveda un nuovo caricamento dei dati su cui si va ad apporre la firma da esporre al soggetto firmatario. | [optional] 
+**allegato_id** | **int** | Identificativo interno al FIR digitale associato all&#39;allegato | [optional] 
 **result** | [**ValidazioneXfirResult**](ValidazioneXfirResult.md) |  | [optional] 
 **identificativo** | **str** |  | [optional] 
 **formulario** | [**DatiTrasmissioneFormularioModel**](DatiTrasmissioneFormularioModel.md) |  | [optional] 

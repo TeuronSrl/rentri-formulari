@@ -4,8 +4,8 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**dati_firma** | [**DatiFirmaResult**](DatiFirmaResult.md) |  | [optional] 
-**annotazione** | **str** |  | 
+**dati_firma** | [**DatiFirmaResult**](DatiFirmaResult.md) | Dati relativi alla firma sull&#39;annotazione | [optional] 
+**annotazione** | **str** | Contenuto dell&#39;annotazione | 
 **identificativo_soggetto** | **str** | Il codice fiscale del soggetto per cui viene richiesta l&#39;aggiunta dell&#39;annotazione al formulario.  Deve coincidere con quello di uno dei soggetti coinvolti nel formulario. L&#39;identità con cui viene eseguita l&#39;operazione deve avere visibilità su (o coincidere con) questo soggetto. | 
 
 ## Example

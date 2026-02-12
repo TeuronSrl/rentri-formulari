@@ -6,7 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **file_content** | **bytearray** | Contenuto del file che rappresenta la copia cartacea del formulario codificato in base64 | 
 **nome_file** | **str** | Nome del file | 
-**mime** | **str** | Tipo MIME del file da caricare | 
+**mime** | **str** | Tipo MIME del file da caricare. Valori ammessi:  &lt;ul&gt;&lt;li&gt;&lt;i&gt;application/pdf&lt;/i&gt;&lt;/li&gt;&lt;li&gt;&lt;i&gt;image/jpeg&lt;/i&gt;&lt;/li&gt;&lt;li&gt;&lt;i&gt;image/png&lt;/i&gt;&lt;/li&gt;&lt;/ul&gt; | 
 **numero_fir** | **str** | Numero del FIR cartaceo, rilasciato al momento della vidimazione | 
 **data_emissione** | **datetime** | Data emissione del formulario cartaceo (formato ISO 8601 UTC) È necessario specificare una data antecedente o uguale alla data corrente | 
 **produttore** | [**CopiaCartaceaSoggettoInfo**](CopiaCartaceaSoggettoInfo.md) | Dati del produttore a cui si rende disponibile la copia cartacea | 

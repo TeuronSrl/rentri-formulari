@@ -1,5 +1,6 @@
 # IntermediarioItemResult
 
+Dati anagrafici riassuntivi riferiti ad un intermediario
 
 ## Properties
 Name | Type | Description | Notes

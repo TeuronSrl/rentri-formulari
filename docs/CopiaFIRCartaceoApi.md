@@ -22,7 +22,7 @@ Method | HTTP request | Description
 
 Elenco copie FIR cartaceo caricate
 
-Ottiene la lista delle copie dei FIR cartacei caricate dall'unità locale del trasportatore.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>
+Ottiene la lista delle copie dei FIR cartacei caricate dall'unità locale del trasportatore.
 
 ### Example
 
@@ -55,7 +55,7 @@ configuration = rentri_formulari.Configuration(
 with rentri_formulari.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = rentri_formulari.CopiaFIRCartaceoApi(api_client)
-    num_iscr_sito = 'num_iscr_sito_example' # str | Numero iscrizione unità locale del trasportatore che ha caricato le copie dei FIR cartacei             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\"
+    num_iscr_sito = 'num_iscr_sito_example' # str | Numero iscrizione unità locale del trasportatore che ha caricato le copie dei FIR cartacei             Per recuperare i numeri di iscrizione attribuiti alle unità locali è possibile utilizzare /anagrafiche/v1.0/operatore/{num_iscr}/siti.
     paging_page = 1 # int | Valore per l'header Paging-Page (optional) (default to 1)
     paging_page_size = 100 # int | Valore per l'header Paging-PageSize (optional) (default to 100)
     numero_fir = 'numero_fir_example' # str | Pattern per filtrare i numeri delle copie dei FIR cartacei da restituire (optional)
@@ -76,7 +76,7 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **num_iscr_sito** | **str**| Numero iscrizione unità locale del trasportatore che ha caricato le copie dei FIR cartacei             Per recuperare il numero iscrizione unità locale consultare l&#39;operazione \&quot;Elenco Unità Locali iscritte\&quot; nell&#39;area riservata Operatori dove è presente la voce \&quot;Numero iscrizione unità locale\&quot; | 
+ **num_iscr_sito** | **str**| Numero iscrizione unità locale del trasportatore che ha caricato le copie dei FIR cartacei             Per recuperare i numeri di iscrizione attribuiti alle unità locali è possibile utilizzare /anagrafiche/v1.0/operatore/{num_iscr}/siti. | 
  **paging_page** | **int**| Valore per l&#39;header Paging-Page | [optional] [default to 1]
  **paging_page_size** | **int**| Valore per l&#39;header Paging-PageSize | [optional] [default to 100]
  **numero_fir** | **str**| Pattern per filtrare i numeri delle copie dei FIR cartacei da restituire | [optional] 
@@ -101,7 +101,8 @@ Name | Type | Description  | Notes
 **200** | OK |  * Paging-PageCount - Numero totale di pagine. <br>  * Paging-Page - Numero di pagina. <br>  * Paging-PageSize - Dimensione della pagina. <br>  * Paging-TotalRecordCount - Numero totale di record. <br>  |
 **403** | Forbidden |  -  |
 **404** | Not Found |  -  |
-**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5s, in caso occorre attendere 10s per effettuare una nuova richiesta. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
+**423** | Sono state eseguite troppe richieste non valide.        Questa risposta viene restituita quando viene rilevato un numero eccessivo di richieste concorrenti, autenticate ma non valide.        In questo caso, le eventuali richieste valide continueranno ad essere accettate, mentre solo le richieste non valide verranno bloccate applicando un meccanismo di \&quot;ban\&quot; a livello di chiamante (Issuer).        Il servizio di assistenza per l&#39;interoperabilità RENTRI potrà essere contattato dal fruitore del servizio per i chiarimenti relativi alle richieste non valide, al fine di apportare le correzioni necessarie ai client. |  -  |
+**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5 secondi. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
 **500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -111,7 +112,7 @@ Name | Type | Description  | Notes
 
 Cancella copia FIR cartaceo
 
-Elimina il caricamento della copia del FIR cartaceo. L'operazione è possibile solo se nessuno dei soggetti a cui è stata resa disponibile la copia del FIR cartaceo l'ha già presa in carico con l'operazione di conferma.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre un codice di stato 422) anche in ambiente di produzione.</i><hr/>
+Elimina il caricamento della copia del FIR cartaceo. L'operazione è possibile solo se nessuno dei soggetti a cui è stata resa disponibile la copia del FIR cartaceo l'ha già presa in carico con l'operazione di conferma.
 
 ### Example
 
@@ -143,7 +144,7 @@ configuration = rentri_formulari.Configuration(
 with rentri_formulari.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = rentri_formulari.CopiaFIRCartaceoApi(api_client)
-    num_iscr_sito = 'num_iscr_sito_example' # str | Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo.             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\"
+    num_iscr_sito = 'num_iscr_sito_example' # str | Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo.             Per recuperare i numeri di iscrizione attribuiti alle unità locali è possibile utilizzare /anagrafiche/v1.0/operatore/{num_iscr}/siti.
     identificativo = 'identificativo_example' # str | Identificativo della copia del FIR cartaceo da cancellare
 
     try:
@@ -159,7 +160,7 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **num_iscr_sito** | **str**| Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo.             Per recuperare il numero iscrizione unità locale consultare l&#39;operazione \&quot;Elenco Unità Locali iscritte\&quot; nell&#39;area riservata Operatori dove è presente la voce \&quot;Numero iscrizione unità locale\&quot; | 
+ **num_iscr_sito** | **str**| Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo.             Per recuperare i numeri di iscrizione attribuiti alle unità locali è possibile utilizzare /anagrafiche/v1.0/operatore/{num_iscr}/siti. | 
  **identificativo** | **str**| Identificativo della copia del FIR cartaceo da cancellare | 
 
 ### Return type
@@ -182,7 +183,8 @@ void (empty response body)
 **400** | Bad Request |  -  |
 **403** | Forbidden |  -  |
 **404** | Not Found |  -  |
-**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5s, in caso occorre attendere 10s per effettuare una nuova richiesta. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
+**423** | Sono state eseguite troppe richieste non valide.        Questa risposta viene restituita quando viene rilevato un numero eccessivo di richieste concorrenti, autenticate ma non valide.        In questo caso, le eventuali richieste valide continueranno ad essere accettate, mentre solo le richieste non valide verranno bloccate applicando un meccanismo di \&quot;ban\&quot; a livello di chiamante (Issuer).        Il servizio di assistenza per l&#39;interoperabilità RENTRI potrà essere contattato dal fruitore del servizio per i chiarimenti relativi alle richieste non valide, al fine di apportare le correzioni necessarie ai client. |  -  |
+**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5 secondi. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
 **500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -192,7 +194,7 @@ void (empty response body)
 
 Documento copia FIR cartaceo
 
-Restituisce il file contenente la copia del FIR cartaceo caricata.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>
+Restituisce il file contenente la copia del FIR cartaceo caricata.
 
 ### Example
 
@@ -225,7 +227,7 @@ configuration = rentri_formulari.Configuration(
 with rentri_formulari.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = rentri_formulari.CopiaFIRCartaceoApi(api_client)
-    num_iscr_sito = 'num_iscr_sito_example' # str | Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo.             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\"
+    num_iscr_sito = 'num_iscr_sito_example' # str | Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo.             Per recuperare i numeri di iscrizione attribuiti alle unità locali è possibile utilizzare /anagrafiche/v1.0/operatore/{num_iscr}/siti.
     identificativo = 'identificativo_example' # str | Identificativo della copia del FIR cartaceo della quale restituire il documento caricato
 
     try:
@@ -243,7 +245,7 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **num_iscr_sito** | **str**| Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo.             Per recuperare il numero iscrizione unità locale consultare l&#39;operazione \&quot;Elenco Unità Locali iscritte\&quot; nell&#39;area riservata Operatori dove è presente la voce \&quot;Numero iscrizione unità locale\&quot; | 
+ **num_iscr_sito** | **str**| Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo.             Per recuperare i numeri di iscrizione attribuiti alle unità locali è possibile utilizzare /anagrafiche/v1.0/operatore/{num_iscr}/siti. | 
  **identificativo** | **str**| Identificativo della copia del FIR cartaceo della quale restituire il documento caricato | 
 
 ### Return type
@@ -263,9 +265,11 @@ Name | Type | Description  | Notes
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | OK |  -  |
+**204** | No Content |  -  |
 **403** | Forbidden |  -  |
 **404** | Not Found |  -  |
-**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5s, in caso occorre attendere 10s per effettuare una nuova richiesta. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
+**423** | Sono state eseguite troppe richieste non valide.        Questa risposta viene restituita quando viene rilevato un numero eccessivo di richieste concorrenti, autenticate ma non valide.        In questo caso, le eventuali richieste valide continueranno ad essere accettate, mentre solo le richieste non valide verranno bloccate applicando un meccanismo di \&quot;ban\&quot; a livello di chiamante (Issuer).        Il servizio di assistenza per l&#39;interoperabilità RENTRI potrà essere contattato dal fruitore del servizio per i chiarimenti relativi alle richieste non valide, al fine di apportare le correzioni necessarie ai client. |  -  |
+**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5 secondi. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
 **500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -275,7 +279,7 @@ Name | Type | Description  | Notes
 
 Dettaglio copia FIR cartaceo
 
-Recupera le informazioni di dettaglio del caricamento della copia del FIR cartaceo specificata.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>
+Recupera le informazioni di dettaglio del caricamento della copia del FIR cartaceo specificata.
 
 ### Example
 
@@ -308,7 +312,7 @@ configuration = rentri_formulari.Configuration(
 with rentri_formulari.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = rentri_formulari.CopiaFIRCartaceoApi(api_client)
-    num_iscr_sito = 'num_iscr_sito_example' # str | Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo             Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\"
+    num_iscr_sito = 'num_iscr_sito_example' # str | Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo             Per recuperare i numeri di iscrizione attribuiti alle unità locali è possibile utilizzare /anagrafiche/v1.0/operatore/{num_iscr}/siti.
     identificativo = 'identificativo_example' # str | Identificativo della copia del FIR cartaceo
 
     try:
@@ -326,7 +330,7 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **num_iscr_sito** | **str**| Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo             Per recuperare il numero iscrizione unità locale consultare l&#39;operazione \&quot;Elenco Unità Locali iscritte\&quot; nell&#39;area riservata Operatori dove è presente la voce \&quot;Numero iscrizione unità locale\&quot; | 
+ **num_iscr_sito** | **str**| Numero iscrizione unità locale del trasportatore che ha caricato la copia del FIR cartaceo             Per recuperare i numeri di iscrizione attribuiti alle unità locali è possibile utilizzare /anagrafiche/v1.0/operatore/{num_iscr}/siti. | 
  **identificativo** | **str**| Identificativo della copia del FIR cartaceo | 
 
 ### Return type
@@ -349,7 +353,8 @@ Name | Type | Description  | Notes
 **400** | Bad Request |  -  |
 **403** | Forbidden |  -  |
 **404** | Not Found |  -  |
-**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5s, in caso occorre attendere 10s per effettuare una nuova richiesta. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
+**423** | Sono state eseguite troppe richieste non valide.        Questa risposta viene restituita quando viene rilevato un numero eccessivo di richieste concorrenti, autenticate ma non valide.        In questo caso, le eventuali richieste valide continueranno ad essere accettate, mentre solo le richieste non valide verranno bloccate applicando un meccanismo di \&quot;ban\&quot; a livello di chiamante (Issuer).        Il servizio di assistenza per l&#39;interoperabilità RENTRI potrà essere contattato dal fruitore del servizio per i chiarimenti relativi alle richieste non valide, al fine di apportare le correzioni necessarie ai client. |  -  |
+**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5 secondi. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
 **500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -359,7 +364,7 @@ Name | Type | Description  | Notes
 
 🔁[ASYNC] Carica copia FIR cartaceo
 
-Acquisisce la richiesta di restituzione della copia del FIR cartaceo che consente al Trasportatore di renderla disponibile ai soggetti specificati.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.   Il file caricato deve essere in formato PDF e non deve superare i 5MB. <hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre un codice di stato 422) anche in ambiente di produzione.</i><hr/><br/>Se viene specificato un URL nell'header X-ReplyTo, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+Acquisisce la richiesta di restituzione della copia del FIR cartaceo che consente al Trasportatore di renderla disponibile ai soggetti specificati.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.   Il file caricato deve essere in uno dei seguenti formati: PDF, JPG, PNG.  Il file non deve superare la dimensione di 5 MB. <br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
 
 ### Example
 
@@ -393,7 +398,7 @@ configuration = rentri_formulari.Configuration(
 with rentri_formulari.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = rentri_formulari.CopiaFIRCartaceoApi(api_client)
-    num_iscr_sito = 'num_iscr_sito_example' # str | Numero iscrizione unità locale del trasportatore che carica la copia del FIR cartaceo. Per recuperare il numero iscrizione unità locale consultare l'operazione \"Elenco Unità Locali iscritte\" nell'area riservata Operatori dove è presente la voce \"Numero iscrizione unità locale\".
+    num_iscr_sito = 'num_iscr_sito_example' # str | Numero iscrizione unità locale del trasportatore che carica la copia del FIR cartaceo. Per recuperare i numeri di iscrizione attribuiti alle unità locali è possibile utilizzare /anagrafiche/v1.0/operatore/{num_iscr}/siti.
     copia_cartacea_model = rentri_formulari.CopiaCartaceaModel() # CopiaCartaceaModel | Dati relativi alla copia del FIR cartaceo e ai soggetti a cui la si rende disponibile
     x_reply_to = 'x_reply_to_example' # str | URL di callback opzionale alla quale verrà inviata la notifica di fine elaborazione (optional)
 
@@ -412,7 +417,7 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **num_iscr_sito** | **str**| Numero iscrizione unità locale del trasportatore che carica la copia del FIR cartaceo. Per recuperare il numero iscrizione unità locale consultare l&#39;operazione \&quot;Elenco Unità Locali iscritte\&quot; nell&#39;area riservata Operatori dove è presente la voce \&quot;Numero iscrizione unità locale\&quot;. | 
+ **num_iscr_sito** | **str**| Numero iscrizione unità locale del trasportatore che carica la copia del FIR cartaceo. Per recuperare i numeri di iscrizione attribuiti alle unità locali è possibile utilizzare /anagrafiche/v1.0/operatore/{num_iscr}/siti. | 
  **copia_cartacea_model** | [**CopiaCartaceaModel**](CopiaCartaceaModel.md)| Dati relativi alla copia del FIR cartaceo e ai soggetti a cui la si rende disponibile | 
  **x_reply_to** | **str**| URL di callback opzionale alla quale verrà inviata la notifica di fine elaborazione | [optional] 
 
@@ -432,21 +437,22 @@ Name | Type | Description  | Notes
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-**200** | OK |  -  |
+**202** | Accepted |  * Location - URL per verificare lo stato dell&#39;elaborazione. Restituito solo se non viene specificata una URL di callback nell&#39;header &lt;i&gt;X-ReplyTo&lt;/i&gt;. <br>  |
 **400** | Bad Request |  -  |
 **403** | Forbidden |  -  |
 **404** | Not Found |  -  |
-**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5s, in caso occorre attendere 10s per effettuare una nuova richiesta. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
+**423** | Sono state eseguite troppe richieste non valide.        Questa risposta viene restituita quando viene rilevato un numero eccessivo di richieste concorrenti, autenticate ma non valide.        In questo caso, le eventuali richieste valide continueranno ad essere accettate, mentre solo le richieste non valide verranno bloccate applicando un meccanismo di \&quot;ban\&quot; a livello di chiamante (Issuer).        Il servizio di assistenza per l&#39;interoperabilità RENTRI potrà essere contattato dal fruitore del servizio per i chiarimenti relativi alle richieste non valide, al fine di apportare le correzioni necessarie ai client. |  -  |
+**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5 secondi. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
 **500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **copia_cartacea_conferma_identificativo_soggetto_get**
-> List[CopiaCartaceaResult] copia_cartacea_conferma_identificativo_soggetto_get(identificativo_soggetto, numero_fir=numero_fir, confermate=confermate, data_emissione_da=data_emissione_da, data_emissione_a=data_emissione_a, num_iscr_sito=num_iscr_sito, paging_page=paging_page, paging_page_size=paging_page_size)
+> List[CopiaCartaceaResult] copia_cartacea_conferma_identificativo_soggetto_get(identificativo_soggetto, numero_fir=numero_fir, confermate=confermate, data_emissione_da=data_emissione_da, data_emissione_a=data_emissione_a, num_iscr_sito=num_iscr_sito, ruolo=ruolo, paging_page=paging_page, paging_page_size=paging_page_size)
 
 Copie FIR cartacei disponibili
 
-Ottiene la lista delle copie dei FIR cartacei, disponibili per la conferma o già confermati, per il soggetto specificato.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>
+Ottiene la lista delle copie dei FIR cartacei, disponibili per la conferma o già confermati, per il soggetto specificato.
 
 ### Example
 
@@ -480,17 +486,18 @@ with rentri_formulari.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = rentri_formulari.CopiaFIRCartaceoApi(api_client)
     identificativo_soggetto = 'identificativo_soggetto_example' # str | Codice fiscale del soggetto per cui richiedere l'elenco delle copie dei FIR cartacei disponibili
-    numero_fir = 'numero_fir_example' # str | Numero FIR della copia del FIR digitale (optional)
+    numero_fir = 'numero_fir_example' # str | Numero FIR della copia del FIR cartaceo (optional)
     confermate = True # bool | Filtra le copie dei FIR digitali confermate o non confermate. (optional)
     data_emissione_da = '2013-10-20T19:20:30+01:00' # datetime | Data di emissione a partire dalla quale si richiedono le copie dei FIR digitali (formato ISO 8601 UTC) (optional)
     data_emissione_a = '2013-10-20T19:20:30+01:00' # datetime | Data massima di emissione entro la quale si richiedono le copie dei FIR digitali (formato ISO 8601 UTC) (optional)
-    num_iscr_sito = 'num_iscr_sito_example' # str | Eventuale numero di iscrizione dell'unità locale per la quale si richiedeono le copie cartacee dei FIR (optional)
+    num_iscr_sito = 'num_iscr_sito_example' # str | Eventuale numero di iscrizione dell'unità locale per la quale si richiedeono le copie cartacee dei FIR. Se non indicato ma si richiedono le sole copie cartacee confermate, verranno restituite solo le copie cartacee che sono state confermate senza essere associate ad alcuna unità locale (optional)
+    ruolo = rentri_formulari.RuoloConfermaCopiaCartacea() # RuoloConfermaCopiaCartacea | Specifica il ruolo per cui si richiedono le copie cartacee dei FIR.  Se non indicato ma si indica una unità locale, vengono considerati tutti i ruoli associati all'unità locale specificata. (optional)
     paging_page = 1 # int | Valore per l'header Paging-Page (optional) (default to 1)
     paging_page_size = 100 # int | Valore per l'header Paging-PageSize (optional) (default to 100)
 
     try:
         # Copie FIR cartacei disponibili
-        api_response = api_instance.copia_cartacea_conferma_identificativo_soggetto_get(identificativo_soggetto, numero_fir=numero_fir, confermate=confermate, data_emissione_da=data_emissione_da, data_emissione_a=data_emissione_a, num_iscr_sito=num_iscr_sito, paging_page=paging_page, paging_page_size=paging_page_size)
+        api_response = api_instance.copia_cartacea_conferma_identificativo_soggetto_get(identificativo_soggetto, numero_fir=numero_fir, confermate=confermate, data_emissione_da=data_emissione_da, data_emissione_a=data_emissione_a, num_iscr_sito=num_iscr_sito, ruolo=ruolo, paging_page=paging_page, paging_page_size=paging_page_size)
         print("The response of CopiaFIRCartaceoApi->copia_cartacea_conferma_identificativo_soggetto_get:\n")
         pprint(api_response)
     except Exception as e:
@@ -504,11 +511,12 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **identificativo_soggetto** | **str**| Codice fiscale del soggetto per cui richiedere l&#39;elenco delle copie dei FIR cartacei disponibili | 
- **numero_fir** | **str**| Numero FIR della copia del FIR digitale | [optional] 
+ **numero_fir** | **str**| Numero FIR della copia del FIR cartaceo | [optional] 
  **confermate** | **bool**| Filtra le copie dei FIR digitali confermate o non confermate. | [optional] 
  **data_emissione_da** | **datetime**| Data di emissione a partire dalla quale si richiedono le copie dei FIR digitali (formato ISO 8601 UTC) | [optional] 
  **data_emissione_a** | **datetime**| Data massima di emissione entro la quale si richiedono le copie dei FIR digitali (formato ISO 8601 UTC) | [optional] 
- **num_iscr_sito** | **str**| Eventuale numero di iscrizione dell&#39;unità locale per la quale si richiedeono le copie cartacee dei FIR | [optional] 
+ **num_iscr_sito** | **str**| Eventuale numero di iscrizione dell&#39;unità locale per la quale si richiedeono le copie cartacee dei FIR. Se non indicato ma si richiedono le sole copie cartacee confermate, verranno restituite solo le copie cartacee che sono state confermate senza essere associate ad alcuna unità locale | [optional] 
+ **ruolo** | [**RuoloConfermaCopiaCartacea**](.md)| Specifica il ruolo per cui si richiedono le copie cartacee dei FIR.  Se non indicato ma si indica una unità locale, vengono considerati tutti i ruoli associati all&#39;unità locale specificata. | [optional] 
  **paging_page** | **int**| Valore per l&#39;header Paging-Page | [optional] [default to 1]
  **paging_page_size** | **int**| Valore per l&#39;header Paging-PageSize | [optional] [default to 100]
 
@@ -531,7 +539,8 @@ Name | Type | Description  | Notes
 **200** | OK |  * Paging-PageCount - Numero totale di pagine. <br>  * Paging-Page - Numero di pagina. <br>  * Paging-PageSize - Dimensione della pagina. <br>  * Paging-TotalRecordCount - Numero totale di record. <br>  |
 **403** | Forbidden |  -  |
 **404** | Not Found |  -  |
-**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5s, in caso occorre attendere 10s per effettuare una nuova richiesta. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
+**423** | Sono state eseguite troppe richieste non valide.        Questa risposta viene restituita quando viene rilevato un numero eccessivo di richieste concorrenti, autenticate ma non valide.        In questo caso, le eventuali richieste valide continueranno ad essere accettate, mentre solo le richieste non valide verranno bloccate applicando un meccanismo di \&quot;ban\&quot; a livello di chiamante (Issuer).        Il servizio di assistenza per l&#39;interoperabilità RENTRI potrà essere contattato dal fruitore del servizio per i chiarimenti relativi alle richieste non valide, al fine di apportare le correzioni necessarie ai client. |  -  |
+**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5 secondi. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
 **500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -541,7 +550,7 @@ Name | Type | Description  | Notes
 
 Documento copia FIR cartaceo disponibile
 
-Restituisce il documento della copia del FIR cartaceo specificata caricata dal trasportatore.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>
+Restituisce il documento della copia del FIR cartaceo specificata caricata dal trasportatore.
 
 ### Example
 
@@ -612,9 +621,11 @@ Name | Type | Description  | Notes
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | OK |  -  |
+**204** | No Content |  -  |
 **403** | Forbidden |  -  |
 **404** | Not Found |  -  |
-**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5s, in caso occorre attendere 10s per effettuare una nuova richiesta. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
+**423** | Sono state eseguite troppe richieste non valide.        Questa risposta viene restituita quando viene rilevato un numero eccessivo di richieste concorrenti, autenticate ma non valide.        In questo caso, le eventuali richieste valide continueranno ad essere accettate, mentre solo le richieste non valide verranno bloccate applicando un meccanismo di \&quot;ban\&quot; a livello di chiamante (Issuer).        Il servizio di assistenza per l&#39;interoperabilità RENTRI potrà essere contattato dal fruitore del servizio per i chiarimenti relativi alle richieste non valide, al fine di apportare le correzioni necessarie ai client. |  -  |
+**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5 secondi. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
 **500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -624,7 +635,7 @@ Name | Type | Description  | Notes
 
 Dettaglio copia FIR cartaceo disponibile
 
-Restituisce il dettaglio dei dati di caricamento della copia del FIR cartaceo caricata dal trasportatore.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>
+Restituisce il dettaglio dei dati di caricamento della copia del FIR cartaceo caricata dal trasportatore.
 
 ### Example
 
@@ -697,7 +708,8 @@ Name | Type | Description  | Notes
 **200** | OK |  -  |
 **403** | Forbidden |  -  |
 **404** | Not Found |  -  |
-**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5s, in caso occorre attendere 10s per effettuare una nuova richiesta. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
+**423** | Sono state eseguite troppe richieste non valide.        Questa risposta viene restituita quando viene rilevato un numero eccessivo di richieste concorrenti, autenticate ma non valide.        In questo caso, le eventuali richieste valide continueranno ad essere accettate, mentre solo le richieste non valide verranno bloccate applicando un meccanismo di \&quot;ban\&quot; a livello di chiamante (Issuer).        Il servizio di assistenza per l&#39;interoperabilità RENTRI potrà essere contattato dal fruitore del servizio per i chiarimenti relativi alle richieste non valide, al fine di apportare le correzioni necessarie ai client. |  -  |
+**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5 secondi. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
 **500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -707,7 +719,7 @@ Name | Type | Description  | Notes
 
 Conferma copia FIR cartaceo disponibile
 
-Pone in stato \"confermata\" la copia del FIR cartaceo specificata associandola all'unità locale specificata.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre un codice di stato 422) anche in ambiente di produzione.</i><hr/>
+Pone in stato \"confermata\" la copia del FIR cartaceo specificata associandola all'unità locale specificata.
 
 ### Example
 
@@ -779,7 +791,8 @@ void (empty response body)
 **400** | Bad Request |  -  |
 **403** | Forbidden |  -  |
 **404** | Not Found |  -  |
-**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5s, in caso occorre attendere 10s per effettuare una nuova richiesta. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
+**423** | Sono state eseguite troppe richieste non valide.        Questa risposta viene restituita quando viene rilevato un numero eccessivo di richieste concorrenti, autenticate ma non valide.        In questo caso, le eventuali richieste valide continueranno ad essere accettate, mentre solo le richieste non valide verranno bloccate applicando un meccanismo di \&quot;ban\&quot; a livello di chiamante (Issuer).        Il servizio di assistenza per l&#39;interoperabilità RENTRI potrà essere contattato dal fruitore del servizio per i chiarimenti relativi alle richieste non valide, al fine di apportare le correzioni necessarie ai client. |  -  |
+**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5 secondi. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
 **500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -789,7 +802,7 @@ void (empty response body)
 
 ⚠️[DEPRECATO] - utilizzare /{transazioneId}/result - Esito transazione
 
-Ottiene l'esito dell'elaborazione di una richiesta asincrona.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>
+Ottiene l'esito dell'elaborazione di una richiesta asincrona.
 
 ### Example
 
@@ -861,7 +874,8 @@ Name | Type | Description  | Notes
 **400** | Richiesta non ancora elaborata. |  -  |
 **403** | Operazione non consentita. |  -  |
 **404** | Richiesta non trovata. |  -  |
-**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5s, in caso occorre attendere 10s per effettuare una nuova richiesta. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
+**423** | Sono state eseguite troppe richieste non valide.        Questa risposta viene restituita quando viene rilevato un numero eccessivo di richieste concorrenti, autenticate ma non valide.        In questo caso, le eventuali richieste valide continueranno ad essere accettate, mentre solo le richieste non valide verranno bloccate applicando un meccanismo di \&quot;ban\&quot; a livello di chiamante (Issuer).        Il servizio di assistenza per l&#39;interoperabilità RENTRI potrà essere contattato dal fruitore del servizio per i chiarimenti relativi alle richieste non valide, al fine di apportare le correzioni necessarie ai client. |  -  |
+**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5 secondi. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
 **500** | Errore non gestito (contattare l&#39;assistenza). |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -871,7 +885,7 @@ Name | Type | Description  | Notes
 
 ⚠️[DEPRECATO] - utilizzare /{transazioneId}/status - Stato transazione
 
-Ottiene lo stato di elaborazione di una richiesta di vidimazione FIR.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>
+Ottiene lo stato di elaborazione di una richiesta di vidimazione FIR.
 
 ### Example
 
@@ -937,11 +951,12 @@ void (empty response body)
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | Richiesta non ancora elaborata. |  -  |
-**303** | La richiesta è stata elaborata e l&#39;URL per il recupero dell&#39;esito si trova nell&#39;header Location. |  * Location - URL per verificare lo stato dell&#39;elaborazione. Restituito solo se non viene specificata una URL di callback nell&#39;header X-ReplyTo. <br>  |
+**303** | La richiesta è stata elaborata e l&#39;URL per il recupero dell&#39;esito si trova nell&#39;header Location. |  * Location - URL per verificare lo stato dell&#39;elaborazione. Restituito solo se non viene specificata una URL di callback nell&#39;header &lt;i&gt;X-ReplyTo&lt;/i&gt;. <br>  |
 **400** | Bad Request |  -  |
 **403** | Operazione non consentita. |  -  |
 **404** | Richiesta non trovata. |  -  |
-**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5s, in caso occorre attendere 10s per effettuare una nuova richiesta. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
+**423** | Sono state eseguite troppe richieste non valide.        Questa risposta viene restituita quando viene rilevato un numero eccessivo di richieste concorrenti, autenticate ma non valide.        In questo caso, le eventuali richieste valide continueranno ad essere accettate, mentre solo le richieste non valide verranno bloccate applicando un meccanismo di \&quot;ban\&quot; a livello di chiamante (Issuer).        Il servizio di assistenza per l&#39;interoperabilità RENTRI potrà essere contattato dal fruitore del servizio per i chiarimenti relativi alle richieste non valide, al fine di apportare le correzioni necessarie ai client. |  -  |
+**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5 secondi. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
 **500** | Errore non gestito (contattare l&#39;assistenza). |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

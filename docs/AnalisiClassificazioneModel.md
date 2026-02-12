@@ -4,8 +4,8 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**tipo** | [**TipoAnalisiClassificazione**](TipoAnalisiClassificazione.md) | &lt;p&gt;Valori ammessi:&lt;ul style&#x3D;\&quot;margin:0\&quot;&gt;&lt;li&gt;&lt;i&gt;Analisi&lt;/i&gt; - Analisi/rapporto di prova&lt;/li&gt;&lt;li&gt;&lt;i&gt;Classificazione&lt;/i&gt; - Classificazione&lt;/li&gt;&lt;/ul&gt;&lt;/p&gt; | [optional] 
-**numero** | **str** |  | [optional] 
+**tipo** | [**TipoAnalisiClassificazione**](TipoAnalisiClassificazione.md) | &lt;p&gt;Valori ammessi:&lt;ul style&#x3D;\&quot;margin:0\&quot;&gt;&lt;li&gt;&lt;i&gt;Analisi&lt;/i&gt; - Analisi/rapporto di prova&lt;/li&gt;&lt;li&gt;&lt;i&gt;Classificazione&lt;/i&gt; - Classificazione&lt;/li&gt;&lt;/ul&gt;&lt;/p&gt; | 
+**numero** | **str** |  | 
 **data** | **datetime** |  | [optional] 
 
 ## Example

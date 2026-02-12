@@ -36,7 +36,7 @@ Stati del FIR digitale
 
 * `ACCETTATO` (value: `'Accettato'`)
 
-* `RESPINTOPARZIALMENTERESPINTO` (value: `'RespintoParzialmenteRespinto'`)
+* `RESPINTOACCETTATOPARZIALMENTE` (value: `'RespintoAccettatoParzialmente'`)
 
 * `FIRMADESTINATARIOSUCCESSIVO` (value: `'FirmaDestinatarioSuccessivo'`)
 

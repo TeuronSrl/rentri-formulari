@@ -4,10 +4,10 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**content_type** | **str** |  | 
-**nome_file** | **str** |  | 
-**contenuto** | **bytearray** |  | 
-**identificativo_soggetto** | **str** |  | 
+**content_type** | **str** | Tipo del documento Valori ammessi: “application/pdf” | 
+**nome_file** | **str** | Nome del file | 
+**contenuto** | **bytearray** | Contenuto del file. Il contenuto non deve suepere 1 MB di dimensione. La dimensione massima dell&#39;xFIR risultante non dovrà superare i 3 MB a seguito dell&#39;aggiunta dell&#39;allegato. | 
+**identificativo_soggetto** | **str** | Codice fiscale del soggetto, tra quelli indicati nel formulario, a cui è da riferirsi l&#39;allegato | 
 **descrizione** | **str** |  | [optional] 
 
 ## Example

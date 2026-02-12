@@ -4,9 +4,10 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**hash_algorithm** | **str** |  | [optional] 
-**digest_to_sign** | **str** |  | [optional] 
-**token** | **str** |  | [optional] 
+**hash_algorithm** | **str** | Sigla dell&#39;algoritmo di hashing con cui è stato calcolato il codice hash | [optional] 
+**digest_to_sign** | **str** | Valore del codice hash su cui calcolare la firma crittografica | [optional] 
+**token** | **str** | Struttura dati \&quot;opaca\&quot;, richiesta come input nell&#39;endpoint di acquisizione della firma crittografica,  utilizzata dal backend per collegare le due operazioni | [optional] 
+**versione** | **int** | Versione di modifica del formulario su cui è stato calcolato il codice hash da firmare. Se diverso dal valore di cui si è presa visione è consigliabile che il flusso di chiamata preveda un nuovo caricamento dei dati su cui si va ad apporre la firma da esporre al soggetto firmatario. | [optional] 
 
 ## Example
 

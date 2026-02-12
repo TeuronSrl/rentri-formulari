@@ -10,11 +10,11 @@ Method | HTTP request | Description
 
 
 # **status_get**
-> status_get()
+> StatusResponse status_get()
 
 Stato API
 
-Verifica dello stato dell'API.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre un codice di stato 422) anche in ambiente di produzione.</i><hr/>
+Verifica dello stato dell'API.
 
 ### Example
 
@@ -23,6 +23,7 @@ Verifica dello stato dell'API.<hr/><i>Servizio richiamabile in modalità <b>STUB
 import time
 import os
 import rentri_formulari
+from rentri_formulari.models.status_response import StatusResponse
 from rentri_formulari.rest import ApiException
 from pprint import pprint
 
@@ -49,7 +50,9 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
     try:
         # Stato API
-        api_instance.status_get()
+        api_response = api_instance.status_get()
+        print("The response of DefaultApi->status_get:\n")
+        pprint(api_response)
     except Exception as e:
         print("Exception when calling DefaultApi->status_get: %s\n" % e)
 ```
@@ -61,7 +64,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-void (empty response body)
+[**StatusResponse**](StatusResponse.md)
 
 ### Authorization
 
@@ -70,14 +73,16 @@ void (empty response body)
 ### HTTP request headers
 
  - **Content-Type**: Not defined
- - **Accept**: application/problem+json
+ - **Accept**: application/json, application/problem+json
 
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | OK |  -  |
-**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5s, in caso occorre attendere 10s per effettuare una nuova richiesta. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
+**423** | Sono state eseguite troppe richieste non valide.        Questa risposta viene restituita quando viene rilevato un numero eccessivo di richieste concorrenti, autenticate ma non valide.        In questo caso, le eventuali richieste valide continueranno ad essere accettate, mentre solo le richieste non valide verranno bloccate applicando un meccanismo di \&quot;ban\&quot; a livello di chiamante (Issuer).        Il servizio di assistenza per l&#39;interoperabilità RENTRI potrà essere contattato dal fruitore del servizio per i chiarimenti relativi alle richieste non valide, al fine di apportare le correzioni necessarie ai client. |  -  |
+**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5 secondi. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
 **500** | Internal Server Error |  -  |
+**503** | Service Unavailable |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -86,7 +91,7 @@ void (empty response body)
 
 Esito transazione
 
-Ottiene l'esito dell'elaborazione di una richiesta di elaborazione per un formulario.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>
+Ottiene l'esito dell'elaborazione di una richiesta di elaborazione per un formulario.
 
 ### Example
 
@@ -158,7 +163,8 @@ Name | Type | Description  | Notes
 **400** | Richiesta non ancora elaborata |  -  |
 **403** | Operazione non consentita |  -  |
 **404** | Richiesta non trovata |  -  |
-**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5s, in caso occorre attendere 10s per effettuare una nuova richiesta. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
+**423** | Sono state eseguite troppe richieste non valide.        Questa risposta viene restituita quando viene rilevato un numero eccessivo di richieste concorrenti, autenticate ma non valide.        In questo caso, le eventuali richieste valide continueranno ad essere accettate, mentre solo le richieste non valide verranno bloccate applicando un meccanismo di \&quot;ban\&quot; a livello di chiamante (Issuer).        Il servizio di assistenza per l&#39;interoperabilità RENTRI potrà essere contattato dal fruitore del servizio per i chiarimenti relativi alle richieste non valide, al fine di apportare le correzioni necessarie ai client. |  -  |
+**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5 secondi. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
 **500** | Errore non gestito (contattare l&#39;assistenza) |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -168,7 +174,7 @@ Name | Type | Description  | Notes
 
 Stato transazione
 
-Ottiene lo stato di elaborazione di una richiesta di elaborazione per un formulario.<hr/><i>Servizio richiamabile in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota) anche in ambiente di produzione.</i><hr/>
+Ottiene lo stato di elaborazione di una richiesta di elaborazione per un formulario.
 
 ### Example
 
@@ -234,11 +240,12 @@ void (empty response body)
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 **200** | Richiesta non ancora elaborata |  -  |
-**303** | La richiesta è stata elaborata e l&#39;URL per il recupero dell&#39;esito si trova nell&#39;header Location |  * Location - URL per verificare lo stato dell&#39;elaborazione. Restituito solo se non viene specificata una URL di callback nell&#39;header X-ReplyTo. <br>  |
+**303** | La richiesta è stata elaborata e l&#39;URL per il recupero dell&#39;esito si trova nell&#39;header Location |  * Location - URL per verificare lo stato dell&#39;elaborazione. Restituito solo se non viene specificata una URL di callback nell&#39;header &lt;i&gt;X-ReplyTo&lt;/i&gt;. <br>  |
 **400** | Bad Request |  -  |
 **403** | Operazione non consentita |  -  |
 **404** | L&#39;Id della transazione specificata non è stata trovato |  -  |
-**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5s, in caso occorre attendere 10s per effettuare una nuova richiesta. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
+**423** | Sono state eseguite troppe richieste non valide.        Questa risposta viene restituita quando viene rilevato un numero eccessivo di richieste concorrenti, autenticate ma non valide.        In questo caso, le eventuali richieste valide continueranno ad essere accettate, mentre solo le richieste non valide verranno bloccate applicando un meccanismo di \&quot;ban\&quot; a livello di chiamante (Issuer).        Il servizio di assistenza per l&#39;interoperabilità RENTRI potrà essere contattato dal fruitore del servizio per i chiarimenti relativi alle richieste non valide, al fine di apportare le correzioni necessarie ai client. |  -  |
+**429** | Troppe richieste. Questa risposta viene restituita quando vengono rilevate più di 100 richieste in 5 secondi. |  * Retry-After - Indica quanto tempo il fruitore deve attendere prima di effettuare una nuova richiesta. <br>  |
 **500** | Errore non gestito (contattare l&#39;assistenza) |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

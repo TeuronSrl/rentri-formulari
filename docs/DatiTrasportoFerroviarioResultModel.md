@@ -4,9 +4,9 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**tipo_trasporto** | [**TipoTrasporto**](TipoTrasporto.md) |  | [optional] 
-**dati_firma_trasportatore** | [**DatiFirmaResult**](DatiFirmaResult.md) |  | [optional] 
-**trasportatore_id** | **int** |  | [optional] 
+**tipo_trasporto** | [**TipoTrasporto**](TipoTrasporto.md) | Tipo del trasporto | [optional] 
+**dati_firma_trasportatore** | [**DatiFirmaResult**](DatiFirmaResult.md) | Dati relativi alla firma sui dati di trasporto | [optional] 
+**trasportatore_id** | **int** | Riferimento al trasportatore nel contesto del FIR a cui sono da attribuire i dati di trasporto | [optional] 
 **treno** | **str** |  | 
 **rid** | **bool** |  | [optional] 
 **tratta** | **str** |  | [optional] 

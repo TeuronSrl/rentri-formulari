@@ -4,18 +4,14 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**treno** | **str** |  | 
-**tratta** | **str** |  | [optional] 
-**rid** | **bool** |  | [optional] 
-**trasportatore_id** | **int** | Id del trasportatore definito all&#39;interno dei dati che vengono trasmessi | 
-**data_ora_inizio_trasporto** | **datetime** | Data e ora inizio trasporto (formato ISO 8601 UTC) | 
-**annotazioni** | **str** | Annotazioni | [optional] 
 **conducente** | [**ConducenteModel**](ConducenteModel.md) | Conducente | 
 **targa_automezzo** | **str** |  | [optional] 
 **targa_rimorchio** | **str** |  | [optional] 
 **percorso** | **str** |  | [optional] 
-**nave** | **str** |  | 
-**imdg** | **bool** |  | [optional] 
+**presa_in_carico_rimorchio_precedente** | **bool** | Significativo solo per i trasporti successivi al primo | [optional] 
+**trasportatore_id** | **int** | Id del trasportatore definito all&#39;interno dei dati che vengono trasmessi | 
+**data_ora_inizio_trasporto** | **datetime** | Data e ora inizio trasporto (formato ISO 8601 UTC) | 
+**annotazioni** | **str** | Annotazioni | [optional] 
 
 ## Example
 

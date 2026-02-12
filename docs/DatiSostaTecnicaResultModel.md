@@ -4,9 +4,8 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**data_ora_trasbordo** | **datetime** | Formato ISO 8601 UTC | [optional] 
-**trasportatore_id** | **int** |  | [optional] 
-**dati_firma** | [**DatiFirmaResult**](DatiFirmaResult.md) |  | [optional] 
+**trasportatore_id** | **int** | Riferimento al trasportatore che ha effettuato la sosta tecnica nel contesto del FIR | [optional] 
+**dati_firma** | [**DatiFirmaResult**](DatiFirmaResult.md) | Dati di firma del trasportatore che registra la sosta tecnica | [optional] 
 **luogo_stazionamento** | **str** |  | 
 **data_ora_sospensione** | **datetime** | Formato ISO 8601 UTC | 
 **data_ora_ripresa** | **datetime** | Formato ISO 8601 UTC | 

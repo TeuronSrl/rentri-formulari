@@ -4,8 +4,8 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**destinatario** | [**DestinatarioSuccessivoResultModel**](DestinatarioSuccessivoResultModel.md) |  | [optional] 
-**accettazione** | [**DatiAccettazioneResultModel**](DatiAccettazioneResultModel.md) |  | [optional] 
+**destinatario** | [**DatiDestinatarioSuccessivoResultModel**](DatiDestinatarioSuccessivoResultModel.md) | Dati del nuovo destinatario | [optional] 
+**accettazione** | [**DatiAccettazioneResultModel**](DatiAccettazioneResultModel.md) | Dati di accettazione del rifiuto del nuovo destinatario | [optional] 
 
 ## Example
 
