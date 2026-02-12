@@ -490,7 +490,7 @@ with rentri_formulari.ApiClient(configuration) as api_client:
     confermate = True # bool | Filtra le copie dei FIR digitali confermate o non confermate. (optional)
     data_emissione_da = '2013-10-20T19:20:30+01:00' # datetime | Data di emissione a partire dalla quale si richiedono le copie dei FIR digitali (formato ISO 8601 UTC) (optional)
     data_emissione_a = '2013-10-20T19:20:30+01:00' # datetime | Data massima di emissione entro la quale si richiedono le copie dei FIR digitali (formato ISO 8601 UTC) (optional)
-    num_iscr_sito = 'num_iscr_sito_example' # str | Eventuale numero di iscrizione dell'unità locale per la quale si richiedeono le copie cartacee dei FIR. Se non indicato ma si richiedono le sole copie cartacee confermate, verranno restituite solo le copie cartacee che sono state confermate senza essere associate ad alcuna unità locale (optional)
+    num_iscr_sito = 'num_iscr_sito_example' # str | Eventuale numero di iscrizione dell'unità locale per la quale si richiedono le copie cartacee dei FIR. Se non indicato ma si richiedono le sole copie cartacee confermate, verranno restituite solo le copie cartacee che sono state confermate senza essere associate ad alcuna unità locale (optional)
     ruolo = rentri_formulari.RuoloConfermaCopiaCartacea() # RuoloConfermaCopiaCartacea | Specifica il ruolo per cui si richiedono le copie cartacee dei FIR.  Se non indicato ma si indica una unità locale, vengono considerati tutti i ruoli associati all'unità locale specificata. (optional)
     paging_page = 1 # int | Valore per l'header Paging-Page (optional) (default to 1)
     paging_page_size = 100 # int | Valore per l'header Paging-PageSize (optional) (default to 100)
@@ -515,7 +515,7 @@ Name | Type | Description  | Notes
  **confermate** | **bool**| Filtra le copie dei FIR digitali confermate o non confermate. | [optional] 
  **data_emissione_da** | **datetime**| Data di emissione a partire dalla quale si richiedono le copie dei FIR digitali (formato ISO 8601 UTC) | [optional] 
  **data_emissione_a** | **datetime**| Data massima di emissione entro la quale si richiedono le copie dei FIR digitali (formato ISO 8601 UTC) | [optional] 
- **num_iscr_sito** | **str**| Eventuale numero di iscrizione dell&#39;unità locale per la quale si richiedeono le copie cartacee dei FIR. Se non indicato ma si richiedono le sole copie cartacee confermate, verranno restituite solo le copie cartacee che sono state confermate senza essere associate ad alcuna unità locale | [optional] 
+ **num_iscr_sito** | **str**| Eventuale numero di iscrizione dell&#39;unità locale per la quale si richiedono le copie cartacee dei FIR. Se non indicato ma si richiedono le sole copie cartacee confermate, verranno restituite solo le copie cartacee che sono state confermate senza essere associate ad alcuna unità locale | [optional] 
  **ruolo** | [**RuoloConfermaCopiaCartacea**](.md)| Specifica il ruolo per cui si richiedono le copie cartacee dei FIR.  Se non indicato ma si indica una unità locale, vengono considerati tutti i ruoli associati all&#39;unità locale specificata. | [optional] 
  **paging_page** | **int**| Valore per l&#39;header Paging-Page | [optional] [default to 1]
  **paging_page_size** | **int**| Valore per l&#39;header Paging-PageSize | [optional] [default to 100]

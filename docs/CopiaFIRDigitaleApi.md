@@ -22,7 +22,7 @@ Method | HTTP request | Description
 
 Copie FIR digitali caricate
 
-Ottiene la lista delle copie dei FIR digitali caricate dal destinatario e rese disponibili agli altri soggetti del FIR.<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota).</i><hr/>
+Ottiene la lista delle copie dei FIR digitali caricate dal destinatario e rese disponibili agli altri soggetti del FIR.
 
 ### Example
 
@@ -124,7 +124,7 @@ Name | Type | Description  | Notes
 
 Cancella copia FIR digitale
 
-Elimina il caricamento della copia del FIR digitale. L'operazione è possibile solo se nessuno dei soggetti a cui è stata resa disponibile la copia del FIR digitale ne ha già preso visione con l'operazione di conferma.<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre un codice di stato 422).</i><hr/>
+Elimina il caricamento della copia del FIR digitale. L'operazione è possibile solo se nessuno dei soggetti a cui è stata resa disponibile la copia del FIR digitale ne ha già preso visione con l'operazione di conferma.
 
 ### Example
 
@@ -206,7 +206,7 @@ void (empty response body)
 
 Documento copia FIR digitale
 
-Restituisce il file xFIR precedentemente caricato dal destinatario stesso.<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota).</i><hr/>
+Restituisce il file xFIR precedentemente caricato dal destinatario stesso.
 
 ### Example
 
@@ -291,7 +291,7 @@ Name | Type | Description  | Notes
 
 Dettaglio copia FIR digitale
 
-Recupera le informazioni di dettaglio del caricamento della copia del FIR digitale.<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota).</i><hr/>
+Recupera le informazioni di dettaglio del caricamento della copia del FIR digitale.
 
 ### Example
 
@@ -376,7 +376,7 @@ Name | Type | Description  | Notes
 
 🔁[ASYNC] Carica copia FIR digitale
 
-Acquisisce la richiesta di chiusura del ciclo di vita del FIR mediante invio, da parte del destinatario del formulario, del file xFIR che ne contiene le informazioni.  L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) il soggetto operatore a cui afferisce il numero di iscrizione dell'unità locale indicato nel parametro <b>num_iscr_sito</b>.  L'unità locale specificata nel parametro <b>num_iscr_sito</b> deve essere iscritta con attività di <i>Recupero</i> o <i>Smaltimento</i> o <i>Centro di raccolta</i> e deve risultare come il soggetto destinatario del formulario.  Il formulario caricato deve essere nello stato <i>Accettato</i> o <i>RespintoAccettatoParzialmente</i>.  Il file xFIR inviato deve essere valido secondo le regole definite nella <i>Guida tecnica alla compilazione del FIR digitale</i>  e verificabile dalla specifica funzione di validazione definita dall'endpoint <i>Validazione xFIR</i> delle API \"Formulario digitale\".  La dimensione massima accettata del file xFIR è 3 MB.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito. <hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre un codice di stato 422).</i><hr/><br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+Acquisisce la richiesta di chiusura del ciclo di vita del FIR mediante invio, da parte del destinatario del formulario, del file xFIR che ne contiene le informazioni.  L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) il soggetto operatore a cui afferisce il numero di iscrizione dell'unità locale indicato nel parametro <b>num_iscr_sito</b>.  L'unità locale specificata nel parametro <b>num_iscr_sito</b> deve essere iscritta con attività di <i>Recupero</i> o <i>Smaltimento</i> o <i>Centro di raccolta</i> e deve risultare come il soggetto destinatario del formulario.  Il formulario caricato deve essere nello stato <i>Accettato</i> o <i>RespintoAccettatoParzialmente</i>.  Il file xFIR inviato deve essere valido secondo le regole definite nella <i>Guida tecnica alla compilazione del FIR digitale</i>  e verificabile dalla specifica funzione di validazione definita dall'endpoint <i>Validazione xFIR</i> delle API \"Formulario digitale\".  La dimensione massima accettata del file xFIR è 3 MB.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito. <br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
 
 ### Example
 
@@ -464,7 +464,7 @@ Name | Type | Description  | Notes
 
 Copie FIR digitali disponibili
 
-Ottiene la lista delle copie dei FIR digitali, disponibili per la conferma o già confermati, per il soggetto specificato.<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota).</i><hr/>
+Ottiene la lista delle copie dei FIR digitali, disponibili per la conferma o già confermati, per il soggetto specificato.
 
 ### Example
 
@@ -498,7 +498,7 @@ with rentri_formulari.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = rentri_formulari.CopiaFIRDigitaleApi(api_client)
     identificativo_soggetto = 'identificativo_soggetto_example' # str | Codice fiscale del soggetto per cui richiedere l'elenco delle copie dei FIR digitali disponibili
-    num_iscr_sito = 'num_iscr_sito_example' # str | Eventuale numero di iscrizione dell'unità locale per la quale si richiedeono le copie dei FIR digitali (optional)
+    num_iscr_sito = 'num_iscr_sito_example' # str | Eventuale numero di iscrizione dell'unità locale per la quale si richiedono le copie dei FIR digitali (optional)
     numero_fir = 'numero_fir_example' # str | Numero FIR della copia del FIR digitale (optional)
     tipo_accettazione = rentri_formulari.TipiAccettazione() # TipiAccettazione | Filtra le copia dei FIR digitali per tipo di accettazione del destinatario (optional)
     confermate = True # bool | Filtra le copie dei FIR digitali confermate o non confermate. (optional)
@@ -526,7 +526,7 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **identificativo_soggetto** | **str**| Codice fiscale del soggetto per cui richiedere l&#39;elenco delle copie dei FIR digitali disponibili | 
- **num_iscr_sito** | **str**| Eventuale numero di iscrizione dell&#39;unità locale per la quale si richiedeono le copie dei FIR digitali | [optional] 
+ **num_iscr_sito** | **str**| Eventuale numero di iscrizione dell&#39;unità locale per la quale si richiedono le copie dei FIR digitali | [optional] 
  **numero_fir** | **str**| Numero FIR della copia del FIR digitale | [optional] 
  **tipo_accettazione** | [**TipiAccettazione**](.md)| Filtra le copia dei FIR digitali per tipo di accettazione del destinatario | [optional] 
  **confermate** | **bool**| Filtra le copie dei FIR digitali confermate o non confermate. | [optional] 
@@ -568,7 +568,7 @@ Name | Type | Description  | Notes
 
 Documento copia FIR digitale disponibile
 
-Restituisce il file xFIR che rappresenta la copia del FIR digitale caricata dal destinatario.<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota).</i><hr/>
+Restituisce il file xFIR che rappresenta la copia del FIR digitale caricata dal destinatario.
 
 ### Example
 
@@ -602,7 +602,7 @@ with rentri_formulari.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = rentri_formulari.CopiaFIRDigitaleApi(api_client)
     identificativo_soggetto = 'identificativo_soggetto_example' # str | Codice fiscale del soggetto per il quale si richiede il documento della copia del FIR digitale
-    identificativo = 'identificativo_example' # str | Identificativo della copia del FIR digitale caricata dal trasportatore
+    identificativo = 'identificativo_example' # str | Identificativo della copia del FIR digitale caricata dal destinatario
 
     try:
         # Documento copia FIR digitale disponibile
@@ -620,7 +620,7 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **identificativo_soggetto** | **str**| Codice fiscale del soggetto per il quale si richiede il documento della copia del FIR digitale | 
- **identificativo** | **str**| Identificativo della copia del FIR digitale caricata dal trasportatore | 
+ **identificativo** | **str**| Identificativo della copia del FIR digitale caricata dal destinatario | 
 
 ### Return type
 
@@ -653,7 +653,7 @@ Name | Type | Description  | Notes
 
 Dettaglio copia digitale FIR disponibile
 
-Restituisce il dettaglio dei dati di caricamento della copia digitale del FIR caricata.<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota).</i><hr/>
+Restituisce il dettaglio dei dati di caricamento della copia digitale del FIR caricata.
 
 ### Example
 
@@ -737,7 +737,7 @@ Name | Type | Description  | Notes
 
 Conferma copia FIR digitale disponibile
 
-Permette al soggetto a cui è stata resa disponibile la copia del FIR digitale di impostarne la stato di presa visione.<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre un codice di stato 422).</i><hr/>
+Permette al soggetto a cui è stata resa disponibile la copia del FIR digitale di impostarne la stato di presa visione.
 
 ### Example
 
@@ -822,7 +822,7 @@ void (empty response body)
 
 ⚠️[DEPRECATO] - utilizzare /{transazioneId}/result - Esito transazione
 
-Ottiene l'esito dell'elaborazione di una richiesta asincrona.<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota).</i><hr/>
+Ottiene l'esito dell'elaborazione di una richiesta asincrona.
 
 ### Example
 
@@ -905,7 +905,7 @@ Name | Type | Description  | Notes
 
 ⚠️[DEPRECATO] - utilizzare /{transazioneId}/status - Stato transazione
 
-Ottiene lo stato di elaborazione di una richiesta di caricamento di una copia di un FIR digitale.<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota).</i><hr/>
+Ottiene lo stato di elaborazione di una richiesta di caricamento di una copia di un FIR digitale.
 
 ### Example
 

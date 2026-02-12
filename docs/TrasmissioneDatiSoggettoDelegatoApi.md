@@ -16,7 +16,7 @@ Method | HTTP request | Description
 
 Trasmissioni effettuate
 
-Ottiene la lista delle trasmissioni di dati di FIR digitali effettuate per l'unità locale specificata.<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota).</i><hr/>
+Ottiene la lista delle trasmissioni di dati di FIR digitali effettuate per l'unità locale specificata.
 
 ### Example
 
@@ -116,7 +116,7 @@ Name | Type | Description  | Notes
 
 Annulla trasmissione di dati del FIR digitale
 
-Pone in stato \"annullata\" la trasmissione di dati del FIR digitale specificata.  L'operazione non è reversibile.<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre un codice di stato 422).</i><hr/>
+Pone in stato \"annullata\" la trasmissione di dati del FIR digitale specificata.  L'operazione non è reversibile.
 
 ### Example
 
@@ -198,7 +198,7 @@ void (empty response body)
 
 Dettaglio trasmissione
 
-Recupera le informazioni di dettaglio della trasmissione di dati di FIR digitale corrispondente all'identificativo specificato<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre una risposta vuota).</i><hr/>
+Recupera le informazioni di dettaglio della trasmissione di dati di FIR digitale corrispondente all'identificativo specificato
 
 ### Example
 
@@ -282,7 +282,7 @@ Name | Type | Description  | Notes
 
 🔁[ASYNC] Estrazione dati per FIR digitale
 
-Effettua l'estrazione dei dati che devono essere trasmessi dal file del FIR digitale che viene specificato tra i dati della richiesta.     L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) il soggetto operatore a cui afferisce il numero di iscrizione dell'unità locale indicato nel parametro <b>num_iscr_sito</b>.            Il file xFIR inviato deve essere valido secondo le regole definite nella <i>Guida tecnica alla compilazione del FIR digitale</i>   e verificabile dalla specifica funzione di validazione definita dall'endpoint <i>Validazione xFIR</i> delle API \"Formulario digitale\".    Il file xFIR non deve contenere dati pertinenti al formulario non firmati digitalmente.     La dimensione massima accettata del file xFIR da cui estrarre i dati è 3 MB.    Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre un codice di stato 422).</i><hr/><br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+Effettua l'estrazione dei dati che devono essere trasmessi dal file del FIR digitale che viene specificato tra i dati della richiesta.     L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) il soggetto operatore a cui afferisce il numero di iscrizione dell'unità locale indicato nel parametro <b>num_iscr_sito</b>.            Il file xFIR inviato deve essere valido secondo le regole definite nella <i>Guida tecnica alla compilazione del FIR digitale</i>   e verificabile dalla specifica funzione di validazione definita dall'endpoint <i>Validazione xFIR</i> delle API \"Formulario digitale\".    Il file xFIR non deve contenere dati pertinenti al formulario non firmati digitalmente.     La dimensione massima accettata del file xFIR da cui estrarre i dati è 3 MB.    Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
 
 ### Example
 
@@ -372,7 +372,7 @@ Name | Type | Description  | Notes
 
 Trasmette i dati del FIR digitale
 
-Effettua la trasmissione dei dati estratti da un FIR digitale riferibile all'unità locale specificata in <b>num_iscr_sito</b>.   Se non viene specificato il parametro <b>num_iscr_sito_trasportatore</b>, l'operazione può essere richiesta solo da un'utenza che abbia incarichi per (o coincida con)  il soggetto operatore a cui afferisce il numero di iscrizione dell'unità locale indicato nel parametro <b>num_iscr_sito</b>.  Tale soggetto deve essere uno dei soggetti coinvolti nel formulario che viene trasmesso.  Se viene specificato il parametro <b>num_iscr_sito_trasportatore</b>, l'operazione di trasmissione è intesa come effettuata dal trasportatore per conto del produttore,  e può essere richiesta solo da un'utenza che abbia incarichi per (o coincida con) il soggetto trasportatore a cui afferisce il numero di iscrizione dell'unità locale indicato in questo parametro.  Questo soggetto deve essere quello indicato come primo trasportatore nei dati del formulario che viene trasmesso, mentre il valore di <b>num_iscr_sito</b> deve riferirsi al soggetto produttore. La trasmissione dei dati del FIR digitale effettuata dal trasportatore per conto del produttore è possibile solo se il numero FIR è stato vidimato al trasportatore.  È possibile trasmettere più volte i dati dello stesso formulario relativamente ad una stessa unità locale.  In caso di trasmissioni ripetute per numero FIR e unità locale, l'ultima trasmissione dati effettuata in ordine temporale annulla e sostituisce le precedenti. <hr/><i>Servizio richiamabile esclusivamente in modalità <b>STUB</b> (le richieste restituiranno sempre un codice di stato 422).</i><hr/>
+Effettua la trasmissione dei dati estratti da un FIR digitale riferibile all'unità locale specificata in <b>num_iscr_sito</b>.   Se non viene specificato il parametro <b>num_iscr_sito_trasportatore</b>, l'operazione può essere richiesta solo da un'utenza che abbia incarichi per (o coincida con)  il soggetto operatore a cui afferisce il numero di iscrizione dell'unità locale indicato nel parametro <b>num_iscr_sito</b>.  Tale soggetto deve essere uno dei soggetti coinvolti nel formulario che viene trasmesso.  Se viene specificato il parametro <b>num_iscr_sito_trasportatore</b>, l'operazione di trasmissione è intesa come effettuata dal trasportatore per conto del produttore,  e può essere richiesta solo da un'utenza che abbia incarichi per (o coincida con) il soggetto trasportatore a cui afferisce il numero di iscrizione dell'unità locale indicato in questo parametro.  Questo soggetto deve essere quello indicato come primo trasportatore nei dati del formulario che viene trasmesso, mentre il valore di <b>num_iscr_sito</b> deve riferirsi al soggetto produttore. La trasmissione dei dati del FIR digitale effettuata dal trasportatore per conto del produttore è possibile solo se il numero FIR è stato vidimato al trasportatore.  È possibile trasmettere più volte i dati dello stesso formulario relativamente ad una stessa unità locale.  In caso di trasmissioni ripetute per numero FIR e unità locale, l'ultima trasmissione dati effettuata in ordine temporale annulla e sostituisce le precedenti.
 
 ### Example
 

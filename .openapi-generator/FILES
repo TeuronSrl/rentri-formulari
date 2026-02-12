@@ -4,6 +4,7 @@
 .openapi-generator-ignore
 .travis.yml
 README.md
+docs/AccettazioneItemResult.md
 docs/AnalisiClassificazioneModel.md
 docs/AutorizzazioneModel.md
 docs/AzioniResult.md
@@ -43,7 +44,7 @@ docs/DatiDestinatarioFormularioResultModel.md
 docs/DatiDestinatarioFormularioSitoModel.md
 docs/DatiDestinatarioSuccessivoResultModel.md
 docs/DatiDestinatarioTrasmissioneModel.md
-docs/DatiDestinazioniSuccessiveResultMdodel.md
+docs/DatiDestinazioniSuccessiveResultModel.md
 docs/DatiDestinazioniSuccessiveTrasmissioniModel.md
 docs/DatiFirmaResult.md
 docs/DatiIntermediariFormularioModel.md
@@ -189,6 +190,7 @@ rentri_formulari/api_response.py
 rentri_formulari/configuration.py
 rentri_formulari/exceptions.py
 rentri_formulari/models/__init__.py
+rentri_formulari/models/accettazione_item_result.py
 rentri_formulari/models/analisi_classificazione_model.py
 rentri_formulari/models/autorizzazione_model.py
 rentri_formulari/models/azioni_result.py
@@ -226,7 +228,7 @@ rentri_formulari/models/dati_destinatario_formulario_result_model.py
 rentri_formulari/models/dati_destinatario_formulario_sito_model.py
 rentri_formulari/models/dati_destinatario_successivo_result_model.py
 rentri_formulari/models/dati_destinatario_trasmissione_model.py
-rentri_formulari/models/dati_destinazioni_successive_result_mdodel.py
+rentri_formulari/models/dati_destinazioni_successive_result_model.py
 rentri_formulari/models/dati_destinazioni_successive_trasmissioni_model.py
 rentri_formulari/models/dati_firma_result.py
 rentri_formulari/models/dati_intermediari_formulario_model.py
@@ -360,6 +362,7 @@ setup.cfg
 setup.py
 test-requirements.txt
 test/__init__.py
+test/test_accettazione_item_result.py
 test/test_analisi_classificazione_model.py
 test/test_autorizzazione_model.py
 test/test_azioni_result.py
@@ -399,7 +402,7 @@ test/test_dati_destinatario_formulario_result_model.py
 test/test_dati_destinatario_formulario_sito_model.py
 test/test_dati_destinatario_successivo_result_model.py
 test/test_dati_destinatario_trasmissione_model.py
-test/test_dati_destinazioni_successive_result_mdodel.py
+test/test_dati_destinazioni_successive_result_model.py
 test/test_dati_destinazioni_successive_trasmissioni_model.py
 test/test_dati_firma_result.py
 test/test_dati_intermediari_formulario_model.py

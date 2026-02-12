@@ -19,7 +19,7 @@ Name | Type | Description | Notes
 **dati_trasbordo_totale** | [**DatiTrasbordoTotaleResultModel**](DatiTrasbordoTotaleResultModel.md) | Dati relativa all&#39;eventuale trasbordo totale del rifiuto | [optional] 
 **dati_trasbordi_parziali** | [**List[DatiTrasbordoParzialeResultModel]**](DatiTrasbordoParzialeResultModel.md) | Dati relativi agli eventuali trasbordi parziali del rifiuto | [optional] 
 **dati_soste_tecniche** | [**List[DatiSostaTecnicaResultModel]**](DatiSostaTecnicaResultModel.md) | Dati relativi alle eventuali soste tecniche effettuate nel trasporto | [optional] 
-**dati_destinazioni_successive** | [**List[DatiDestinazioniSuccessiveResultMdodel]**](DatiDestinazioniSuccessiveResultMdodel.md) | Dati relativi alle eventuali destinazioni successive inserite per il rifiuto a seguito di respingimenti | [optional] 
+**dati_destinazioni_successive** | [**List[DatiDestinazioniSuccessiveResultModel]**](DatiDestinazioniSuccessiveResultModel.md) | Dati relativi alle eventuali destinazioni successive inserite per il rifiuto a seguito di respingimenti | [optional] 
 
 ## Example
 
