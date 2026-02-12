@@ -159,6 +159,10 @@ class EsitoFormularioModelEsito(BaseModel):
             match += 1
         except (ValidationError, ValueError) as e:
             error_messages.append(str(e))
+
+        if match == 1:
+            return instance
+
         # deserialize data into EsitoNuovoFormularioModel
         try:
             instance.actual_instance = EsitoNuovoFormularioModel.from_json(json_str)
