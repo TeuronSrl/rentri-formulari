@@ -124,7 +124,7 @@ configuration = rentri_formulari.Configuration(
 with rentri_formulari.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = rentri_formulari.DefaultApi(api_client)
-    transazione_id = 'transazione_id_example' # str | Id della richiesta
+    transazione_id = UUID('38400000-8cf0-11bd-b23e-10b96e4ef00d') # UUID | Id della richiesta
 
     try:
         # Esito transazione
@@ -142,7 +142,7 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **transazione_id** | **str**| Id della richiesta | 
+ **transazione_id** | **UUID**| Id della richiesta | 
 
 ### Return type
 
@@ -207,7 +207,7 @@ configuration = rentri_formulari.Configuration(
 with rentri_formulari.ApiClient(configuration) as api_client:
     # Create an instance of the API class
     api_instance = rentri_formulari.DefaultApi(api_client)
-    transazione_id = 'transazione_id_example' # str | Id della richiesta.
+    transazione_id = UUID('38400000-8cf0-11bd-b23e-10b96e4ef00d') # UUID | Id della richiesta.
 
     try:
         # Stato transazione
@@ -223,7 +223,7 @@ with rentri_formulari.ApiClient(configuration) as api_client:
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **transazione_id** | **str**| Id della richiesta. | 
+ **transazione_id** | **UUID**| Id della richiesta. | 
 
 ### Return type
 

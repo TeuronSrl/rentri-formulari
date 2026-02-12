@@ -148,7 +148,15 @@ Name | Type | Description  | Notes
 
 🔁[ASYNC] Accettazione FIR
 
-Acquisisce la richiesta di aggiunta dei dati di accettazione del rifiuto da parte del destinatario per il FIR specificato.  L'aggiunta dei dati di accettazione è consentita solo ad un'utenza che abbia visibilità per (o coincida con) il soggetto destinatario che è in attesa del rifiuto.   Stati del formulario ammessi: <ul><li>InserimentoAccettazione</li></ul> In caso esista una copia del FIR digitale già restituita con accettazione totale del rifiuto, l'operazione non è consentita.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+Acquisisce la richiesta di aggiunta dei dati di accettazione del rifiuto da parte del destinatario per il FIR specificato.
+
+L'aggiunta dei dati di accettazione è consentita solo ad un'utenza che abbia visibilità per (o coincida con) il soggetto destinatario che è in attesa del rifiuto. 
+
+Stati del formulario ammessi:
+<ul><li>InserimentoAccettazione</li></ul>
+In caso esista una copia del FIR digitale già restituita con accettazione totale del rifiuto, l'operazione non è consentita.
+
+Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
 
 ### Example
 
@@ -237,7 +245,32 @@ Name | Type | Description  | Notes
 
 🔁[ASYNC] Imposta dati firma
 
-Acquisisce la richiesta di aggiunta dei dati per completare la creazione del file di firma digitale XAdES nel file xFIR.  L'operazione può essere eseguita da un'utenza che abbia visibilità su (o coincida con) il soggetto, tra quelli indicati nel formulario, coinvolto nell'operazione di aggiunta delle informazioni da firmare.  Il formulario deve essere in uno stato di attesa di firma, conseguente all'aggiunta di nuove informazioni.  Stati del formulario ammessi: <ul><li>FirmaProduttoreTrasportatoreIniziale</li><li>FirmaProduttore</li><li>FirmaTrasportatoreIniziale</li><li>FirmaTrasportatoreSuccessivo</li><li>FirmaAccettazione</li><li>FirmaAnnotazione</li><li>FirmaAnnullamento</li><li>FirmaTrasbordoParziale</li><li>FirmaTrasbordoTotale</li><li>FirmaSostaTecnica</li><li>FirmaDestinatarioSuccessivo</li><li>FirmaAccettazioneSuccessiva</li></ul> Il valore della proprietà <i>firma</i> deve corrispondere alla firma crittografica calcolata con la chiave privata  associata al certificato X509 indicato nella proprietà <i>certificato</i>.  Il valore della proprietà <i>token</i> deve coincidere con il valore restituito dalla precedente invocazione all'endpoint <i>POST /{numero_fir}/hash</i>, utilizzata per richiedere il codice hash da firmare.  In ambiente di <b>PRODUZIONE</b> l'operazione asincrona, con l'identificativo della transazione restituito dall'endpoint, avrà esito positivo solo se  il codice hash firmato è stato calcolato sulla base di una data dichiarata di firma successiva alle ore 00:00 del giorno 13/02/2026.  L'art. 7 c.3 del D.M. 59/2023 prevede che il FIR sia sottoscritto da parte degli operatori coinvolti nelle diverse fasi del trasporto,  per cui se il certificato di firma è intestato ad una persona giuridica deve riferirsi al soggetto firmatario. Esclusivamente in ambiente <b>DEMO</b>, se il certificato firmatario non viene riconosciuto come valido secondo la regola qui descritta, il sistema produrrà un avviso non bloccante. In ambiente di <b>PRODUZIONE</b> il controllo sarà bloccante.  In caso esista una copia del FIR digitale già restituita con accettazione totale del rifiuto, l'operazione non è consentita.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+Acquisisce la richiesta di aggiunta dei dati per completare la creazione del file di firma digitale XAdES nel file xFIR.
+
+L'operazione può essere eseguita da un'utenza che abbia visibilità su (o coincida con) il soggetto,
+tra quelli indicati nel formulario, coinvolto nell'operazione di aggiunta delle informazioni da firmare.
+
+Il formulario deve essere in uno stato di attesa di firma, conseguente all'aggiunta di nuove informazioni.
+
+Stati del formulario ammessi:
+<ul><li>FirmaProduttoreTrasportatoreIniziale</li><li>FirmaProduttore</li><li>FirmaTrasportatoreIniziale</li><li>FirmaTrasportatoreSuccessivo</li><li>FirmaAccettazione</li><li>FirmaAnnotazione</li><li>FirmaAnnullamento</li><li>FirmaTrasbordoParziale</li><li>FirmaTrasbordoTotale</li><li>FirmaSostaTecnica</li><li>FirmaDestinatarioSuccessivo</li><li>FirmaAccettazioneSuccessiva</li></ul>
+Il valore della proprietà <i>firma</i> deve corrispondere alla firma crittografica calcolata con la chiave privata 
+associata al certificato X509 indicato nella proprietà <i>certificato</i>.
+
+Il valore della proprietà <i>token</i> deve coincidere con il valore restituito dalla precedente invocazione all'endpoint <i>POST /{numero_fir}/hash</i>,
+utilizzata per richiedere il codice hash da firmare.
+
+In ambiente di <b>PRODUZIONE</b> l'operazione asincrona, con l'identificativo della transazione restituito dall'endpoint, avrà esito positivo solo se 
+il codice hash firmato è stato calcolato sulla base di una data dichiarata di firma successiva alle ore 00:00 del giorno 13/02/2026.
+
+L'art. 7 c.3 del D.M. 59/2023 prevede che il FIR sia sottoscritto da parte degli operatori coinvolti nelle diverse fasi del trasporto, 
+per cui se il certificato di firma è intestato ad una persona giuridica deve riferirsi al soggetto firmatario.
+Esclusivamente in ambiente <b>DEMO</b>, se il certificato firmatario non viene riconosciuto come valido secondo la regola qui descritta, il sistema produrrà un avviso non bloccante.
+In ambiente di <b>PRODUZIONE</b> il controllo sarà bloccante.
+
+In caso esista una copia del FIR digitale già restituita con accettazione totale del rifiuto, l'operazione non è consentita.
+
+Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
 
 ### Example
 
@@ -326,7 +359,12 @@ Name | Type | Description  | Notes
 
 ⚠️[DEPRECATO] - utilizzare /{numeroFIR}/acquisizione-visibilita/{numIscrSito} - Acquisizione visibilità FIR
 
-Acquisisce la visibilità in ricerca sull'unità locale specificata di un FIR digitale creato da terzi.  L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) almeno uno dei soggetti coinvolti nel formulario,  e a cui deve essere riferibile il numero di iscrizione dell'unità locale specificata nel parametro <b>num_iscr_sito</b> . L'operazione consente di rendere visibile il FIR digitale in ricerca per una specifica unità locale.
+Acquisisce la visibilità in ricerca sull'unità locale specificata di un FIR digitale creato da terzi.
+
+L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) almeno uno dei soggetti coinvolti nel formulario, 
+e a cui deve essere riferibile il numero di iscrizione dell'unità locale specificata nel parametro <b>num_iscr_sito</b>
+.
+L'operazione consente di rendere visibile il FIR digitale in ricerca per una specifica unità locale.
 
 ### Example
 
@@ -409,7 +447,12 @@ void (empty response body)
 
 Acquisizione visibilità FIR
 
-Acquisisce la visibilità in ricerca sull'unità locale specificata di un FIR digitale creato da terzi.  L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) almeno uno dei soggetti coinvolti nel formulario,  e a cui deve essere riferibile il numero di iscrizione dell'unità locale specificata nel parametro <b>num_iscr_sito</b> . L'operazione consente di rendere visibile il FIR digitale in ricerca per una specifica unità locale.
+Acquisisce la visibilità in ricerca sull'unità locale specificata di un FIR digitale creato da terzi.
+
+L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) almeno uno dei soggetti coinvolti nel formulario, 
+e a cui deve essere riferibile il numero di iscrizione dell'unità locale specificata nel parametro <b>num_iscr_sito</b>
+.
+L'operazione consente di rendere visibile il FIR digitale in ricerca per una specifica unità locale.
 
 ### Example
 
@@ -492,7 +535,15 @@ void (empty response body)
 
 🔁[ASYNC] Rimuove un allegato
 
-Acquisisce la richiesta di eliminazione di un allegato dal formulario digitale specificato.  L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) il soggetto a cui è stato riferito l'allegato specificato in fase di inserimento.  L'operazione può essere eseguita in tutti gli stati, salvo gli stati Annullato e FirmaAnnullamento.  In caso esista una copia del FIR digitale già restituita con accettazione totale del rifiuto, l'operazione non è consentita.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+Acquisisce la richiesta di eliminazione di un allegato dal formulario digitale specificato.
+
+L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) il soggetto a cui è stato riferito l'allegato specificato in fase di inserimento.
+
+L'operazione può essere eseguita in tutti gli stati, salvo gli stati Annullato e FirmaAnnullamento.
+
+In caso esista una copia del FIR digitale già restituita con accettazione totale del rifiuto, l'operazione non è consentita.
+
+Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
 
 ### Example
 
@@ -580,7 +631,9 @@ Name | Type | Description  | Notes
 
 Download un allegato
 
-Restituisce il file allegato al formulario digitale specificato.  L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) il soggetto a cui è stato riferito l'allegato specificato in fase di inserimento.
+Restituisce il file allegato al formulario digitale specificato.
+
+L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) il soggetto a cui è stato riferito l'allegato specificato in fase di inserimento.
 
 ### Example
 
@@ -666,7 +719,20 @@ Name | Type | Description  | Notes
 
 🔁[ASYNC] Aggiunge un allegato
 
-Acquisisce la richiesta di aggiunta di un allegato al formulario digitale specificato.  L'operazione può essere eseguita in tutti gli stati, salvo gli stati Annullato e FirmaAnnullamento.  Il file aggiunto all'xFIR viene inserito all'interno del contenitore ZIP e non ncessita di essere firmato.  Il file da allegare non deve superare 1 MB di dimensione, e la dimensione massima del file xFIR risultante non deve superare i 3 MB. I file accettati come allegati da questo endpoint devono necessariamente essere dei file PDF.  Per il recupero dell'allegato è necessario scaricare il file xFIR.  In caso esista una copia del FIR digitale già restituita con accettazione totale del rifiuto, l'operazione non è consentita.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+Acquisisce la richiesta di aggiunta di un allegato al formulario digitale specificato.
+
+L'operazione può essere eseguita in tutti gli stati, salvo gli stati Annullato e FirmaAnnullamento.
+
+Il file aggiunto all'xFIR viene inserito all'interno del contenitore ZIP e non ncessita di essere firmato.
+
+Il file da allegare non deve superare 1 MB di dimensione, e la dimensione massima del file xFIR risultante non deve superare i 3 MB.
+I file accettati come allegati da questo endpoint devono necessariamente essere dei file PDF.
+
+Per il recupero dell'allegato è necessario scaricare il file xFIR.
+
+In caso esista una copia del FIR digitale già restituita con accettazione totale del rifiuto, l'operazione non è consentita.
+
+Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
 
 ### Example
 
@@ -755,7 +821,15 @@ Name | Type | Description  | Notes
 
 🔁[ASYNC] Aggiunge annotazione
 
-Acquisisce la richiesta di aggiunta di un'annotazione da allegare al formulario digitale specificato.  L'operazione può essere eseguita da un'utenza che abbia visibilità su (o coincida con) il soggetto del formulario, trasportatore o destinatario, che risulta avere in carico il rifiuto successivamente alle firme di partenza.  Stati del formulario ammessi: <ul><li>InserimentoAccettazione</li><li>InserimentoTrasportoSuccessivo</li><li>Accettato</li><li>RespintoAccettatoParzialmente</li></ul> In caso esista una copia del FIR digitale già restituita con accettazione totale del rifiuto, l'operazione non è consentita.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+Acquisisce la richiesta di aggiunta di un'annotazione da allegare al formulario digitale specificato.
+
+L'operazione può essere eseguita da un'utenza che abbia visibilità su (o coincida con) il soggetto del formulario, trasportatore o destinatario, che risulta avere in carico il rifiuto successivamente alle firme di partenza.
+
+Stati del formulario ammessi:
+<ul><li>InserimentoAccettazione</li><li>InserimentoTrasportoSuccessivo</li><li>Accettato</li><li>RespintoAccettatoParzialmente</li></ul>
+In caso esista una copia del FIR digitale già restituita con accettazione totale del rifiuto, l'operazione non è consentita.
+
+Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
 
 ### Example
 
@@ -844,7 +918,19 @@ Name | Type | Description  | Notes
 
 🔁[ASYNC] Annullamento FIR
 
-Acquisisce la richiesta di annullamento del FIR specificato.  L'operazione può essere richiesta solo da un utenza che abbia incarichi per (o coincida con) il soggetto che, tra produttore e trasportatore iniziale, ha vidimato il numero FIR.  L'annullamento può essere richiesto solo se il formulario non risulta già essere firmato sia dal produttore che dal trasportatore.  Stati del formulario ammessi: <ul><li>InserimentoQuantita</li><li>InserimentoQuantitaTrasportoIniziale</li><li>InserimentoTrasportoIniziale</li><li>FirmaProduttoreTrasportatoreIniziale</li><li>FirmaProduttore</li><li>FirmaTrasportatoreIniziale</li></ul> Ulteriori condizioni affinché l'annullamento sia eseguito sono: <ul><li>Non deve risultare una copia digitale del FIR con lo stesso numero già consegnata dal destinatario</li><li>Non deve risultare (per rifiuti pericolosi) alcuna trasmissione di dati del FIR digitale con lo stesso numero avvenuta da parte di alcun soggetto coinvolto nel FIR.</li></ul> L'operazione di annullamento provvede ad annullare il FIR e la relativa vidimazione.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+Acquisisce la richiesta di annullamento del FIR specificato.
+
+L'operazione può essere richiesta solo da un utenza che abbia incarichi per (o coincida con) il soggetto che, tra produttore e trasportatore iniziale, ha vidimato il numero FIR.
+
+L'annullamento può essere richiesto solo se il formulario non risulta già essere firmato sia dal produttore che dal trasportatore.
+
+Stati del formulario ammessi:
+<ul><li>InserimentoQuantita</li><li>InserimentoQuantitaTrasportoIniziale</li><li>InserimentoTrasportoIniziale</li><li>FirmaProduttoreTrasportatoreIniziale</li><li>FirmaProduttore</li><li>FirmaTrasportatoreIniziale</li></ul>
+Ulteriori condizioni affinché l'annullamento sia eseguito sono:
+<ul><li>Non deve risultare una copia digitale del FIR con lo stesso numero già consegnata dal destinatario</li><li>Non deve risultare (per rifiuti pericolosi) alcuna trasmissione di dati del FIR digitale con lo stesso numero avvenuta da parte di alcun soggetto coinvolto nel FIR.</li></ul>
+L'operazione di annullamento provvede ad annullare il FIR e la relativa vidimazione.
+
+Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
 
 ### Example
 
@@ -930,7 +1016,12 @@ Name | Type | Description  | Notes
 
 🔁[ASYNC] ⚠️[DEPRECATO] - utilizzare /{numeroFIR}/annulla-fir - Annullamento FIR
 
-Acquisisce la richiesta di annullamento del FIR specificato.  L'annullamento può essere richiesto solo se il formulario non risulta già essere firmato sia dal produttore che dal trasportatore.  L'operazione di annullamento provvede ad annullare il FIR e la relativa vidimazione. Questa operazione può essere richiesta solo dal soggetto che ha vidimato il numero FIR. Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+Acquisisce la richiesta di annullamento del FIR specificato.
+
+L'annullamento può essere richiesto solo se il formulario non risulta già essere firmato sia dal produttore che dal trasportatore.
+
+L'operazione di annullamento provvede ad annullare il FIR e la relativa vidimazione. Questa operazione può essere richiesta solo dal soggetto che ha vidimato il numero FIR.
+Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
 
 ### Example
 
@@ -1019,7 +1110,9 @@ Name | Type | Description  | Notes
 
 Operazioni disponibili
 
-Restituisce l'elenco delle azioni che è possibile eseguire sul formulario indicato, in funzione dello stato in cui si trova, dal soggetto specificato nel parametro <b>identificativo_soggetto</b>.  L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) il soggetto specificato nel parametro <b>identificativo_soggetto</b> ed almeno uno dei soggetti coinvolti nel formulario.
+Restituisce l'elenco delle azioni che è possibile eseguire sul formulario indicato, in funzione dello stato in cui si trova, dal soggetto specificato nel parametro <b>identificativo_soggetto</b>.
+
+L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) il soggetto specificato nel parametro <b>identificativo_soggetto</b> ed almeno uno dei soggetti coinvolti nel formulario.
 
 ### Example
 
@@ -1107,7 +1200,17 @@ Name | Type | Description  | Notes
 
 🔁[ASYNC] Aggiunge nuovo destinatario
 
-Acquisisce la richiesta di aggiunta dei dati del nuovo destinatario per il rifiuto indicato nel formulario specificato, a seguito del respingimento o della parziale accettazione del rifiuto da parte del destinatario precedente.  L'operazione può essere eseguita da un'utenza che abbia visibilità su (o coincida con) il soggetto produttore o il soggetto trasportatore che risulta avere  in carico il rifiuto al momento del respingimento.  Stati del formulario ammessi: <ul><li>RespintoAccettatoParzialmente</li></ul> In caso esista una copia del FIR digitale già restituita con accettazione totale del rifiuto, l'operazione non è consentita.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+Acquisisce la richiesta di aggiunta dei dati del nuovo destinatario per il rifiuto indicato nel formulario specificato, a seguito del
+respingimento o della parziale accettazione del rifiuto da parte del destinatario precedente.
+
+L'operazione può essere eseguita da un'utenza che abbia visibilità su (o coincida con) il soggetto produttore o il soggetto trasportatore che risulta avere 
+in carico il rifiuto al momento del respingimento.
+
+Stati del formulario ammessi:
+<ul><li>RespintoAccettatoParzialmente</li></ul>
+In caso esista una copia del FIR digitale già restituita con accettazione totale del rifiuto, l'operazione non è consentita.
+
+Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
 
 ### Example
 
@@ -1196,7 +1299,9 @@ Name | Type | Description  | Notes
 
 Dettaglio FIR
 
-Restituisce i dati completi del formulario indicato.   L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) almeno uno dei soggetti coinvolti nel formulario.
+Restituisce i dati completi del formulario indicato. 
+
+L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) almeno uno dei soggetti coinvolti nel formulario.
 
 ### Example
 
@@ -1280,7 +1385,31 @@ Name | Type | Description  | Notes
 
 🔁[ASYNC] Calcolo del codice hash da firmare
 
-Acquisisce la richiesta per il calcolo del codice hash di tipo SHA256 da firmare per poter apporre la firma digitale sul formulario.    L'operazione può essere eseguita da un'utenza che abbia visibilità su (o coincida con) il soggetto tra quelli indicati nel formulario   coinvolto nell'operazione di aggiunta delle informazioni da firmare.    Il formulario deve essere in uno stato di attesa di firma, conseguente all'aggiunta di nuove informazioni.    Stati del formulario ammessi:  <ul><li>FirmaProduttoreTrasportatoreIniziale</li><li>FirmaProduttore</li><li>FirmaTrasportatoreIniziale</li><li>FirmaTrasportatoreSuccessivo</li><li>FirmaAccettazione</li><li>FirmaAnnotazione</li><li>FirmaAnnullamento</li><li>FirmaTrasbordoParziale</li><li>FirmaTrasbordoTotale</li><li>FirmaSostaTecnica</li><li>FirmaDestinatarioSuccessivo</li><li>FirmaAccettazioneSuccessiva</li></ul>  Questa operazione non muta lo stato del formulario.    Il codice hash SHA256 prodotto da questo endpoint è calcolato sull'elemento della struttura dati XAdES <i>ds:SignedInfo</i>,  che contiene un riferimento ad una data dichiarata di firma impostata con l'ora corrente al momento dell'invocazione.     Il codice hash dovrà essere firmato con la chiave privata associata al certificato X509 indicato nella proprietà <i>certificato</i> del modello di input.    Per completare l'apposizione della firma al formulario digitale dovrà essere successivamente invocato l'endpoint <i>POST /{numero_fir}/acquisizione-firma</i>   specificando nel modello di input:   <ul><li>lo stesso certificato X509 incluso nell'invocazione di questo endpoint</li><li>lo stesso token ricevuto nell'esito di questa invocazione</li><li>la firma crittografica calcolata con la chiave privata associata al certificato X509</li></ul>  L'art. 7 c.3 del D.M. 59/2023 prevede che il FIR sia sottoscritto da parte degli operatori coinvolti nelle diverse fasi del trasporto,   per cui se il certificato di firma è intestato ad una persona giuridica deve riferirsi al soggetto firmatario.  Esclusivamente in ambiente <b>DEMO</b>, se il certificato firmatario non viene riconosciuto come valido secondo la regola qui descritta, il sistema produrrà un avviso non bloccante.  In ambiente di <b>PRODUZIONE</b> il controllo sarà bloccante.    Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+Acquisisce la richiesta per il calcolo del codice hash di tipo SHA256 da firmare per poter apporre la firma digitale sul formulario.
+
+L'operazione può essere eseguita da un'utenza che abbia visibilità su (o coincida con) il soggetto tra quelli indicati nel formulario 
+coinvolto nell'operazione di aggiunta delle informazioni da firmare.
+
+Il formulario deve essere in uno stato di attesa di firma, conseguente all'aggiunta di nuove informazioni.
+
+Stati del formulario ammessi:
+<ul><li>FirmaProduttoreTrasportatoreIniziale</li><li>FirmaProduttore</li><li>FirmaTrasportatoreIniziale</li><li>FirmaTrasportatoreSuccessivo</li><li>FirmaAccettazione</li><li>FirmaAnnotazione</li><li>FirmaAnnullamento</li><li>FirmaTrasbordoParziale</li><li>FirmaTrasbordoTotale</li><li>FirmaSostaTecnica</li><li>FirmaDestinatarioSuccessivo</li><li>FirmaAccettazioneSuccessiva</li></ul>
+Questa operazione non muta lo stato del formulario.
+
+Il codice hash SHA256 prodotto da questo endpoint è calcolato sull'elemento della struttura dati XAdES <i>ds:SignedInfo</i>,
+che contiene un riferimento ad una data dichiarata di firma impostata con l'ora corrente al momento dell'invocazione.
+ 
+Il codice hash dovrà essere firmato con la chiave privata associata al certificato X509 indicato nella proprietà <i>certificato</i> del modello di input.
+
+Per completare l'apposizione della firma al formulario digitale dovrà essere successivamente invocato l'endpoint <i>POST /{numero_fir}/acquisizione-firma</i> 
+specificando nel modello di input: 
+<ul><li>lo stesso certificato X509 incluso nell'invocazione di questo endpoint</li><li>lo stesso token ricevuto nell'esito di questa invocazione</li><li>la firma crittografica calcolata con la chiave privata associata al certificato X509</li></ul>
+L'art. 7 c.3 del D.M. 59/2023 prevede che il FIR sia sottoscritto da parte degli operatori coinvolti nelle diverse fasi del trasporto, 
+per cui se il certificato di firma è intestato ad una persona giuridica deve riferirsi al soggetto firmatario.
+Esclusivamente in ambiente <b>DEMO</b>, se il certificato firmatario non viene riconosciuto come valido secondo la regola qui descritta, il sistema produrrà un avviso non bloccante.
+In ambiente di <b>PRODUZIONE</b> il controllo sarà bloccante.
+
+Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
 
 ### Example
 
@@ -1369,7 +1498,12 @@ Name | Type | Description  | Notes
 
 Invia il FIR ad un dispositivo
 
-Effettua l'invio delle informazioni di un formulario al dispositivo associato all'identificativo delle credenziali.  L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) almeno uno dei soggetti coinvolti nel formulario.  Le credenziali indicate nel parametro <b>credentials_id</b> devono essere state create attraverso le API \"Firma remota RENTRI\",  e devono essere associate o all'unità locale che ha creato il FIR digitale, oppure ad una delle unità locali che abbiano già acquisito la visibilità del FIR digitale.
+Effettua l'invio delle informazioni di un formulario al dispositivo associato all'identificativo delle credenziali.
+
+L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) almeno uno dei soggetti coinvolti nel formulario.
+
+Le credenziali indicate nel parametro <b>credentials_id</b> devono essere state create attraverso le API "Firma remota RENTRI", 
+e devono essere associate o all'unità locale che ha creato il FIR digitale, oppure ad una delle unità locali che abbiano già acquisito la visibilità del FIR digitale.
 
 ### Example
 
@@ -1452,7 +1586,13 @@ void (empty response body)
 
 🔁[ASYNC] Imposta le note di annullamento del FIR
 
-Acquisisce la richiesta di aggiunta delle note di annullamento per il FIR specificato.  L'operazione può essere richiesta solo da un utenza che abbia incarichi per (o coincida con) il soggetto che, tra produttore e trasportatore iniziale, ha vidimato il numero FIR.  Stati del formulario ammessi: <ul><li>Annullato (il formulario deve essere privo di note)</li></ul> Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+Acquisisce la richiesta di aggiunta delle note di annullamento per il FIR specificato.
+
+L'operazione può essere richiesta solo da un utenza che abbia incarichi per (o coincida con) il soggetto che, tra produttore e trasportatore iniziale, ha vidimato il numero FIR.
+
+Stati del formulario ammessi:
+<ul><li>Annullato (il formulario deve essere privo di note)</li></ul>
+Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
 
 ### Example
 
@@ -1541,7 +1681,9 @@ Name | Type | Description  | Notes
 
 Stampa PDF del FIR
 
-Ottiene una stampa in PDF del FIR.  L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) almeno uno dei soggetti coinvolti nel formulario.
+Ottiene una stampa in PDF del FIR.
+
+L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) almeno uno dei soggetti coinvolti nel formulario.
 
 ### Example
 
@@ -1626,7 +1768,13 @@ Name | Type | Description  | Notes
 
 🔁[ASYNC] Modifica FIR
 
-Acquisisce la richiesta di modifica dei dati di un FIR esistente.  L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) il soggetto produttore o il soggetto del primo trasportatore indicati nel formulario originale.  Stati del formulario ammessi: <ul><li>InserimentoQuantita</li><li>InserimentoQuantitaTrasportoIniziale</li><li>InserimentoTrasportoIniziale</li><li>FirmaProduttoreTrasportatoreIniziale</li><li>FirmaTrasportatoreIniziale (per formulario da trasbordo parziale)</li></ul> Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+Acquisisce la richiesta di modifica dei dati di un FIR esistente.
+
+L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) il soggetto produttore o il soggetto del primo trasportatore indicati nel formulario originale.
+
+Stati del formulario ammessi:
+<ul><li>InserimentoQuantita</li><li>InserimentoQuantitaTrasportoIniziale</li><li>InserimentoTrasportoIniziale</li><li>FirmaProduttoreTrasportatoreIniziale</li><li>FirmaTrasportatoreIniziale (per formulario da trasbordo parziale)</li></ul>
+Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
 
 ### Example
 
@@ -1715,7 +1863,15 @@ Name | Type | Description  | Notes
 
 🔁[ASYNC] Imposta quantità
 
-Acquisice la richiesta di aggiunta o modifica del dato della quantità sul formulario indicato.  L'operazione può essere eseguita da un'utenza che abbia visibilità su (o coincida con) il produttore o il primo trasportatore.  Stati del formulario ammessi: <ul><li>InserimentoQuantita</li><li>InserimentoQuantitaTrasportoIniziale</li><li>InserimentoTrasportoIniziale</li><li>FirmaProduttoreTrasportatoreIniziale</li></ul> In caso esista una copia del FIR digitale già restituita con accettazione totale del rifiuto, l'operazione non è consentita.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+Acquisice la richiesta di aggiunta o modifica del dato della quantità sul formulario indicato.
+
+L'operazione può essere eseguita da un'utenza che abbia visibilità su (o coincida con) il produttore o il primo trasportatore.
+
+Stati del formulario ammessi:
+<ul><li>InserimentoQuantita</li><li>InserimentoQuantitaTrasportoIniziale</li><li>InserimentoTrasportoIniziale</li><li>FirmaProduttoreTrasportatoreIniziale</li></ul>
+In caso esista una copia del FIR digitale già restituita con accettazione totale del rifiuto, l'operazione non è consentita.
+
+Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
 
 ### Example
 
@@ -1804,7 +1960,15 @@ Name | Type | Description  | Notes
 
 🔁[ASYNC] Reset stato
 
-Acquisisce la richiesta di cancellazione degli ultimi dati inseriti nel formulario in attesa di firma, riportando lo stato del formulario a quello precedente.  La cancellazione degli ultimi dati inseriti (e non ancora firmati) è consentita solo alle utenze con visibilità per (o che coincidono con)  gli stessi soggetti coinvolti nel formulario a cui è consentito l'inserimento del tipo di informazione che si sta eliminando. Stati del formulario ammessi: <ul><li>FirmaTrasportatoreIniziale (per formulario da trasbordo parziale)</li><li>FirmaTrasportatoreSuccessivo</li><li>FirmaDestinatarioSuccessivo</li><li>FirmaAccettazione</li><li>FirmaAccettazioneSuccessiva</li><li>FirmaAnnotazione</li><li>FirmaAnnullamento</li><li>FirmaTrasbordoParziale</li><li>FirmaTrasbordoTotale</li><li>FirmaSostaTecnica</li></ul> In caso esista una copia del FIR digitale già restituita con accettazione totale del rifiuto, l'operazione non è consentita.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+Acquisisce la richiesta di cancellazione degli ultimi dati inseriti nel formulario in attesa di firma, riportando lo stato del formulario a quello precedente.
+
+La cancellazione degli ultimi dati inseriti (e non ancora firmati) è consentita solo alle utenze con visibilità per (o che coincidono con) 
+gli stessi soggetti coinvolti nel formulario a cui è consentito l'inserimento del tipo di informazione che si sta eliminando.
+Stati del formulario ammessi:
+<ul><li>FirmaTrasportatoreIniziale (per formulario da trasbordo parziale)</li><li>FirmaTrasportatoreSuccessivo</li><li>FirmaDestinatarioSuccessivo</li><li>FirmaAccettazione</li><li>FirmaAccettazioneSuccessiva</li><li>FirmaAnnotazione</li><li>FirmaAnnullamento</li><li>FirmaTrasbordoParziale</li><li>FirmaTrasbordoTotale</li><li>FirmaSostaTecnica</li></ul>
+In caso esista una copia del FIR digitale già restituita con accettazione totale del rifiuto, l'operazione non è consentita.
+
+Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
 
 ### Example
 
@@ -1890,7 +2054,7 @@ Name | Type | Description  | Notes
 
 ⚠️[DEPRECATO] - utilizzare /{numeroFIR}/rilascio-visibilita/{numIscrSito} - Rilascio visibilità FIR
 
-Abbandona la visibilità in ricerca sull'unità locale specificata, ottenuta con l'operazione di \"acquisizione di visibilità\", relativamente al FIR digitale specificato creato da terzi.
+Abbandona la visibilità in ricerca sull'unità locale specificata, ottenuta con l'operazione di "acquisizione di visibilità", relativamente al FIR digitale specificato creato da terzi.
 
 ### Example
 
@@ -1973,7 +2137,7 @@ void (empty response body)
 
 Rilascio visibilità FIR
 
-Abbandona la visibilità in ricerca sull'unità locale specificata, ottenuta con l'operazione di \"acquisizione\", relativamente al FIR digitale specificato creato da terzi.
+Abbandona la visibilità in ricerca sull'unità locale specificata, ottenuta con l'operazione di "acquisizione", relativamente al FIR digitale specificato creato da terzi.
 
 ### Example
 
@@ -2056,7 +2220,11 @@ void (empty response body)
 
 🔁[ASYNC] Rollback dell'ultima firma
 
-Acquisisce la richiesta di rollback dell'ultima firma apposta (tranne la firma di annullamento) riportando lo stato del formulario a quello di attesa firma precedente alla sua apposizione.  L'operazione di apposizione delle firme digitali in un FIR attraverso gli endpoint di queste API è reversibile solo a determinate condizioni: <ul><li>la firma è l'ultima apposta al FIR digitale in ordine temporale</li><li>la firma è stata apposta con le API RENTRI senza che il file sia stato ricaricato con un'operazione di upload dopo la sua apposizione</li><li>la firma è stata apposta su dati riferiti ad un soggetto che coincide con l'identità di chi invoca l'endpoint (o per cui l'utente che invoca l'endpoint ha visibilità)</li><li>la firma è stata apposta entro i 15 minuti precedenti al momento in cui si richiede l'operazione (calcolati dalla data firma presente nella struttura dati XAdES del file di firma)</li><li>non è stata effettuata, dopo l'acquisizione della firma, alcuna operazione di download (via API, portale Operatori iscritti, App RENTRI) del file xFIR attraverso <i>GET /{numero_fir}/xfir</i>; da parte di alcun soggetto che abbia visibilità del FIR</li><li>non è presente a sistema una copia cartacea con lo stesso numero FIR restituita dal trasportatore agli altri soggetti coinvolti nel FIR</li><li>non è presente a sistema una copia digitale con lo stesso numero FIR restituita dal destinatario agli altri soggetti coinvolti nel FIR</li></ul> Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+Acquisisce la richiesta di rollback dell'ultima firma apposta (tranne la firma di annullamento) riportando lo stato del formulario a quello di attesa firma precedente alla sua apposizione.
+
+L'operazione di apposizione delle firme digitali in un FIR attraverso gli endpoint di queste API è reversibile solo a determinate condizioni:
+<ul><li>la firma è l'ultima apposta al FIR digitale in ordine temporale</li><li>la firma è stata apposta con le API RENTRI senza che il file sia stato ricaricato con un'operazione di upload dopo la sua apposizione</li><li>la firma è stata apposta su dati riferiti ad un soggetto che coincide con l'identità di chi invoca l'endpoint (o per cui l'utente che invoca l'endpoint ha visibilità)</li><li>la firma è stata apposta entro i 15 minuti precedenti al momento in cui si richiede l'operazione (calcolati dalla data firma presente nella struttura dati XAdES del file di firma)</li><li>non è stata effettuata, dopo l'acquisizione della firma, alcuna operazione di download (via API, portale Operatori iscritti, App RENTRI) del file xFIR attraverso <i>GET /{numero_fir}/xfir</i>; da parte di alcun soggetto che abbia visibilità del FIR</li><li>non è presente a sistema una copia cartacea con lo stesso numero FIR restituita dal trasportatore agli altri soggetti coinvolti nel FIR</li><li>non è presente a sistema una copia digitale con lo stesso numero FIR restituita dal destinatario agli altri soggetti coinvolti nel FIR</li></ul>
+Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
 
 ### Example
 
@@ -2142,7 +2310,16 @@ Name | Type | Description  | Notes
 
 🔁[ASYNC] Aggiunge sosta tecnica
 
-Acquisisce la richiesta per l'aggiunta dei dati di sosta tecnica per il formulario indicato.  L'operazione può essere eseguita da un'utenza che abbia visibilità su (o coincida con) il soggetto trasportatore che risulta avere  in carico il rifiuto.  Stati del formulario ammessi: <ul><li>InserimentoAccettazione</li><li>InserimentoTrasportoSuccessivo</li></ul> In caso esista una copia del FIR digitale già restituita con accettazione totale del rifiuto, l'operazione non è consentita.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+Acquisisce la richiesta per l'aggiunta dei dati di sosta tecnica per il formulario indicato.
+
+L'operazione può essere eseguita da un'utenza che abbia visibilità su (o coincida con) il soggetto trasportatore che risulta avere 
+in carico il rifiuto.
+
+Stati del formulario ammessi:
+<ul><li>InserimentoAccettazione</li><li>InserimentoTrasportoSuccessivo</li></ul>
+In caso esista una copia del FIR digitale già restituita con accettazione totale del rifiuto, l'operazione non è consentita.
+
+Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
 
 ### Example
 
@@ -2315,7 +2492,16 @@ Name | Type | Description  | Notes
 
 🔁[ASYNC] Aggiunge trasbordo parziale
 
-Acquisisce la richiesta per l'aggiunta dei dati di un trasbordo parziale per il formulario indicato.  L'operazione può essere eseguita da un'utenza che abbia visibilità su (o coincida con) il soggetto trasportatore che risulta avere  in carico il rifiuto.  Stati del formulario ammessi: <ul><li>InserimentoAccettazione</li><li>InserimentoTrasportoSuccessivo</li></ul> In caso esista una copia del FIR digitale già restituita con accettazione totale del rifiuto, l'operazione non è consentita.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+Acquisisce la richiesta per l'aggiunta dei dati di un trasbordo parziale per il formulario indicato.
+
+L'operazione può essere eseguita da un'utenza che abbia visibilità su (o coincida con) il soggetto trasportatore che risulta avere 
+in carico il rifiuto.
+
+Stati del formulario ammessi:
+<ul><li>InserimentoAccettazione</li><li>InserimentoTrasportoSuccessivo</li></ul>
+In caso esista una copia del FIR digitale già restituita con accettazione totale del rifiuto, l'operazione non è consentita.
+
+Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
 
 ### Example
 
@@ -2404,7 +2590,18 @@ Name | Type | Description  | Notes
 
 🔁[ASYNC] Aggiunge trasbordo totale
 
-Acquisisce la richiesta per l'aggiunta dei dati di un trasbordo totale per il formulario indicato.  L'operazione può essere eseguita da un'utenza che abbia visibilità su (o coincida con) il soggetto trasportatore che risulta avere  in carico il rifiuto.  Stati del formulario ammessi: <ul><li>InserimentoAccettazione</li><li>InserimentoTrasportoSuccessivo</li></ul> Il tipo del trasporto deve essere <b>\"Terrestre\"</b>.  In caso esista una copia del FIR digitale già restituita con accettazione totale del rifiuto, l'operazione non è consentita.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+Acquisisce la richiesta per l'aggiunta dei dati di un trasbordo totale per il formulario indicato.
+
+L'operazione può essere eseguita da un'utenza che abbia visibilità su (o coincida con) il soggetto trasportatore che risulta avere 
+in carico il rifiuto.
+
+Stati del formulario ammessi:
+<ul><li>InserimentoAccettazione</li><li>InserimentoTrasportoSuccessivo</li></ul>
+Il tipo del trasporto deve essere <b>"Terrestre"</b>.
+
+In caso esista una copia del FIR digitale già restituita con accettazione totale del rifiuto, l'operazione non è consentita.
+
+Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
 
 ### Example
 
@@ -2493,7 +2690,18 @@ Name | Type | Description  | Notes
 
 🔁[ASYNC] Aggiunge dati trasporto
 
-Acquisisce la richiesta di aggiunta dei dati di trasporto del rifiuto da parte del trasportatore che ha in carico il FIR specificato.  L'operazione può essere eseguita da un'utenza che abbia visibilità su (o coincida con) il soggetto produttore o il soggetto trasportatore iniziale, nel caso il formulario non sia ancora stato firmato, oppure il trasportatore che effettua la presa in carico del rifiuto dal trasportatore precedente.  Stati del formulario ammessi: <ul><li>InserimentoQuantita</li><li>InserimentoQuantitaTrasportoIniziale</li><li>InserimentoTrasportoIniziale</li><li>InserimentoTrasportoSuccessivo</li><li>FirmaProduttoreTrasportatoreIniziale</li><li>FirmaTrasportatoreIniziale (per formulario da trasbordo parziale)</li><li>FirmaTrasportatoreSuccessivo</li><li>FirmaTrasbordoTotale</li></ul> Il tipo di modello passato come contenuto del POST determina la modalità del trasporto.  In caso esista una copia del FIR digitale già restituita con accettazione totale del rifiuto, l'operazione non è consentita.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+Acquisisce la richiesta di aggiunta dei dati di trasporto del rifiuto da parte del trasportatore che ha in carico il FIR specificato.
+
+L'operazione può essere eseguita da un'utenza che abbia visibilità su (o coincida con) il soggetto produttore o il soggetto trasportatore iniziale,
+nel caso il formulario non sia ancora stato firmato, oppure il trasportatore che effettua la presa in carico del rifiuto dal trasportatore precedente.
+
+Stati del formulario ammessi:
+<ul><li>InserimentoQuantita</li><li>InserimentoQuantitaTrasportoIniziale</li><li>InserimentoTrasportoIniziale</li><li>InserimentoTrasportoSuccessivo</li><li>FirmaProduttoreTrasportatoreIniziale</li><li>FirmaTrasportatoreIniziale (per formulario da trasbordo parziale)</li><li>FirmaTrasportatoreSuccessivo</li><li>FirmaTrasbordoTotale</li></ul>
+Il tipo di modello passato come contenuto del POST determina la modalità del trasporto.
+
+In caso esista una copia del FIR digitale già restituita con accettazione totale del rifiuto, l'operazione non è consentita.
+
+Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
 
 ### Example
 
@@ -2582,7 +2790,9 @@ Name | Type | Description  | Notes
 
 Download xFIR
 
-Restituisce il file in formato xFIR che rappresenta il formulario specificato con il numero FIR.  L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) almeno uno dei soggetti coinvolti nel formulario.
+Restituisce il file in formato xFIR che rappresenta il formulario specificato con il numero FIR.
+
+L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) almeno uno dei soggetti coinvolti nel formulario.
 
 ### Example
 
@@ -2666,7 +2876,29 @@ Name | Type | Description  | Notes
 
 🔁[ASYNC] Upload xFIR
 
-Carica un file xFIR esterno nell'area virtuale di interscambio per permetterne l'aggiunta di informazioni e relative firme attraverso le API formulari.  L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) almeno uno dei soggetti coinvolti nel formulario.  Se non esiste alcun FIR digitale in compilazione con lo stesso numero, l'endpoint lo aggiunge all'area virtuale di interscambio permettendone l'interazione con queste API.  Se il file xFIR è già presente nell'area virtuale di interscambio, e le informazioni contenute nel file caricato sono compatibili con quelle del file xFIR già presente, l'endpoint aggiorna il file xFIR con quello caricato.   La compatibilità delle nuove informazioni rispetto a quelle eventualmente già presenti in area virtuale di interscambio è determinata dalla presenza degli stessi dati firmati e degli stessi valori per le relative firme crittografiche.  Il file xFIR inviato deve essere valido secondo le regole definite nella <i>Guida tecnica alla compilazione del FIR digitale</i>  e verificabile dalla specifica funzione di validazione definita dall'endpoint <i>Validazione xFIR</i>. Relativamente alle date dichiarate nell'apposizione delle firme presenti nel file xFIR, l'esito della validazione deve essere <i>Ok</i> per tutti i controlli con codice <i>firmaDataDichiarata</i>.  In ambiente di <b>PRODUZIONE</b>, la validazione dei controlli con codice <i>firmaDataDichiarata</i> sulle date dichiarate di firma presenti nei file XAdES dell'xFIR  avrà esito positivo solo con date successive alle ore 00:00 del giorno 13/02/2026.  In caso esista una copia del FIR digitale già restituita con accettazione totale del rifiuto, l'operazione non è consentita.  La dimensione massima accettata del file xFIR è 3 MB.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+Carica un file xFIR esterno nell'area virtuale di interscambio per permetterne l'aggiunta di informazioni e relative firme attraverso le API formulari.
+
+L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) almeno uno dei soggetti coinvolti nel formulario.
+
+Se non esiste alcun FIR digitale in compilazione con lo stesso numero, l'endpoint lo aggiunge all'area virtuale di interscambio permettendone l'interazione con queste API.
+
+Se il file xFIR è già presente nell'area virtuale di interscambio, e le informazioni contenute nel file caricato sono compatibili con quelle del file xFIR già presente,
+l'endpoint aggiorna il file xFIR con quello caricato. 
+
+La compatibilità delle nuove informazioni rispetto a quelle eventualmente già presenti in area virtuale di interscambio è determinata dalla presenza degli stessi dati firmati e degli stessi valori per le relative firme crittografiche.
+
+Il file xFIR inviato deve essere valido secondo le regole definite nella <i>Guida tecnica alla compilazione del FIR digitale</i> 
+e verificabile dalla specifica funzione di validazione definita dall'endpoint <i>Validazione xFIR</i>.
+Relativamente alle date dichiarate nell'apposizione delle firme presenti nel file xFIR, l'esito della validazione deve essere <i>Ok</i> per tutti i controlli con codice <i>firmaDataDichiarata</i>.
+
+In ambiente di <b>PRODUZIONE</b>, la validazione dei controlli con codice <i>firmaDataDichiarata</i> sulle date dichiarate di firma presenti nei file XAdES dell'xFIR 
+avrà esito positivo solo con date successive alle ore 00:00 del giorno 13/02/2026.
+
+In caso esista una copia del FIR digitale già restituita con accettazione totale del rifiuto, l'operazione non è consentita.
+
+La dimensione massima accettata del file xFIR è 3 MB.
+
+Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
 
 ### Example
 
@@ -2863,7 +3095,14 @@ Name | Type | Description  | Notes
 
 🔁[ASYNC] Crea FIR
 
-Acquisisce la richiesta di creazione di un nuovo FIR.  L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) il soggetto produttore o il soggetto del primo trasportatore indicati nei dati del formulario usati come modello.  Il numero del nuovo FIR può essere specificato nell'apposita proprietà del modello, altrimenti verrà generato automaticamente dal sistema dal blocco indicato nel parametro <b>codice_blocco</b>.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+Acquisisce la richiesta di creazione di un nuovo FIR.
+
+L'operazione può essere eseguita da un'utenza che abbia incarichi per (o coincida con) il soggetto produttore o il soggetto del primo trasportatore indicati nei dati del formulario usati come modello.
+
+Il numero del nuovo FIR può essere specificato nell'apposita proprietà del modello,
+altrimenti verrà generato automaticamente dal sistema dal blocco indicato nel parametro <b>codice_blocco</b>.
+
+Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
 
 ### Example
 
@@ -2952,7 +3191,13 @@ Name | Type | Description  | Notes
 
 🔁[ASYNC] Validazione xFIR
 
-Acquisisce la richiesta di controllo di validità dei dati contenuti nel file xFIR secondo le specifiche del formato definite nella <i>Guida tecnica alla struttura del FIR digitale</i>.  L'operazione può essere eseguita da qualsiasi utenza o soggetto, non necessariamente coinvolta nel formulario.  La dimensione massima accettata del file xFIR è 3 MB.  Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
+Acquisisce la richiesta di controllo di validità dei dati contenuti nel file xFIR secondo le specifiche del formato definite nella <i>Guida tecnica alla struttura del FIR digitale</i>.
+
+L'operazione può essere eseguita da qualsiasi utenza o soggetto, non necessariamente coinvolta nel formulario.
+
+La dimensione massima accettata del file xFIR è 3 MB.
+
+Con l'identificativo della transazione restituito è possibile consultare lo stato di avanzamento dell'elaborazione e richiederne l'esito.<br/>Se viene specificato un URL nell'header <i>X-ReplyTo</i>, al termine dell'elaborazione dei dati, il fruitore riceverà una notifica con l'esito dell'elaborazione all'URL specificato.
 
 ### Example
 

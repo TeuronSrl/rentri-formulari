@@ -5,7 +5,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**transazione_id** | **str** |  | [optional] 
+**transazione_id** | **UUID** |  | [optional] 
 
 ## Example
 

@@ -5,11 +5,11 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**data_ora_inizio_trasporto** | **datetime** | Data e ora inizio trasporto (formato ISO 8601 UTC) | 
+**annotazioni** | **str** | Annotazioni | [optional] 
 **treno** | **str** |  | 
 **rid** | **bool** |  | [optional] 
 **tratta** | **str** |  | [optional] 
-**data_ora_inizio_trasporto** | **datetime** | Data e ora inizio trasporto (formato ISO 8601 UTC) | 
-**annotazioni** | **str** | Annotazioni | [optional] 
 
 ## Example
 

@@ -1,6 +1,5 @@
 # ComuneModel
 
-Comune Italiano
 
 ## Properties
 

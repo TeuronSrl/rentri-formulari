@@ -7,7 +7,7 @@ Esito
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **tipo** | **str** | Tipo di esito | [optional] 
-**transazione_id** | **str** | Identificativo della transazione asincrona | [optional] 
+**transazione_id** | **UUID** | Identificativo della transazione asincrona | [optional] 
 **validazione** | [**List[EsitoMessaggioModel]**](EsitoMessaggioModel.md) | Messaggi di validazione | [optional] 
 **errore** | **bool** |  | [optional] 
 **tempo_elaborazione** | **str** |  | [optional] 
