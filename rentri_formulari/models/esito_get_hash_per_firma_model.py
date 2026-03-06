@@ -68,6 +68,10 @@ class EsitoGetHashPerFirmaModel(BaseModel):
             return EsitoGetHashPerFirmaModel.parse_obj(obj)
 
         _obj = EsitoGetHashPerFirmaModel.parse_obj({
+            "hash_algorithm": obj.get("hash_algorithm"),
+            "digest_to_sign": obj.get("digest_to_sign"),
+            "token": obj.get("token"),
+            "versione": obj.get("versione"),
         })
         return _obj
 

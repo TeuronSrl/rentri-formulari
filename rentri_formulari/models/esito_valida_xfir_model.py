@@ -66,6 +66,7 @@ class EsitoValidaXfirModel(BaseModel):
             return EsitoValidaXfirModel.parse_obj(obj)
 
         _obj = EsitoValidaXfirModel.parse_obj({
+            "result": obj.get("result"),
         })
         return _obj
 

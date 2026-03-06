@@ -65,6 +65,7 @@ class ComuneModel(BaseModel):
             return ComuneModel.parse_obj(obj)
 
         _obj = ComuneModel.parse_obj({
+            'comune_id': obj.get('comune_id')
         })
         return _obj
 
