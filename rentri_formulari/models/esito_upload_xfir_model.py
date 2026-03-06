@@ -66,6 +66,7 @@ class EsitoUploadXfirModel(BaseModel):
             return EsitoUploadXfirModel.parse_obj(obj)
 
         _obj = EsitoUploadXfirModel.parse_obj({
+            "result": obj.get("result"),
         })
         return _obj
 
