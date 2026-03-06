@@ -73,6 +73,8 @@ class CittaEsteraModel(BaseModel):
             return CittaEsteraModel.parse_obj(obj)
 
         _obj = CittaEsteraModel.parse_obj({
+            'nazione_id': obj.get('nazione_id'),
+            'nome_citta': obj.get('nome_citta')
         })
         return _obj
 

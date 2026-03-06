@@ -65,6 +65,7 @@ class EsitoNuovoFormularioModel(BaseModel):
             return EsitoNuovoFormularioModel.parse_obj(obj)
 
         _obj = EsitoNuovoFormularioModel.parse_obj({
+            "numero_fir": obj.get("numero_fir"),
         })
         return _obj
 
