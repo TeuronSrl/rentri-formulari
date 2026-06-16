@@ -75,7 +75,10 @@ class DatiTrasportoFerroviarioModel(BaseModel):
 
         _obj = DatiTrasportoFerroviarioModel.parse_obj({
             "data_ora_inizio_trasporto": obj.get("data_ora_inizio_trasporto"),
-            "annotazioni": obj.get("annotazioni")
+            "annotazioni": obj.get("annotazioni"),
+            "treno": obj.get("treno"),
+            "rid": obj.get("rid"),
+            "tratta": obj.get("tratta")
         })
         return _obj
 

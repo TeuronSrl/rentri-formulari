@@ -159,14 +159,14 @@ class DatiTrasmissioneFormularioModel(BaseModel):
             return DatiTrasmissioneFormularioModel.parse_obj(obj)
 
         _obj = DatiTrasmissioneFormularioModel.parse_obj({
-            "dati_partenza": DatiTrasmissionePartenzaModel.from_dict(obj.get("dati_partenza")) if obj.get("dati_partenza") is not None else None,
-            "dati_trasporto": [DatiTrasportoTrasmissioneBaseModel2.from_dict(_item) for _item in obj.get("dati_trasporto")] if obj.get("dati_trasporto") is not None else None,
-            "dati_accettazione": DatiAccettazioneModel.from_dict(obj.get("dati_accettazione")) if obj.get("dati_accettazione") is not None else None,
-            "dati_annotazioni": [DatiAnnotazioneModel.from_dict(_item) for _item in obj.get("dati_annotazioni")] if obj.get("dati_annotazioni") is not None else None,
-            "dati_trasbordo_totale": DatiTrasbordoTotaleTrasmissioneModel.from_dict(obj.get("dati_trasbordo_totale")) if obj.get("dati_trasbordo_totale") is not None else None,
-            "dati_trasbordi_parziali": [DatiTrasbordoParzialeTrasmissioneModel.from_dict(_item) for _item in obj.get("dati_trasbordi_parziali")] if obj.get("dati_trasbordi_parziali") is not None else None,
-            "dati_soste_tecniche": [DatiSostaTecnicaTrasmissioneModel.from_dict(_item) for _item in obj.get("dati_soste_tecniche")] if obj.get("dati_soste_tecniche") is not None else None,
-            "dati_destinazioni_successive": [DatiDestinazioniSuccessiveTrasmissioniModel.from_dict(_item) for _item in obj.get("dati_destinazioni_successive")] if obj.get("dati_destinazioni_successive") is not None else None
+            "dati_partenza": DatiTrasmissionePartenzaModel.from_dict(obj["dati_partenza"]) if obj.get("dati_partenza") is not None else None,
+            "dati_trasporto": [DatiTrasportoTrasmissioneBaseModel1.from_dict(_item) for _item in obj["dati_trasporto"]] if obj.get("dati_trasporto") is not None else None,
+            "dati_accettazione": DatiAccettazioneModel.from_dict(obj["dati_accettazione"]) if obj.get("dati_accettazione") is not None else None,
+            "dati_annotazioni": [DatiAnnotazioneModel.from_dict(_item) for _item in obj["dati_annotazioni"]] if obj.get("dati_annotazioni") is not None else None,
+            "dati_trasbordo_totale": DatiTrasbordoTotaleTrasmissioneModel.from_dict(obj["dati_trasbordo_totale"]) if obj.get("dati_trasbordo_totale") is not None else None,
+            "dati_trasbordi_parziali": [DatiTrasbordoParzialeTrasmissioneModel.from_dict(_item) for _item in obj["dati_trasbordi_parziali"]] if obj.get("dati_trasbordi_parziali") is not None else None,
+            "dati_soste_tecniche": [DatiSostaTecnicaTrasmissioneModel.from_dict(_item) for _item in obj["dati_soste_tecniche"]] if obj.get("dati_soste_tecniche") is not None else None,
+            "dati_destinazioni_successive": [DatiDestinazioniSuccessiveTrasmissioniModel.from_dict(_item) for _item in obj["dati_destinazioni_successive"]] if obj.get("dati_destinazioni_successive") is not None else None
         })
         return _obj
 

@@ -80,7 +80,7 @@ class DatiNotificaPushCaricaCopiaDigitaleModel(BaseModel):
             return DatiNotificaPushCaricaCopiaDigitaleModel.parse_obj(obj)
 
         _obj = DatiNotificaPushCaricaCopiaDigitaleModel.parse_obj({
-            "proprieta": ProprietaDatiNotificaPushCaricaCopiaDigitaleModel.from_dict(obj.get("proprieta")) if obj.get("proprieta") is not None else None,
+            "proprieta": ProprietaDatiNotificaPushCaricaCopiaDigitaleModel.from_dict(obj["proprieta"]) if obj.get("proprieta") is not None else None,
             "tipo": obj.get("tipo")
         })
         return _obj

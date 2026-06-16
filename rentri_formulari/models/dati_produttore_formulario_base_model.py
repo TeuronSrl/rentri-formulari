@@ -106,8 +106,8 @@ class DatiProduttoreFormularioBaseModel(BaseModel):
             return DatiProduttoreFormularioBaseModel.parse_obj(obj)
 
         _obj = DatiProduttoreFormularioBaseModel.parse_obj({
-            "luogo_produzione": IndirizzoModel.from_dict(obj.get("luogo_produzione")) if obj.get("luogo_produzione") is not None else None,
-            "autorizzazione": AutorizzazioneModel.from_dict(obj.get("autorizzazione")) if obj.get("autorizzazione") is not None else None,
+            "luogo_produzione": IndirizzoModel.from_dict(obj["luogo_produzione"]) if obj.get("luogo_produzione") is not None else None,
+            "autorizzazione": AutorizzazioneModel.from_dict(obj["autorizzazione"]) if obj.get("autorizzazione") is not None else None,
             "detentore": obj.get("detentore"),
             "numero_iscrizione_albo": obj.get("numero_iscrizione_albo")
         })

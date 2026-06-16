@@ -88,7 +88,7 @@ class DatiAnnullamentoResultModel(BaseModel):
 
         _obj = DatiAnnullamentoResultModel.parse_obj({
             "data_annullamento": obj.get("data_annullamento"),
-            "dati_firma": DatiFirmaResult.from_dict(obj.get("dati_firma")) if obj.get("dati_firma") is not None else None,
+            "dati_firma": DatiFirmaResult.from_dict(obj["dati_firma"]) if obj.get("dati_firma") is not None else None,
             "note": obj.get("note"),
             "codice_fiscale_soggetto": obj.get("codice_fiscale_soggetto")
         })

@@ -87,7 +87,7 @@ class DatiTrasbordoParzialeOrigineResultModel(BaseModel):
 
         _obj = DatiTrasbordoParzialeOrigineResultModel.parse_obj({
             "numero_fir_origine": obj.get("numero_fir_origine"),
-            "produttore_originario": DatiProduttoreOriginarioModel.from_dict(obj.get("produttore_originario")) if obj.get("produttore_originario") is not None else None,
+            "produttore_originario": DatiProduttoreOriginarioModel.from_dict(obj["produttore_originario"]) if obj.get("produttore_originario") is not None else None,
             "causale": obj.get("causale")
         })
         return _obj

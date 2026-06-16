@@ -74,7 +74,9 @@ class DatiTrasportoMarittimoModel(BaseModel):
 
         _obj = DatiTrasportoMarittimoModel.parse_obj({
             "data_ora_inizio_trasporto": obj.get("data_ora_inizio_trasporto"),
-            "annotazioni": obj.get("annotazioni")
+            "annotazioni": obj.get("annotazioni"),
+            "nave": obj.get("nave"),
+            "imdg": obj.get("imdg")
         })
         return _obj
 

@@ -73,7 +73,8 @@ class DatiTrasportoTrasmissioneBaseModel(BaseModel):
 
         _obj = DatiTrasportoTrasmissioneBaseModel.parse_obj({
             "data_ora_inizio_trasporto": obj.get("data_ora_inizio_trasporto"),
-            "annotazioni": obj.get("annotazioni")
+            "annotazioni": obj.get("annotazioni"),
+            "trasportatore_id": obj.get("trasportatore_id")
         })
         return _obj
 

@@ -84,7 +84,7 @@ class DatiSostaTecnicaResultModel(BaseModel):
 
         _obj = DatiSostaTecnicaResultModel.parse_obj({
             "trasportatore_id": obj.get("trasportatore_id"),
-            "dati_firma": DatiFirmaResult.from_dict(obj.get("dati_firma")) if obj.get("dati_firma") is not None else None,
+            "dati_firma": DatiFirmaResult.from_dict(obj["dati_firma"]) if obj.get("dati_firma") is not None else None,
             "luogo_stazionamento": obj.get("luogo_stazionamento"),
             "data_ora_sospensione": obj.get("data_ora_sospensione"),
             "data_ora_ripresa": obj.get("data_ora_ripresa")

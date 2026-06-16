@@ -133,13 +133,13 @@ class DatiTrasmissionePartenzaModel(BaseModel):
 
         _obj = DatiTrasmissionePartenzaModel.parse_obj({
             "numero_fir": obj.get("numero_fir"),
-            "produttore": DatiProduttoreTrasmissioneModel.from_dict(obj.get("produttore")) if obj.get("produttore") is not None else None,
-            "trasbordo_parziale_origine": DatiTrasbordoParzialeOrigineModel.from_dict(obj.get("trasbordo_parziale_origine")) if obj.get("trasbordo_parziale_origine") is not None else None,
-            "destinatario": DatiDestinatarioTrasmissioneModel.from_dict(obj.get("destinatario")) if obj.get("destinatario") is not None else None,
-            "trasportatori": [DatiTrasportatoreTrasmissioneModel.from_dict(_item) for _item in obj.get("trasportatori")] if obj.get("trasportatori") is not None else None,
+            "produttore": DatiProduttoreTrasmissioneModel.from_dict(obj["produttore"]) if obj.get("produttore") is not None else None,
+            "trasbordo_parziale_origine": DatiTrasbordoParzialeOrigineModel.from_dict(obj["trasbordo_parziale_origine"]) if obj.get("trasbordo_parziale_origine") is not None else None,
+            "destinatario": DatiDestinatarioTrasmissioneModel.from_dict(obj["destinatario"]) if obj.get("destinatario") is not None else None,
+            "trasportatori": [DatiTrasportatoreTrasmissioneModel.from_dict(_item) for _item in obj["trasportatori"]] if obj.get("trasportatori") is not None else None,
             "data_emissione": obj.get("data_emissione"),
-            "intermediari": [DatiIntermediariFormularioModel.from_dict(_item) for _item in obj.get("intermediari")] if obj.get("intermediari") is not None else None,
-            "rifiuto": DatiRifiutoModel.from_dict(obj.get("rifiuto")) if obj.get("rifiuto") is not None else None,
+            "intermediari": [DatiIntermediariFormularioModel.from_dict(_item) for _item in obj["intermediari"]] if obj.get("intermediari") is not None else None,
+            "rifiuto": DatiRifiutoModel.from_dict(obj["rifiuto"]) if obj.get("rifiuto") is not None else None,
             "annotazioni": obj.get("annotazioni")
         })
         return _obj

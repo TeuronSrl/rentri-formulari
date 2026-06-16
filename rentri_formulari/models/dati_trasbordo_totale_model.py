@@ -74,8 +74,8 @@ class DatiTrasbordoTotaleModel(BaseModel):
             return DatiTrasbordoTotaleModel.parse_obj(obj)
 
         _obj = DatiTrasbordoTotaleModel.parse_obj({
-            "trasportatore": DatiPartenzaModelTrasportatoriInner.from_dict(obj.get("trasportatore")) if obj.get("trasportatore") is not None else None,
-            "presa_in_carico": DatiTrasportoTerrestreModel.from_dict(obj.get("presa_in_carico")) if obj.get("presa_in_carico") is not None else None
+            "trasportatore": DatiPartenzaModelTrasportatoriInner.from_dict(obj["trasportatore"]) if obj.get("trasportatore") is not None else None,
+            "presa_in_carico": DatiTrasportoTerrestreModel.from_dict(obj["presa_in_carico"]) if obj.get("presa_in_carico") is not None else None
         })
         return _obj
 

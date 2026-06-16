@@ -171,13 +171,13 @@ class DatiPartenzaResultModel(BaseModel):
 
         _obj = DatiPartenzaResultModel.parse_obj({
             "data_emissione": obj.get("data_emissione"),
-            "produttore": DatiProduttoreFormularioResultModel.from_dict(obj.get("produttore")) if obj.get("produttore") is not None else None,
-            "destinatario": DatiDestinatarioFormularioResultModel.from_dict(obj.get("destinatario")) if obj.get("destinatario") is not None else None,
-            "trasportatori": [DatiTrasportatoreFormularioResultModel.from_dict(_item) for _item in obj.get("trasportatori")] if obj.get("trasportatori") is not None else None,
-            "intermediari": [DatiIntermediariFormularioModel.from_dict(_item) for _item in obj.get("intermediari")] if obj.get("intermediari") is not None else None,
-            "rifiuto": DatiRifiutoModel.from_dict(obj.get("rifiuto")) if obj.get("rifiuto") is not None else None,
-            "trasbordo_parziale_origine": DatiTrasbordoParzialeOrigineResultModel.from_dict(obj.get("trasbordo_parziale_origine")) if obj.get("trasbordo_parziale_origine") is not None else None,
-            "dati_firma_produttore": DatiFirmaResult.from_dict(obj.get("dati_firma_produttore")) if obj.get("dati_firma_produttore") is not None else None,
+            "produttore": DatiProduttoreFormularioResultModel.from_dict(obj["produttore"]) if obj.get("produttore") is not None else None,
+            "destinatario": DatiDestinatarioFormularioResultModel.from_dict(obj["destinatario"]) if obj.get("destinatario") is not None else None,
+            "trasportatori": [DatiTrasportatoreFormularioResultModel.from_dict(_item) for _item in obj["trasportatori"]] if obj.get("trasportatori") is not None else None,
+            "intermediari": [DatiIntermediariFormularioModel.from_dict(_item) for _item in obj["intermediari"]] if obj.get("intermediari") is not None else None,
+            "rifiuto": DatiRifiutoModel.from_dict(obj["rifiuto"]) if obj.get("rifiuto") is not None else None,
+            "trasbordo_parziale_origine": DatiTrasbordoParzialeOrigineResultModel.from_dict(obj["trasbordo_parziale_origine"]) if obj.get("trasbordo_parziale_origine") is not None else None,
+            "dati_firma_produttore": DatiFirmaResult.from_dict(obj["dati_firma_produttore"]) if obj.get("dati_firma_produttore") is not None else None,
             "numero_fir": obj.get("numero_fir"),
             "annotazioni": obj.get("annotazioni")
         })

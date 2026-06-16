@@ -108,7 +108,7 @@ class DatiTrasportoFerroviarioResultModel(BaseModel):
 
         _obj = DatiTrasportoFerroviarioResultModel.parse_obj({
             "tipo_trasporto": obj.get("tipo_trasporto"),
-            "dati_firma_trasportatore": DatiFirmaResult.from_dict(obj.get("dati_firma_trasportatore")) if obj.get("dati_firma_trasportatore") is not None else None,
+            "dati_firma_trasportatore": DatiFirmaResult.from_dict(obj["dati_firma_trasportatore"]) if obj.get("dati_firma_trasportatore") is not None else None,
             "trasportatore_id": obj.get("trasportatore_id"),
             "treno": obj.get("treno"),
             "rid": obj.get("rid"),

@@ -76,7 +76,7 @@ class DatiAnnotazioneResultModel(BaseModel):
             return DatiAnnotazioneResultModel.parse_obj(obj)
 
         _obj = DatiAnnotazioneResultModel.parse_obj({
-            "dati_firma": DatiFirmaResult.from_dict(obj.get("dati_firma")) if obj.get("dati_firma") is not None else None,
+            "dati_firma": DatiFirmaResult.from_dict(obj["dati_firma"]) if obj.get("dati_firma") is not None else None,
             "annotazione": obj.get("annotazione"),
             "identificativo_soggetto": obj.get("identificativo_soggetto")
         })

@@ -105,9 +105,10 @@ class DatiDestinatarioFormularioSitoModel(BaseModel):
             return DatiDestinatarioFormularioSitoModel.parse_obj(obj)
 
         _obj = DatiDestinatarioFormularioSitoModel.parse_obj({
-            "autorizzazione": AutorizzazioneModel.from_dict(obj.get("autorizzazione")) if obj.get("autorizzazione") is not None else None,
+            "autorizzazione": AutorizzazioneModel.from_dict(obj["autorizzazione"]) if obj.get("autorizzazione") is not None else None,
             "attivita": obj.get("attivita"),
-            "numero_iscrizione_albo": obj.get("numero_iscrizione_albo")
+            "numero_iscrizione_albo": obj.get("numero_iscrizione_albo"),
+            "num_iscr_sito": obj.get("num_iscr_sito")
         })
         return _obj
 

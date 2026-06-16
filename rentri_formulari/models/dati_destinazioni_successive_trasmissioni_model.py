@@ -84,8 +84,8 @@ class DatiDestinazioniSuccessiveTrasmissioniModel(BaseModel):
             return DatiDestinazioniSuccessiveTrasmissioniModel.parse_obj(obj)
 
         _obj = DatiDestinazioniSuccessiveTrasmissioniModel.parse_obj({
-            "destinatario": DatiDestinatarioFormularioModel.from_dict(obj.get("destinatario")) if obj.get("destinatario") is not None else None,
-            "accettazione": DatiAccettazioneModel.from_dict(obj.get("accettazione")) if obj.get("accettazione") is not None else None
+            "destinatario": DatiDestinatarioFormularioModel.from_dict(obj["destinatario"]) if obj.get("destinatario") is not None else None,
+            "accettazione": DatiAccettazioneModel.from_dict(obj["accettazione"]) if obj.get("accettazione") is not None else None
         })
         return _obj
 
