@@ -86,7 +86,10 @@ class DatiTrasportatoreFormularioModel(BaseModel):
 
         _obj = DatiTrasportatoreFormularioModel.parse_obj({
             "tipo_trasporto": obj.get("tipo_trasporto"),
-            "numero_iscrizione_albo": obj.get("numero_iscrizione_albo")
+            "numero_iscrizione_albo": obj.get("numero_iscrizione_albo"),
+            "denominazione": obj.get("denominazione"),
+            "codice_fiscale": obj.get("codice_fiscale"),
+            "nazione_id": obj.get("nazione_id")
         })
         return _obj
 
