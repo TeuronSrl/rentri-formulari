@@ -78,9 +78,14 @@ class DatiTrasportoTerrestreTrasmissioneModel(BaseModel):
             return DatiTrasportoTerrestreTrasmissioneModel.parse_obj(obj)
 
         _obj = DatiTrasportoTerrestreTrasmissioneModel.parse_obj({
-            "trasportatore_id": obj.get("trasportatore_id"),
             "data_ora_inizio_trasporto": obj.get("data_ora_inizio_trasporto"),
-            "annotazioni": obj.get("annotazioni")
+            "annotazioni": obj.get("annotazioni"),
+            "trasportatore_id": obj.get("trasportatore_id"),
+            "conducente": ConducenteModel.from_dict(obj["conducente"]) if obj.get("conducente") is not None else None,
+            "targa_automezzo": obj.get("targa_automezzo"),
+            "targa_rimorchio": obj.get("targa_rimorchio"),
+            "percorso": obj.get("percorso"),
+            "presa_in_carico_rimorchio_precedente": obj.get("presa_in_carico_rimorchio_precedente")
         })
         return _obj
 

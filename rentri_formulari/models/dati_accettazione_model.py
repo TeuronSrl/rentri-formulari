@@ -97,7 +97,7 @@ class DatiAccettazioneModel(BaseModel):
 
         _obj = DatiAccettazioneModel.parse_obj({
             "tipo_accettazione": obj.get("tipo_accettazione"),
-            "quantita_accettata": QuantitaKgModel.from_dict(obj.get("quantita_accettata")) if obj.get("quantita_accettata") is not None else None,
+            "quantita_accettata": QuantitaKgModel.from_dict(obj["quantita_accettata"]) if obj.get("quantita_accettata") is not None else None,
             "causale_respingimento": obj.get("causale_respingimento"),
             "motivo_respingimento": obj.get("motivo_respingimento"),
             "data_ora_arrivo": obj.get("data_ora_arrivo"),

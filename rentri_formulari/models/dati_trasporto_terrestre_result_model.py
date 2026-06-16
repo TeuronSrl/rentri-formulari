@@ -124,9 +124,9 @@ class DatiTrasportoTerrestreResultModel(BaseModel):
 
         _obj = DatiTrasportoTerrestreResultModel.parse_obj({
             "tipo_trasporto": obj.get("tipo_trasporto"),
-            "dati_firma_trasportatore": DatiFirmaResult.from_dict(obj.get("dati_firma_trasportatore")) if obj.get("dati_firma_trasportatore") is not None else None,
+            "dati_firma_trasportatore": DatiFirmaResult.from_dict(obj["dati_firma_trasportatore"]) if obj.get("dati_firma_trasportatore") is not None else None,
             "trasportatore_id": obj.get("trasportatore_id"),
-            "conducente": ConducenteModel.from_dict(obj.get("conducente")) if obj.get("conducente") is not None else None,
+            "conducente": ConducenteModel.from_dict(obj["conducente"]) if obj.get("conducente") is not None else None,
             "targa_automezzo": obj.get("targa_automezzo"),
             "targa_rimorchio": obj.get("targa_rimorchio"),
             "percorso": obj.get("percorso"),

@@ -104,11 +104,11 @@ class DatiTrasbordoParzialeResultModel(BaseModel):
             return DatiTrasbordoParzialeResultModel.parse_obj(obj)
 
         _obj = DatiTrasbordoParzialeResultModel.parse_obj({
-            "trasportatore": DatiTrasportatoreModel.from_dict(obj.get("trasportatore")) if obj.get("trasportatore") is not None else None,
+            "trasportatore": DatiTrasportatoreModel.from_dict(obj["trasportatore"]) if obj.get("trasportatore") is not None else None,
             "trasportatore_id": obj.get("trasportatore_id"),
-            "dati_firma": DatiFirmaResult.from_dict(obj.get("dati_firma")) if obj.get("dati_firma") is not None else None,
+            "dati_firma": DatiFirmaResult.from_dict(obj["dati_firma"]) if obj.get("dati_firma") is not None else None,
             "numero_fir": obj.get("numero_fir"),
-            "quantita_residua": QuantitaModel.from_dict(obj.get("quantita_residua")) if obj.get("quantita_residua") is not None else None,
+            "quantita_residua": QuantitaModel.from_dict(obj["quantita_residua"]) if obj.get("quantita_residua") is not None else None,
             "causale": obj.get("causale")
         })
         return _obj

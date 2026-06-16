@@ -148,11 +148,11 @@ class DatiRifiutoModel(BaseModel):
             "caratteristiche_chimico_fisiche": obj.get("caratteristiche_chimico_fisiche"),
             "caratteristiche_pericolo": obj.get("caratteristiche_pericolo"),
             "stato_fisico": obj.get("stato_fisico"),
-            "quantita": QuantitaModel.from_dict(obj.get("quantita")) if obj.get("quantita") is not None else None,
+            "quantita": QuantitaModel.from_dict(obj["quantita"]) if obj.get("quantita") is not None else None,
             "verificato_in_partenza": obj.get("verificato_in_partenza"),
             "trasporto_adr": obj.get("trasporto_adr"),
-            "dati_adr": NormativaADRModel.from_dict(obj.get("dati_adr")) if obj.get("dati_adr") is not None else None,
-            "analisi_classificazione": AnalisiClassificazioneModel.from_dict(obj.get("analisi_classificazione")) if obj.get("analisi_classificazione") is not None else None,
+            "dati_adr": NormativaADRModel.from_dict(obj["dati_adr"]) if obj.get("dati_adr") is not None else None,
+            "analisi_classificazione": AnalisiClassificazioneModel.from_dict(obj["analisi_classificazione"]) if obj.get("analisi_classificazione") is not None else None,
             "numero_colli": obj.get("numero_colli"),
             "rinfusa": obj.get("rinfusa")
         })

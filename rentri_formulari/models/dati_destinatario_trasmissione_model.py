@@ -129,9 +129,9 @@ class DatiDestinatarioTrasmissioneModel(BaseModel):
             "denominazione": obj.get("denominazione"),
             "codice_fiscale": obj.get("codice_fiscale"),
             "nazione_id": obj.get("nazione_id"),
-            "indirizzo": IndirizzoModel.from_dict(obj.get("indirizzo")) if obj.get("indirizzo") is not None else None,
+            "indirizzo": IndirizzoModel.from_dict(obj["indirizzo"]) if obj.get("indirizzo") is not None else None,
             "num_iscr_sito": obj.get("num_iscr_sito"),
-            "autorizzazione": AutorizzazioneModel.from_dict(obj.get("autorizzazione")) if obj.get("autorizzazione") is not None else None,
+            "autorizzazione": AutorizzazioneModel.from_dict(obj["autorizzazione"]) if obj.get("autorizzazione") is not None else None,
             "attivita": obj.get("attivita"),
             "numero_iscrizione_albo": obj.get("numero_iscrizione_albo")
         })

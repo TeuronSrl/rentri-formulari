@@ -106,9 +106,9 @@ class DatiAccettazioneResultModel(BaseModel):
             return DatiAccettazioneResultModel.parse_obj(obj)
 
         _obj = DatiAccettazioneResultModel.parse_obj({
-            "dati_firma": DatiFirmaResult.from_dict(obj.get("dati_firma")) if obj.get("dati_firma") is not None else None,
+            "dati_firma": DatiFirmaResult.from_dict(obj["dati_firma"]) if obj.get("dati_firma") is not None else None,
             "tipo_accettazione": obj.get("tipo_accettazione"),
-            "quantita_accettata": QuantitaKgModel.from_dict(obj.get("quantita_accettata")) if obj.get("quantita_accettata") is not None else None,
+            "quantita_accettata": QuantitaKgModel.from_dict(obj["quantita_accettata"]) if obj.get("quantita_accettata") is not None else None,
             "causale_respingimento": obj.get("causale_respingimento"),
             "motivo_respingimento": obj.get("motivo_respingimento"),
             "data_ora_arrivo": obj.get("data_ora_arrivo"),
