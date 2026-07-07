@@ -288,7 +288,16 @@ class ApiClient:
         elif isinstance(obj, (datetime.datetime, datetime.date)):
             return obj.isoformat()
 
+        # 🚨 INIZIO MODIFICA RENTRI (1/2): Intercetta i Modelli oneOf
+        elif hasattr(obj, 'actual_instance') and getattr(obj, 'actual_instance', None) is not None:
+            return self.sanitize_for_serialization(obj.actual_instance)
+        # 🚨 FINE MODIFICA
+
         if isinstance(obj, dict):
+            # 🚨 INIZIO MODIFICA RENTRI (2/2): Intercetta i Dizionari oneOf
+            if 'actual_instance' in obj and 'one_of_schemas' in obj:
+                return self.sanitize_for_serialization(obj['actual_instance'])
+            # 🚨 FINE MODIFICA
             obj_dict = obj
         else:
             # Convert model obj to dict except
